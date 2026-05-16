@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: dotimes
+# key: dotimes
+# --
+(dotimes (${1:var} ${2:count})
+  $0)

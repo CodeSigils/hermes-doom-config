@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: destructuring object
+# key: dob
+# --
+const {${1:prop}} = ${2:object}$0

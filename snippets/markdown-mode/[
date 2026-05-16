@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: [link](url)
+# key: [
+# --
+[${1:text}](${2:url})$0

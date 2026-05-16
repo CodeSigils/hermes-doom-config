@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: table
+# key: table
+# --
+#+NAME: ${1:table-name}
+| ${2:Header1} | ${3:Header2} |
+|--------------+--------------|
+| ${4:cell1}   | ${5:cell2}   |
+$0

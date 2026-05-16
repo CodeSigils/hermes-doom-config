@@ -1,0 +1,25 @@
+# -*- mode: snippet -*-
+# name: package header
+# key: header
+# --
+;;; ${1:name}.el --- ${2:summary} -*- lexical-binding: t -*-
+
+;; Author: ${3:author} <${4:email}>
+;; Homepage: ${5:URL}
+;; Version: ${6:0.1.0}
+;; Package-Requires: (${7:deps})
+;; Keywords: ${8:keywords}
+
+;; This file is not part of GNU Emacs.
+
+;;; Commentary:
+;; ${9:commentary}
+
+;;; License: ${10:GPLv3}
+
+;;; Code:
+
+$0
+
+(provide '${1:name})
+;;; ${1:name}.el ends here

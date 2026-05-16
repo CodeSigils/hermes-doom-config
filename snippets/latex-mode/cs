@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: \begin{cases}
+# key: cs
+# --
+\begin{cases}
+  ${1:a} & \text{if } ${2:cond1} \\
+  ${3:b} & \text{if } ${4:cond2}
+\end{cases}$0

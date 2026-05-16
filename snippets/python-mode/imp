@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: import
+# key: imp
+# --
+import ${1:module}${2: as ${3:alias}}$0

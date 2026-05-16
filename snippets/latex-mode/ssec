@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: subsection
+# key: ssec
+# --
+\subsection{${1:name}}
+\label{sec:${2:label}}
+
+$0

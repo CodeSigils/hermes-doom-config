@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: export
+# key: export
+# --
+export ${1:VAR}=${2:value}$0
