@@ -45,10 +45,11 @@ Doom skill.
 
 ### Completion Policy
 
-- Load the `emacs-lisp-expert` and `doom-emacs-config` Hermes skills before
-  modifying this Doom Emacs config or debugging Emacs Lisp behavior.
-  The repo also ships the skill at `.agents/skills/doom-emacs/SKILL.md` —
-  read it directly if the canonical Hermes skills aren't available.
+- Load the `doom-emacs-config` Hermes skill before modifying this Doom Emacs
+  config. If `emacs-lisp-expert` is installed, load it too for general Emacs
+  Lisp guidance; if it is missing, do not block work.
+  The repo ships its required Doom skill at `.agents/skills/doom-emacs/SKILL.md`
+  so new users and agents can work from the repo alone.
 - The preferred completion backend is Doom's `:completion company` module for
   the fuller Company experience: snippets, code completion, file-path
   completion, and mature completion backends.

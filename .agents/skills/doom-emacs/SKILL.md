@@ -16,8 +16,11 @@ metadata:
 Skill for correctly modifying a Doom Emacs configuration. Load this whenever
 touching files under `~/.config/doom/` or when the user asks about Emacs config.
 
-**Prerequisite:** Load the `emacs-lisp-expert` skill too — it covers Emacs Lisp
-fundamentals that this skill builds on.
+**Companion skill:** If `emacs-lisp-expert` is installed, load it too — it
+covers Emacs Lisp fundamentals that this skill builds on. If it is not
+installed, do not block: use this skill's Doom-specific guidance plus the
+fallback Emacs Lisp checklist below. This repo must remain self-contained for
+new users and agents.
 
 **Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it
 exists — it contains user-specific policies (completion preference, window
@@ -176,6 +179,34 @@ patterns Hermes most often gets wrong — commit them to memory:
   `(when (featurep! :ui popup) ...)`
 - **`set-popup-rule!`** — control popup buffer display
 
+## Emacs Lisp Companion Skill Strategy
+
+`emacs-lisp-expert` is a useful optional companion skill, not a hard dependency
+of this repo. New users who have Hermes installed should try to install it from
+their configured skill sources:
+
+```sh
+hermes skills search emacs-lisp-expert
+hermes skills install <matching-skill-id>
+```
+
+If no matching skill is available, continue with this fallback checklist before
+editing Emacs Lisp:
+
+1. Prefer Doom macros over vanilla equivalents: `after!`, `use-package!`,
+   `map!`, `add-hook!`, `setq-hook!`, `set-popup-rule!`.
+2. Check whether a symbol exists before calling optional package entrypoints:
+   `(when (fboundp 'some-command) ...)`.
+3. Keep package installation in `packages.el`; keep runtime configuration in
+   `config.el`.
+4. Validate changed `.el` files with `check-parens` before running `doom sync`.
+5. When unsure about a function or variable, read its source in
+   `~/.config/emacs/` or `~/.config/emacs/.local/straight/repos/` instead of
+   guessing.
+
+Repo policy: mention the companion skill as optional in AGENTS.md/README.md,
+but never require a missing local skill for basic repo maintenance.
+
 ## Procedures
 
 ### A. Adding a Module to init.el
@@ -249,7 +280,33 @@ Do not skip the backup. `doom upgrade` modifies `~/.config/emacs/` but
 `~/.config/doom/` is yours — framework updates can introduce API changes that
 break your config.
 
-### H. Enabling Spell Checking
+### H. Dirvish Launcher Binding
+
+When Doom's `dired +dirvish` module is enabled, configure Dirvish behavior in
+`config.el` with `after! dirvish`, but keep launcher keybindings outside the
+`after!` block so they are available immediately and can autoload the command.
+
+Preferred pattern for this config:
+
+```elisp
+;;; DIRVISH
+;; Keep the launcher binding available immediately; the command is autoloaded.
+(map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)
+
+(after! dirvish
+  (setq dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
+  (setq dirvish-subtree-state-style 'nerd)
+  (setq dirvish-path-separators
+        (list (format " %s " (nerd-icons-codicon "nf-cod-home"))
+              (format " %s " (nerd-icons-codicon "nf-cod-root_folder"))
+              (format " %s " (nerd-icons-faicon "nf-fa-angle_right")))))
+```
+
+Pitfall: putting `SPC d d` inside `(after! dirvish ...)` can delay the binding
+until Dirvish has already loaded. For launcher commands, bind first; customize
+after load.
+
+### I. Enabling Spell Checking
 
 Init.el declares `(spell +flyspell)` — this module provides Doom's spell
 infrastructure (keybindings, faces, integration). The hooks below add
@@ -266,20 +323,62 @@ Requires an external spell checker (`aspell` or `ispell`) at the system level.
 
 **Alternative — Jinx:** async, no subprocess per check, supports multiple
 languages simultaneously. Jinx is not a Doom module flag — switch by disabling
-`(spell +flyspell)` in init.el and installing Jinx separately:
+`(spell +flyspell)` in init.el and installing Jinx separately.
+
+Before recommending Jinx, check system support. Jinx needs Enchant and a backend
+spell dictionary; on Debian/PikaOS-style systems the useful probes are:
+
+```sh
+command -v enchant-2 || command -v enchant
+command -v pkg-config
+command -v hunspell || command -v nuspell
+```
+
+Do not persist missing-package warnings as durable skill facts; they are local
+setup state. If missing, recommend the corresponding OS packages. For Jinx
+builds, the runtime Enchant package is not enough; the development package must
+provide the `enchant-2.pc` pkg-config file. On Debian/PikaOS-style systems this
+is typically `libenchant-2-dev` plus `pkg-config` and a Hunspell/Nuspell
+dictionary such as `hunspell-en-us`. If `pkg-config --exists enchant-2` fails,
+install `libenchant-2-dev` before running `doom sync`.
+
+Use this Doom-native configuration:
 
 ```elisp
-;; init.el — comment out spell module
+;; init.el — comment out the spell module; do not delete the line
 ;; (spell +flyspell)
 
 ;; packages.el
 (package! jinx)
 
 ;; config.el — replace flyspell hooks
-(global-jinx-mode 1)
+(use-package! jinx
+  :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
+  :config
+  (setq jinx-languages "en_US")
+  (map! :map jinx-mode-map
+        "M-$" #'jinx-correct
+        :leader
+        (:prefix ("s" . "spelling")
+         :desc "Correct word" "c" #'jinx-correct
+         :desc "Next misspelling" "n" #'jinx-next
+         :desc "Previous misspelling" "p" #'jinx-previous)))
 ```
 
-Then `doom sync` and restart. Jinx toggles with `M-$`.
+Then run `doom sync`, restart or `doom/reload`, and run `doom doctor`. If using
+`emacsclient -e '(doom/reload)'`, remember it only works when the Emacs server
+is already running; otherwise tell the user to restart Emacs or run
+`M-x doom/reload` inside Emacs.
+
+Useful Jinx verification after `doom sync`:
+
+```sh
+emacs --batch -L ~/.config/emacs/.local/straight/repos/jinx \
+  --eval "(progn (require 'jinx) (message \"jinx loads OK: %s\" (featurep 'jinx)))"
+```
+
+For multilingual setups, extend `jinx-languages`, e.g. `"en_US de_DE"`, but
+start with the user's primary dictionary unless they ask for more.
 
 ## Keeping the Config Repo Self-Contained
 
@@ -325,14 +424,15 @@ only the comment blocks, not the example code.
 
 ## Safety Checks — Always Run After Changes
 
-| After this              | Run this                                                                         |
-| :---------------------- | :------------------------------------------------------------------------------- |
-| `init.el` change        | `doom sync` (required after any module change)                                   |
-| `packages.el` change    | `doom sync` (required after any package change)                                  |
-| `config.el` change      | `M-x eval-buffer` or restart Emacs                                               |
-| Any `.el` file change   | `check-parens` to verify balanced parens                                         |
-| After `doom sync`       | `doom doctor` — catches missing deps, wrong flags, broken recipes                |
-| Emacs won't start (CLI) | `emacs --batch --eval "(let ((check-parens t)) (check-parens))"` for paren check |
+| After this              | Run this                                                                           |
+| :---------------------- | :--------------------------------------------------------------------------------- |
+| Any requested Doom edit | `check-parens` for changed `.el` files, then `doom sync` unless user says not to   |
+| `init.el` change        | `doom sync` (required after any module change)                                     |
+| `packages.el` change    | `doom sync` (required after any package change)                                    |
+| `config.el` change      | `M-x eval-buffer` or restart Emacs; `doom sync` is still acceptable/preferred here |
+| Any `.el` file change   | `check-parens` to verify balanced parens                                           |
+| After `doom sync`       | `doom doctor` — catches missing deps, wrong flags, broken recipes                  |
+| Emacs won't start (CLI) | `emacs --batch --eval "(let ((check-parens t)) (check-parens))"` for paren check   |
 
 **Paren balancing is critical** — a missing paren in `config.el` can prevent
 Emacs from starting. Always verify before declaring done.
@@ -340,6 +440,11 @@ Emacs from starting. Always verify before declaring done.
 **Run `doom doctor` after every `doom sync`** — `doom sync` compiles but doesn't
 validate config. `doom doctor` catches module flag mismatches, missing system
 dependencies, and package recipe errors that would otherwise fail silently.
+
+**For this user's Doom repo, run `doom sync` after edits even when only
+`config.el` changed unless explicitly told not to.** It is cheap, safe, and
+matches the expected workflow; still run the paren check first so syntax errors
+are caught locally before Doom rebuilds the profile.
 
 ## Pitfalls
 
@@ -358,6 +463,13 @@ dependencies, and package recipe errors that would otherwise fail silently.
   Emacs auto-formats on save. Running `doom sync` then saving `config.el` may
   break indentation. Warn the user and have them run `M-x doom/reload` after
   `doom sync` to avoid this.
+
+## Session Reference Notes
+
+- `references/2026-05-16-doom-config-evolution.md` captures the session where
+  this repo was named `doom-emacs-config`, Flyspell was replaced with Jinx,
+  `SPC d d` was made an immediate Dirvish launcher binding, and the user
+  clarified that `doom sync` should be run after requested Doom edits.
 
 ## Reference Sources
 

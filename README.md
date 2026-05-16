@@ -14,7 +14,11 @@ doom sync
 doom doctor
 ```
 
-If you're an AI agent working in this repo, read `AGENTS.md` first.
+If you're an AI agent working in this repo, read `AGENTS.md` first. The repo's
+required Doom skill is self-contained at `.agents/skills/doom-emacs/SKILL.md`.
+If your Hermes installation also has `emacs-lisp-expert`, load it as an optional
+companion skill for general Emacs Lisp guidance; do not require it for basic
+repo maintenance.
 
 ## Notable Modules
 
