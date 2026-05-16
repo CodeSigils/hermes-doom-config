@@ -1,10 +1,10 @@
 ---
 name: doom-emacs-config
 description: Configure Doom Emacs correctly — module system, package management, safe patterns, and verification steps. Load before modifying any Doom config file.
-version: 1.2.0
-author: Code Sigils
-tier: powerful
 metadata:
+  version: "1.2.1"
+  author: Code Sigils
+  tier: powerful
   hermes:
     tags: [doom, emacs, emacs-lisp, config, elisp]
     related_skills: [emacs-lisp-expert]
@@ -26,18 +26,36 @@ new users and agents.
 
 **Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it
 exists — it contains user-specific policies (completion preference, window
-management rules, package restrictions, etc.).
+management rules, Markdown style, verification steps, etc.).
+
+## AI Agent Operating Loop
+
+Agents should work sequentially and make the smallest safe change that solves
+the user's request. Prefer one concern per edit and one concern per commit.
+
+1. Load this skill before editing files under `~/.config/doom/`.
+2. Read `~/.config/doom/AGENTS.md` for repo-specific policy.
+3. Check `git status --short` before changing files.
+4. Inspect the relevant file before patching; do not guess from memory.
+5. Edit one concern at a time.
+6. For changed `.el` files, run `check-parens` before `doom sync`.
+7. Run `doom sync` after requested Doom config edits unless the user says not to.
+8. Run `doom doctor` after `doom sync`.
+9. If Markdown changed, run the repo Markdown linter before reporting done.
+10. If this skill changed, copy the repo skill to the Hermes runtime mirror with
+    `cp` from repo to `~/.hermes`; do not hand-edit the mirror.
+11. Finish with `git diff --check`, `git status --short`, and a concise summary.
 
 ## File Roles — Know What Goes Where
 
 Doom splits config across three files. Putting the wrong thing in the wrong
 file is the most common mistake.
 
-| File          | Purpose                                                  | `doom sync` needed? |
-| :------------ | :------------------------------------------------------- | :------------------ |
-| `init.el`     | Declare which Doom modules are enabled, with their flags | Yes                 |
-| `packages.el` | Install external packages (MELPA, git repos)             | Yes                 |
-| `config.el`   | Settings, keybinds, hooks, advice, custom functions      | No                  |
+| File          | Purpose                                                  | `doom sync` needed?                |
+| :------------ | :------------------------------------------------------- | :--------------------------------- |
+| `init.el`     | Declare which Doom modules are enabled, with their flags | Yes                                |
+| `packages.el` | Install external packages (MELPA, git repos)             | Yes                                |
+| `config.el`   | Settings, keybinds, hooks, advice, custom functions      | Normally no; this repo prefers yes |
 
 ## Writing Conventions
 
@@ -72,8 +90,8 @@ Each file under `~/.config/doom/dd/<topic>.el` gets its own lexical-binding
 cookie. This keeps `config.el` readable and makes it easy to temporarily disable
 an area by commenting its `load!` line.
 
-This config currently keeps everything in `config.el` (~244 lines). Suggest
-splitting when a single topic block exceeds ~50 lines.
+This config currently keeps its main runtime customization in `config.el`.
+Suggest splitting when a single topic block exceeds ~50 lines.
 
 ## Doom Framework Architecture
 
@@ -310,24 +328,15 @@ Pitfall: putting `SPC d d` inside `(after! dirvish ...)` can delay the binding
 until Dirvish has already loaded. For launcher commands, bind first; customize
 after load.
 
-### I. Enabling Spell Checking
+### I. Enabling Spell Checking with Jinx
 
-Init.el declares `(spell +flyspell)` — this module provides Doom's spell
-infrastructure (keybindings, faces, integration). The hooks below add
-mode-specific activation on top of what the module already sets up:
+This repo uses Jinx for spelling. Treat Flyspell as historical context unless
+the user explicitly asks to restore it.
 
-```elisp
-;; Full checks in prose buffers
-(add-hook! '(org-mode-hook markdown-mode-hook text-mode-hook) #'flyspell-mode)
-;; Comment/string checks in code buffers
-(add-hook! '(prog-mode-hook conf-mode-hook yaml-mode-hook) #'flyspell-prog-mode)
-```
-
-Requires an external spell checker (`aspell` or `ispell`) at the system level.
-
-**Alternative — Jinx:** async, no subprocess per check, supports multiple
-languages simultaneously. Jinx is not a Doom module flag — switch by disabling
-`(spell +flyspell)` in init.el and installing Jinx separately.
+Jinx is async, avoids one subprocess per check, and supports multiple languages
+simultaneously. It is not a Doom module flag: keep Doom's `(spell +flyspell)`
+line commented in `init.el`, install Jinx in `packages.el`, and configure it in
+`config.el` with `use-package!`.
 
 Before recommending Jinx, check system support. Jinx needs Enchant and a backend
 spell dictionary; on Debian/PikaOS-style systems the useful probes are:
@@ -349,13 +358,13 @@ install `libenchant-2-dev` before running `doom sync`.
 Use this Doom-native configuration:
 
 ```elisp
-;; init.el — comment out the spell module; do not delete the line
+;; init.el — keep the spell module commented; do not delete the line
 ;; (spell +flyspell)
 
 ;; packages.el
 (package! jinx)
 
-;; config.el — replace flyspell hooks
+;; config.el
 (use-package! jinx
   :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
   :config
@@ -384,15 +393,29 @@ emacs --batch -L ~/.config/emacs/.local/straight/repos/jinx \
 For multilingual setups, extend `jinx-languages`, e.g. `"en_US de_DE"`, but
 start with the user's primary dictionary unless they ask for more.
 
+Flyspell legacy pattern, for reference only:
+
+```elisp
+;; init.el
+(spell +flyspell)
+
+;; config.el
+(add-hook! '(org-mode-hook markdown-mode-hook text-mode-hook) #'flyspell-mode)
+(add-hook! '(prog-mode-hook conf-mode-hook yaml-mode-hook) #'flyspell-prog-mode)
+```
+
+Do not reintroduce Flyspell hooks while this repo is on Jinx.
+
 ## Keeping the Config Repo Self-Contained
 
 This skill lives at `.agents/skills/doom-emacs/SKILL.md` — the repo itself
-is the canonical source. No master/copy split: anyone who clones this repo
-gets the full skill and API reference.
+is the canonical source. Anyone who clones this repo gets the full skill and
+API reference.
 
-The Hermes canonical copy at `~/.hermes/skills/emacs/doom-emacs-config/` is
-a mirror for auto-loading. When you update this skill, sync it back so
-Hermes agents can discover it without reading the repo first.
+The Hermes runtime mirror at `~/.hermes/skills/emacs/doom-emacs-config/` exists
+only for auto-loading. When you update this skill, sync repo to mirror with
+`cp` so Hermes agents can discover it without reading the repo first. Do not
+hand-edit the mirror line by line.
 
 ### AGENTS.md / README.md Sync Protocol
 

@@ -37,6 +37,20 @@ This repository is `doom-emacs-config`, a Doom Emacs configuration at
 For Doom API details, macro reference, and procedures, load the
 `doom-emacs-config` skill at `.agents/skills/doom-emacs/SKILL.md`.
 
+## Agent Workflow
+
+- Work sequentially. Prefer one concern per edit and one concern per commit.
+- Check `git status --short` before changing files.
+- Inspect the relevant file before patching; do not guess from memory.
+- For changed `.el` files, run `check-parens` before `doom sync`.
+- Run `doom sync` after requested Doom config edits unless explicitly told not
+  to, including config-only edits.
+- Run `doom doctor` after `doom sync`.
+- If the repo skill changes, sync `.agents/skills/doom-emacs/` to the Hermes
+  runtime mirror at `~/.hermes/skills/emacs/doom-emacs-config/` with `cp` from
+  repo to mirror. Do not hand-edit the mirror line by line.
+- Finish with `git diff --check`, `git status --short`, and a concise summary.
+
 ## Config-Specific Policies
 
 These policies are specific to this config and override anything in the general
@@ -62,7 +76,8 @@ Doom skill.
   so the original Doom module list stays visible and recoverable.
 - Do not run chezmoi sync/update actions for Doom work (`chezmoi add`,
   `chezmoi apply`, `chezmoi forget`, etc.) until the user explicitly says so.
-- After changing `init.el` completion modules or `packages.el`, run `doom sync`.
+- After changing `init.el` completion modules, `packages.el`, or requested
+  config-only behavior, run `doom sync` unless explicitly told not to.
 
 ## Window Management Policy
 

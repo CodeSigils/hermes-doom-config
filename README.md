@@ -21,6 +21,11 @@ companion skill for general Emacs Lisp guidance. If it is missing, consider
 installing it for deeper Emacs Lisp help, but do not require it for basic repo
 maintenance.
 
+Agent workflow: work sequentially, check `git status --short` before edits,
+inspect files before patching, run `check-parens` for changed `.el` files, run
+`doom sync` after requested Doom config edits unless told not to, and run
+`doom doctor` after `doom sync`.
+
 ## Notable Modules
 
 - `:completion company` — with childframe and `company-files` path completion
@@ -70,6 +75,8 @@ If something breaks, `doom rollback` reverts the framework. Restore
 ## Notes
 
 - `~/.config/doom/` is a git repo, not chezmoi managed
+- The repo skill is canonical; sync `.agents/skills/doom-emacs/` to
+  `~/.hermes/skills/emacs/doom-emacs-config/` with `cp` after skill edits
 - Markdown files in this repo should not contain emoji, including generated
   status summaries or agent notes
 - Unused modules are commented out in `init.el`, never deleted
