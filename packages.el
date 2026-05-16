@@ -58,6 +58,7 @@
 (package! websocket)
 (package! org-roam-ui)
 (package! rainbow-delimiters)
+(package! jinx)
 
 ;; Native Org supports remote inline images via
 ;; `org-display-remote-inline-images'. Keep org-remoteimg disabled; its advice

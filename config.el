@@ -55,10 +55,18 @@
 (global-prettify-symbols-mode 1)
 (global-subword-mode 1)
 
-;; Enable spell checking broadly. Flyspell has no built-in global mode, so use
-;; hooks: full checks in prose buffers, comment/string checks elsewhere.
-(add-hook! '(org-mode-hook markdown-mode-hook text-mode-hook) #'flyspell-mode)
-(add-hook! '(prog-mode-hook conf-mode-hook yaml-mode-hook) #'flyspell-prog-mode)
+;; Fast async spell checking via Enchant/Hunspell.
+(use-package! jinx
+  :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
+  :config
+  (setq jinx-languages "en_US")
+  (map! :map jinx-mode-map
+        "M-$" #'jinx-correct
+        :leader
+        (:prefix ("s" . "spelling")
+         :desc "Correct word" "c" #'jinx-correct
+         :desc "Next misspelling" "n" #'jinx-next
+         :desc "Previous misspelling" "p" #'jinx-previous)))
 
 (after! smartparens
   (show-smartparens-global-mode 1))
@@ -188,15 +196,16 @@
               (sand/initial-frame-size)))
 
 ;;; DIRVISH
+;; Keep the launcher binding available immediately; the command is autoloaded.
+(map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)
+
 (after! dirvish
   (setq dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
   (setq dirvish-subtree-state-style 'nerd)
   (setq dirvish-path-separators
         (list (format " %s " (nerd-icons-codicon "nf-cod-home"))
               (format " %s " (nerd-icons-codicon "nf-cod-root_folder"))
-              (format " %s " (nerd-icons-faicon "nf-fa-angle_right"))))
-  ;; Dirvish keys
-  (map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim))
+              (format " %s " (nerd-icons-faicon "nf-fa-angle_right")))))
 
 ;;; TIME
 (setq display-time-24hr-format t)

@@ -1,27 +1,69 @@
-# Doom Emacs config
+# doom-emacs-config
 
-## Agent instructions
+My personal Doom Emacs configuration repo. Designed for org-mode, GTD
+workflows, and general development with Company completion on a dual-monitor
+setup.
 
-- Load the `emacs-lisp-expert` and `doom-emacs-config` Hermes skills before
-  modifying this Doom Emacs config or debugging Emacs Lisp behavior.
-  Local reference copies are in `skills/` if the canonical skills aren't available.
-- Use `;;;` for section headings (left-aligned) and `;;` for code-level
-  documentation in config.el. Never remove or alter the lexical-binding cookie.
-- Do not remove lines from `init.el`; comment disabled modules/settings instead so the original Doom module list stays visible and recoverable.
-- Prefer Doom's `:completion company` module in this config: `(company +childframe +tng)`.
-- Preserve the explicit `company-files` backend expansion in `config.el`; it is what provides file/path autosuggestions with Company.
-- Keep `corfu` present but commented unless explicitly requested otherwise.
-- Use documented window/display controls for layout behavior, such as `split-window-preferred-function`, Doom `set-popup-rule!`, and explicit keybindings. Do not advise low-level primitives like `window-split`.
-- Keep initial frame sizing monitor-aware via `sand/initial-frame-size`; avoid returning to a single hardcoded frame size unless explicitly requested.
-- Prefer targeted Doom popup rules for recurring transient buffers instead of broad catch-all star-buffer rules.
-- Keep optional package startup defensive with `fboundp` guards when practical, e.g. `org-roam-db-autosync-mode`.
-- Keep `delete-by-moving-to-trash` global; do not duplicate it inside package-specific blocks unless a package requires a different value.
-- Do not add Ollama Buddy (`ollama-buddy`) back unless explicitly requested.
-- Do not run chezmoi sync/update actions for Doom work until explicitly told to.
-- Run `doom sync` after changing `init.el` modules or `packages.el`.
-- Run `doom doctor` after `doom sync` to catch missing deps, wrong flags, or broken recipes.
+## Quick Start
 
-## Doom Upgrade Safety
+Requires [Doom Emacs](https://github.com/doomemacs/doomemacs) installed.
 
-Before updating the Doom framework: `cp -a ~/.config/doom ~/.config/doom.backup.$(date +%Y%m%d)`
-Then `doom upgrade`, `doom sync`, `doom doctor`. If something breaks, `doom rollback` or restore from backup.
+```sh
+git clone <remote-url> ~/.config/doom
+doom sync
+doom doctor
+```
+
+If you're an AI agent working in this repo, read `AGENTS.md` first.
+
+## Notable Modules
+
+- `:completion company` — with childframe and `company-files` path completion
+- `:ui doom, doom-dashboard, hl-todo, modeline, nav-flash, ophints, popup, treemacs, vi-tilde-fringe, window-select, workspaces`
+- `:editor evil, fold, multiple-cursors, rotate-text`
+- `:emacs dired, electric, undo, vc`
+- `:tools direnv, editorconfig, eval, lookup, lsp, magit, tree-sitter`
+- `:lang org, markdown, yaml, rest, sh, emacs-lisp, json, python, web`
+- `:email mu4e` (withmu and mbsync)
+- `:app everywhere, irc, rss, scriba`
+- `:config default`
+
+## Key Features
+
+- **Company completion** with file path expansion — `company-files` added to
+  `prog-mode`, `org-mode`, and `org-capture-mode`
+- **Dirvish** — `SPC d d` launches `dirvish-dwim`
+- **Jinx spell checking** — fast Enchant/Hunspell-backed spell checking for
+  prose and code comments/strings
+- **Org mode** — org-roam, org-journal, org-download with yank-media, habit
+  tracking, and GTD workflows
+- **Mu4e** — email with contexts, native address completion, org-capture
+  integration
+- **Window management** — `set-popup-rule!` for transient buffers,
+  `split-window-preferred-function` for predictable splits, monitor-aware
+  initial frame sizing via `sand/initial-frame-size`
+- **Popup targets** — `*Help*`, `*Completions*`, `*vterm*`, `*vc-diff*`,
+  `*vc-log*`, `*org-capture*`, `*elfeed-search*`, `*gnuplot*`,
+  `*doom:scratch-buffer*`
+- **Defensive setup** — `fboundp` guards on optional packages,
+  `delete-by-moving-to-trash` globally
+
+## Maintenance
+
+```sh
+# Before upgrading Doom, back up your config
+cp -a ~/.config/doom ~/.config/doom.backup.$(date +%Y%m%d)
+
+doom upgrade
+doom sync
+doom doctor
+```
+
+If something breaks, `doom rollback` reverts the framework. Restore
+`~/.config/doom.backup.*` if config files were affected.
+
+## Notes
+
+- `~/.config/doom/` is a git repo, not chezmoi managed
+- Ollama Buddy is intentionally excluded from this config
+- Unused modules are commented out in `init.el`, never deleted

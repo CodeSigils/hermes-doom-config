@@ -19,11 +19,36 @@
 💡 *Use `mem-find` to search full details. Use `mem-create` to save important decisions.*
 <!-- /open-mem-context -->
 
-## Doom Emacs Completion Policy
+## Repository Overview
+
+This repository is `doom-emacs-config`, a Doom Emacs configuration at
+`~/.config/doom/`. Key characteristics:
+
+- **Completion:** Company mode (`:completion company` module) — see Completion
+  Policy below
+- **Spelling:** Jinx with Enchant/Hunspell (`jinx-languages` = `en_US`)
+- **Dirvish:** `SPC d d` launches `dirvish-dwim`
+- **Org mode:** Active for notes and GTD workflows
+- **Display:** Custom frame sizing via `sand/initial-frame-size` for dual
+  monitors
+- **Package policy:** No Ollama Buddy or llm provider configs
+- **Version control:** `~/.config/doom/` is a git repo, NOT chezmoi managed
+- **Module style:** Comment out unused modules in `init.el`, never delete lines
+
+For Doom API details, macro reference, and procedures, load the
+`doom-emacs-config` skill at `.agents/skills/doom-emacs/SKILL.md`.
+
+## Config-Specific Policies
+
+These policies are specific to this config and override anything in the general
+Doom skill.
+
+### Completion Policy
 
 - Load the `emacs-lisp-expert` and `doom-emacs-config` Hermes skills before
   modifying this Doom Emacs config or debugging Emacs Lisp behavior.
-  Local reference copies are in `skills/` if the canonical skills aren't available.
+  The repo also ships the skill at `.agents/skills/doom-emacs/SKILL.md` —
+  read it directly if the canonical Hermes skills aren't available.
 - The preferred completion backend is Doom's `:completion company` module for
   the fuller Company experience: snippets, code completion, file-path
   completion, and mature completion backends.
@@ -61,95 +86,3 @@
 
 - Do not add Ollama Buddy (`ollama-buddy`) back to this Doom config unless the
   user explicitly requests it.
-
-## Doom API Quick Reference
-
-Use these Doom-specific macros instead of their standard Emacs equivalents:
-
-| Macro                  | Use Instead Of                  | Example                                                |
-| :--------------------- | :------------------------------ | :----------------------------------------------------- |
-| `after!`               | `with-eval-after-load`          | `(after! org (setq org-adapt-indentation nil))`        |
-| `use-package!`         | `use-package`                   | `(use-package! foo :defer t :config ...)`              |
-| `map!`                 | `define-key` / `global-set-key` | `(map! :leader :desc \"Foo\" \"f f\" #'foo)`           |
-| `add-hook!`            | `add-hook` (multi-mode)         | `(add-hook! '(a-mode b-mode) #'fn)`                    |
-| `set-company-backend!` | `setq company-backends`         | `(set-company-backend! 'prog-mode 'company-files ...)` |
-| `set-popup-rule!`      | `display-buffer-alist`          | `(set-popup-rule! \"^\\*Help\\*\" :size 0.35)`         |
-| `featurep!`            | —                               | `(when (featurep! :ui popup) ...)`                     |
-| `setq-hook!`           | `add-hook` + lambda             | `(setq-hook! 'org-mode-hook truncate-lines nil)`       |
-
-**Key rules:**
-
-- `use-package!` (with bang) — Doom's version, not the MELPA one
-- `after!` is for config.el, not init.el or packages.el
-- Never use `with-eval-load` or standard `use-package` in Doom config
-- `setq-default` is rarely needed in Doom — prefer `setq`
-
-## Verification Checklist
-
-Run these after changes. A missing step can leave Emacs in a broken state.
-
-| After changing             | Command                                                           |
-| :------------------------- | :---------------------------------------------------------------- |
-| `init.el` or `packages.el` | `doom sync`                                                       |
-| `config.el`                | `M-x eval-buffer` or restart Emacs                                |
-| Any `.el` file             | `check-parens` to verify balanced parens                          |
-| After `doom sync`          | `doom doctor` — catches missing deps, wrong flags, broken recipes |
-
-**Paren check from CLI (if Emacs can't start):**
-
-```
-emacs --batch --eval "(let ((check-parens t)) (check-parens))" ~/.config/doom/config.el
-```
-
-**Do not:**
-
-- Edit `early-init.el` or `~/.emacs.d/init.el` — Doom manages those
-- Run `package-install` manually — use `package!` in packages.el then `doom sync`
-- Delete lines from `init.el` — comment them out instead
-
-## Doom Upgrade Safety
-
-When updating the Doom framework itself:
-
-1. **Backup first:** `cp -a ~/.config/doom ~/.config/doom.backup.$(date +%Y%m%d)`
-2. **Run upgrade:** `doom upgrade`
-3. **Verify:** `doom sync && doom doctor`
-4. **Check for deprecation warnings** in the doctor output — macros sometimes change between versions
-5. **If anything breaks:** `doom rollback` reverts to the previous version; restore `~/.config/doom.backup.*` if config files were affected
-
-Doom's own `~/.config/emacs/` is managed by Doom and shouldn't be manually edited, but `~/.config/doom/` is yours — always have a backup before running `doom upgrade`.
-
-## Elisp Comment Convention
-
-Use the correct number of semicolons — it signals structure, not style.
-
-| Level   | Marker | Usage                                                                                                                        |
-| :------ | :----- | :--------------------------------------------------------------------------------------------------------------------------- |
-| Section | `;;;`  | Left-aligned, column 0. Section headings like `;;; ORG`, `;;; COMPANY`. Use these to organize config.el into visible blocks. |
-| Line    | `;;`   | Indented with surrounding code. Standard documentation for settings, hooks, and logic. Most common in config files.          |
-| Inline  | `;`    | Right-aligned at end of a code line. Rare in config — only for very short annotations.                                       |
-
-**This file uses `;;;` for section breaks and `;;` for code-level docs.** Match
-the existing style when adding new config.
-
-## Lexical Binding
-
-All Doom config files (`config.el`, `init.el`, `packages.el`) must start with
-the file-local variable:
-
-```elisp
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
-```
-
-This enables **lexical scoping** (closures capture by value) instead of
-**dynamic scoping** (closures capture by rebinding). Benefits:
-
-- **Faster byte-compilation** — local variables can live in CPU registers
-  instead of heap-allocated cells. Byte-compiled code can be 2-5x faster.
-- **Correct closures** — `(lambda ...)` inside loops works as expected; each
-  iteration captures its own value instead of sharing one mutable cell.
-- **Modern Elisp compatibility** — packages, Doom itself, and the byte-compiler
-  all assume lexical-binding is on. Without it, `macroexpand` and compilation
-  produce warnings.
-
-**Never remove or alter the `-*- lexical-binding: t; -*-` cookie.**
