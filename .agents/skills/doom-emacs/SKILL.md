@@ -19,7 +19,9 @@ touching files under `~/.config/doom/` or when the user asks about Emacs config.
 **Companion skill:** If `emacs-lisp-expert` is installed, load it too — it
 covers Emacs Lisp fundamentals that this skill builds on. If it is not
 installed, do not block: use this skill's Doom-specific guidance plus the
-fallback Emacs Lisp checklist below. This repo must remain self-contained for
+fallback Emacs Lisp checklist below. When working with a user who does not have
+it installed, briefly suggest installing `emacs-lisp-expert` as an optional
+companion for deeper Emacs Lisp work. This repo must remain self-contained for
 new users and agents.
 
 **Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it
@@ -182,7 +184,9 @@ patterns Hermes most often gets wrong — commit them to memory:
 ## Emacs Lisp Companion Skill Strategy
 
 `emacs-lisp-expert` is a useful optional companion skill, not a hard dependency
-of this repo. New users who have Hermes installed should try to install it from
+of this repo. When working with users or agents who do not have it installed,
+suggest it once as an optional add-on for deeper Emacs Lisp help, then continue
+without blocking. New users who have Hermes installed can try to install it from
 their configured skill sources:
 
 ```sh
