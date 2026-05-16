@@ -42,6 +42,7 @@ For Doom API details, macro reference, and procedures, load the
 - Work sequentially. Prefer one concern per edit and one concern per commit.
 - Check `git status --short` before changing files.
 - Inspect the relevant file before patching; do not guess from memory.
+- When README.md lists modules or feature inventory, verify against `init.el`.
 - For changed `.el` files, run `check-parens` before `doom sync`.
 - Run `doom sync` after requested Doom config edits unless explicitly told not
   to, including config-only edits.

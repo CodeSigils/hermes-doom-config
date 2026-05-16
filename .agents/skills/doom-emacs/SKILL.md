@@ -42,9 +42,11 @@ the user's request. Prefer one concern per edit and one concern per commit.
 7. Run `doom sync` after requested Doom config edits unless the user says not to.
 8. Run `doom doctor` after `doom sync`.
 9. If Markdown changed, run the repo Markdown linter before reporting done.
-10. If this skill changed, copy the repo skill to the Hermes runtime mirror with
+10. When README.md describes enabled modules or feature inventory, verify it
+    against `init.el`; never trust README from memory or prior state.
+11. If this skill changed, copy the repo skill to the Hermes runtime mirror with
     `cp` from repo to `~/.hermes`; do not hand-edit the mirror.
-11. Finish with `git diff --check`, `git status --short`, and a concise summary.
+12. Finish with `git diff --check`, `git status --short`, and a concise summary.
 
 ## File Roles — Know What Goes Where
 
@@ -433,6 +435,35 @@ that AGENTS.md carries. But every actionable policy in AGENTS.md should have
 a corresponding line in README.md so agents and humans alike find the rule
 from either entry point.
 
+### README Module Inventory Protocol
+
+When README.md lists notable modules or feature categories, `init.el` is the
+source of truth. Do not infer enabled modules from README, memory, or old
+conversation state.
+
+1. Read the active `(doom! ...)` form in `init.el`.
+2. Treat uncommented module lines as enabled and commented lines as disabled
+   documentation.
+3. Compare README claims module by module before saying docs are current.
+4. When changing `init.el`, update README module/feature lists in the same
+   concern-sized commit.
+5. If `doom doctor` warns about missing executables for enabled modules, either
+   document them as optional system dependencies or disable/comment the module
+   when the feature is not actually used.
+
+Also document substantial repo content that affects the user experience, such
+as `snippets/<major-mode>/`, instead of leaving it invisible in README.
+
+### Runtime Artifact Hygiene
+
+Do not assume every tracked file in `~/.config/doom/` is intentional config.
+Check for local runtime state before committing or recommending repo cleanup.
+SQLite databases and their WAL/SHM files under tool-specific directories (for
+example `.open-mem/*.db`, `.open-mem/*.db-wal`, `.open-mem/*.db-shm`) are often
+noisy and may contain personal/session data. Prefer ignoring runtime artifacts;
+if the data should be durable and reviewable, export it to Markdown or another
+human-readable format.
+
 ## Restoring Official Template Content
 
 Doom ships canonical example files at `~/.config/emacs/static/`:
@@ -490,6 +521,11 @@ are caught locally before Doom rebuilds the profile.
   Emacs auto-formats on save. Running `doom sync` then saving `config.el` may
   break indentation. Warn the user and have them run `M-x doom/reload` after
   `doom sync` to avoid this.
+- **Stale template comments can mislead agents** — if restored upstream Doom
+  comments recommend `with-eval-after-load`, standard `use-package`, or other
+  non-Doom patterns that conflict with this repo, replace or annotate the
+  comment so the active guidance remains `after!`, `use-package!`, `map!`, and
+  `load!`.
 
 ## Session Reference Notes
 
@@ -497,6 +533,10 @@ are caught locally before Doom rebuilds the profile.
   this repo was named `doom-emacs-config`, Flyspell was replaced with Jinx,
   `SPC d d` was made an immediate Dirvish launcher binding, and the user
   clarified that `doom sync` should be run after requested Doom edits.
+- `references/2026-05-16-doom-repo-audit-hygiene.md` captures the repo audit
+  lessons around README/init.el drift, tracked runtime SQLite artifacts,
+  `doom doctor` warning classification, stale upstream template comments, and
+  documenting snippets.
 
 ## Reference Sources
 

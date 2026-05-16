@@ -221,33 +221,16 @@
   :hook ((org-mode prog-mode) . rainbow-delimiters-mode))
 
 
-;; Whenever you reconfigure a package, make sure to wrap your config in an
-;; `with-eval-after-load' block, otherwise Doom's defaults may override your
-;; settings. E.g.
+;; Prefer Doom-native configuration forms in this repo:
 ;;
-;;   (with-eval-after-load 'PACKAGE
-;;     (setq x y))
+;;   - `after!' for deferred package/module configuration
+;;   - `use-package!' for external packages declared in packages.el
+;;   - `map!' for keybindings
+;;   - `load!' for local config modules relative to this file
 ;;
-;; The exceptions to this rule:
+;; Avoid vanilla `with-eval-after-load' and standard `use-package' here; Doom's
+;; macros integrate with its module and package lifecycle.
 ;;
-;;   - Setting file/directory variables (like `org-directory')
-;;   - Setting variables which explicitly tell you to set them before their
-;;     package is loaded (see 'C-h v VARIABLE' to look them up).
-;;   - Setting doom variables (which start with 'doom-' or '+').
-;;
-;; Here are some additional functions/macros that will help you configure Doom.
-;;
-;; - `load!' for loading external *.el files relative to this one
-;; - `add-load-path!' for adding directories to the `load-path', relative to
-;;   this file. Emacs searches the `load-path' when you load packages with
-;;   `require' or `use-package'.
-;; - `map!' for binding new keys
-;;
-;; To get information about any of these functions/macros, move the cursor over
-;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
-;; This will open documentation for it, including demos of how they are used.
-;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
-;; etc).
-;;
-;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
-;; they are implemented.
+;; File/directory variables (like `org-directory'), variables that must be set
+;; before package load, and Doom variables (`doom-*' or `+') can stay at top
+;; level. For symbol help, use `K' (or `C-c c k') on the symbol, or `C-h o'.

@@ -1,0 +1,4 @@
+# Runtime artifacts
+.open-mem/*.db
+.open-mem/*.db-shm
+.open-mem/*.db-wal
