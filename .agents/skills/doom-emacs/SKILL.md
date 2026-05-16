@@ -464,6 +464,17 @@ noisy and may contain personal/session data. Prefer ignoring runtime artifacts;
 if the data should be durable and reviewable, export it to Markdown or another
 human-readable format.
 
+When removing already-tracked runtime artifacts while preserving local files:
+
+1. Add ignore patterns first (for example `.open-mem/*.db*`).
+2. Run `git rm --cached <paths>` to stage deletion from the index only.
+3. Do not try to `git add` the ignored runtime paths afterward; Git will refuse
+   because the ignore rule is working. Stage the `.gitignore` and other edited
+   docs/config files instead.
+4. Verify with `git ls-files <runtime-dir>` that artifacts are no longer
+   tracked, and with an existence check if you need to confirm local files were
+   preserved.
+
 ## Restoring Official Template Content
 
 Doom ships canonical example files at `~/.config/emacs/static/`:
