@@ -58,8 +58,8 @@ commented out in `init.el`.
 - **Dirvish** — `SPC d d` launches `dirvish-dwim`
 - **Jinx spell checking** — fast Enchant/Hunspell-backed spell checking for
   prose and code comments/strings
-- **Org mode** — org-roam, org-journal, org-download with yank-media, habit
-  tracking, and GTD workflows
+- **Org mode** — org-roam, org-tempo (<s Tab for src blocks), org-journal,
+  org-download with yank-media, habit tracking, and GTD workflows
 - **Window management** — `set-popup-rule!` for transient buffers,
   `split-window-preferred-function` for predictable splits, monitor-aware
   initial frame sizing via `sand/initial-frame-size`

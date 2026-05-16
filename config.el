@@ -8,6 +8,7 @@
 ;; clients, file templates and snippets. It is optional.
 ;; (setq user-full-name "John Doe"
 ;;       user-mail-address "john@doe.com")
+;;
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
@@ -78,6 +79,7 @@
     (apply fn args)))
 
 (after! org
+  (require 'org-tempo)
   (add-hook 'org-mode-hook #'+org-pretty-mode)
 
   ;; Inline images

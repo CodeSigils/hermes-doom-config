@@ -408,6 +408,30 @@ Flyspell legacy pattern, for reference only:
 
 Do not reintroduce Flyspell hooks while this repo is on Jinx.
 
+### J. Enabling Org-Tempo (`<s` Tab Expansion in Org)
+
+Org-tempo provides `<s` + Tab -> `#+begin_src` style template expansion in
+Org buffers. The templates are built-in but Doom loads them lazily.
+
+**Required:** `(require 'org-tempo)` inside `(after! org ...)`. Without this
+explicit require, `<s` will not expand even though `org-tempo-remember-template`
+is available.
+
+```elisp
+(after! org
+  (require 'org-tempo)
+  (add-hook 'org-mode-hook #'+org-pretty-mode)
+  ;; ... rest of org config
+```
+
+Also note: the org module needs the `+pretty` flag for full template expansion
+to work. If `<s` still doesn't expand after adding the require, verify the org
+module declaration in `init.el` includes `+pretty` (e.g., `(org +roam +babel
++dragndrop +pretty)`) — or check with `M-x org-tempo-remember-template`.
+
+The yasnippet path is separate: `SPC h i` to insert a snippet, type `src`, and
+Tab. Org-tempo and yasnippet coexist — they are independent completion systems.
+
 ## Keeping the Config Repo Self-Contained
 
 This skill lives at `.agents/skills/doom-emacs/SKILL.md` — the repo itself
