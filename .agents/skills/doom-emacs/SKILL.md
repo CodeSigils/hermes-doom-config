@@ -397,7 +397,7 @@ Hermes agents can discover it without reading the repo first.
 ### AGENTS.md / README.md Sync Protocol
 
 AGENTS.md is the authoritative source for user-specific policies (completion
-preference, window rules, package restrictions, verification steps). Whenever
+preference, window rules, Markdown style, verification steps). Whenever
 you add a new policy or safety step to AGENTS.md in the same session:
 
 1. Add a condensed version to README.md (same key information, less detail)

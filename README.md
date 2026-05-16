@@ -70,5 +70,6 @@ If something breaks, `doom rollback` reverts the framework. Restore
 ## Notes
 
 - `~/.config/doom/` is a git repo, not chezmoi managed
-- Ollama Buddy is intentionally excluded from this config
+- Markdown files in this repo should not contain emoji, including generated
+  status summaries or agent notes
 - Unused modules are commented out in `init.el`, never deleted

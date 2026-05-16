@@ -5,18 +5,18 @@
 
 ### ./
 
-| ID                                   | Type         | Title                                         | Date       |
-| :----------------------------------- | :----------- | :-------------------------------------------- | :--------- |
-| b78dff5a-5ce9-4892-8e84-b1c1e1f99ed5 | ✅ change    | Customized Emacs Configuration for Doom Emacs | 2026-05-16 |
-| aa6cbcf8-18f7-4d61-85c3-eed44ccae342 | 🔄 refactor  | Refactor config.el structure and patterns     | 2026-05-16 |
-| a6f6c595-173e-4915-a1a0-c0204e8e4290 | ✅ change    | Files and directories listing                 | 2026-05-16 |
-| 5528033a-dca6-4350-aecf-8ea15ecfbd4a | 🔵 discovery | Doom Emacs Package Configuration              | 2026-05-16 |
-| 47e1fc20-cde9-403c-9251-796e9f1e248c | 🔵 discovery | Multiple archive versions detected            | 2026-05-16 |
-| c7238829-e69f-44d5-a148-d2d28425d561 | 🔵 discovery | MELPA package list refresh completed          | 2026-05-16 |
+| ID                                   | Type      | Title                                         | Date       |
+| :----------------------------------- | :-------- | :-------------------------------------------- | :--------- |
+| b78dff5a-5ce9-4892-8e84-b1c1e1f99ed5 | change    | Customized Emacs Configuration for Doom Emacs | 2026-05-16 |
+| aa6cbcf8-18f7-4d61-85c3-eed44ccae342 | refactor  | Refactor config.el structure and patterns     | 2026-05-16 |
+| a6f6c595-173e-4915-a1a0-c0204e8e4290 | change    | Files and directories listing                 | 2026-05-16 |
+| 5528033a-dca6-4350-aecf-8ea15ecfbd4a | discovery | Doom Emacs Package Configuration              | 2026-05-16 |
+| 47e1fc20-cde9-403c-9251-796e9f1e248c | discovery | Multiple archive versions detected            | 2026-05-16 |
+| c7238829-e69f-44d5-a148-d2d28425d561 | discovery | MELPA package list refresh completed          | 2026-05-16 |
 
 **Key concepts:** doom-emacs-configuration, font-configuration, theme-configuration, package-configuration, org-mode, org-roam, company-mode, dirvish, window-management, refactor
 
-💡 *Use `mem-find` to search full details. Use `mem-create` to save important decisions.*
+Use `mem-find` to search full details. Use `mem-create` to save important decisions.
 <!-- /open-mem-context -->
 
 ## Repository Overview
@@ -31,7 +31,6 @@ This repository is `doom-emacs-config`, a Doom Emacs configuration at
 - **Org mode:** Active for notes and GTD workflows
 - **Display:** Custom frame sizing via `sand/initial-frame-size` for dual
   monitors
-- **Package policy:** No Ollama Buddy or llm provider configs
 - **Version control:** `~/.config/doom/` is a git repo, NOT chezmoi managed
 - **Module style:** Comment out unused modules in `init.el`, never delete lines
 
@@ -84,7 +83,7 @@ Doom skill.
   in the main defaults section and should not be duplicated inside package
   blocks unless a package needs a different value.
 
-## Package Policy
+## Markdown Policy
 
-- Do not add Ollama Buddy (`ollama-buddy`) back to this Doom config unless the
-  user explicitly requests it.
+- Do not use emoji in any Markdown file in this repository, including generated
+  memory summaries, status labels, tables, and agent notes.
