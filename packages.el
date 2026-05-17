@@ -58,7 +58,16 @@
 (package! websocket)
 (package! org-roam-ui)
 (package! rainbow-delimiters)
-(package! jinx)
+;; Jinx 2.7 currently calls legacy `incf` while only requiring `cl-lib`.
+;; Patch the straight checkout before byte-compilation so timers use `cl-incf`.
+(package! jinx
+  :recipe (:host github :repo "minad/jinx"
+           :pre-build
+           (with-temp-buffer
+             (insert-file-contents "jinx.el")
+             (while (search-forward "(incf " nil t)
+               (replace-match "(cl-incf " nil t))
+             (write-region nil nil "jinx.el"))))
 
 ;; Native Org supports remote inline images via
 ;; `org-display-remote-inline-images'. Keep org-remoteimg disabled; its advice

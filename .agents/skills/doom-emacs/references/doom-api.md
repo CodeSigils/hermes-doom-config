@@ -171,6 +171,8 @@ a lambda.
 | `company`            | `+childframe`, `+tng` (tab-and-go)                               |
 | `corfu`              | `+orderless`, `+dabbrev`                                         |
 | `org`                | `+roam`, `+babel`, `+dragndrop`, `+noter`, `+pandoc`, `+present` |
+| `org` (tempo)        | `+pretty` enables full `<s` Tab expansion; also requires         |
+|                      | `(require 'org-tempo)` inside `(after! org ...)`                 |
 | `lsp`                | `+eglot`, `+lsp-mode`                                            |
 | `format`             | `+onsave`                                                        |
 | `spell`              | `+flyspell`, `+aspell`, `+hunspell`                              |
@@ -180,6 +182,33 @@ a lambda.
 | `vc-gutter`          | `+pretty`                                                        |
 | `workspaces`         | `+auto`                                                          |
 | `(evil +everywhere)` | `+everywhere` (evil in non-programming buffers)                  |
+
+## Org Snippet Style
+
+Org yasnippet blocks use empty lines between open/close markers and body.
+Cursor lands in the blank body line (via `$0`), not on the opening line.
+
+**Standard block snippet shape:**
+
+```text
+#+begin_src python
+
+$0
+#+end_src
+```
+
+Not:
+
+```text
+#+begin_src python$0
+...
+#+end_src
+```
+
+Snippets live at `~/.config/doom/snippets/org-mode/`. Keys map to file names:
+`<e` (example), `<h` (export html), `<q` (quote), `<v` (verse), `src`
+(source). Only `src` has a default language argument (`${1:python}` with no
+further tab stop after it — cursor goes straight to the body).
 
 ## Pitfalls Summary
 

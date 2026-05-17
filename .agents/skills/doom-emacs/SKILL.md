@@ -44,8 +44,8 @@ the user's request. Prefer one concern per edit and one concern per commit.
 9. If Markdown changed, run the repo Markdown linter before reporting done.
 10. When README.md describes enabled modules or feature inventory, verify it
     against `init.el`; never trust README from memory or prior state.
-11. If this skill changed, copy the repo skill to the Hermes runtime mirror with
-    `cp` from repo to `~/.hermes`; do not hand-edit the mirror.
+11. If this skill changed, replace the Hermes runtime mirror from the repo
+    source and verify equality. Do not hand-edit the mirror.
 12. Finish with `git diff --check`, `git status --short`, and a concise summary.
 
 ## File Roles — Know What Goes Where
@@ -133,7 +133,10 @@ To resolve a flag's meaning: put cursor on the flag in `init.el` and press
 `K` (`C-c c k`) for docs, or `gd` (`C-c c d`) to jump to its definition in
 `~/.config/emacs/modules/<cat>/<mod>/+<flag>.el`.
 
-See `references/doom-api.md` for a table of common flags.
+See `references/doom-api.md` for a table of common flags. See
+`references/agent-shell-evaluation.md` for the conservative Agent Shell pilot
+configuration and ACP transport cautions. See `references/jinx-incf-timer.md`
+for the Jinx 2.7 idle-timer `incf` failure and straight `:pre-build` patch.
 
 ### Doom Variables
 
@@ -364,7 +367,16 @@ Use this Doom-native configuration:
 ;; (spell +flyspell)
 
 ;; packages.el
-(package! jinx)
+;; Jinx 2.7 currently calls legacy `incf` while only requiring `cl-lib`.
+;; Patch the straight checkout before byte-compilation so timers use `cl-incf`.
+(package! jinx
+  :recipe (:host github :repo "minad/jinx"
+           :pre-build
+           (with-temp-buffer
+             (insert-file-contents "jinx.el")
+             (while (search-forward "(incf " nil t)
+               (replace-match "(cl-incf " nil t))
+             (write-region nil nil "jinx.el"))))
 
 ;; config.el
 (use-package! jinx
@@ -388,9 +400,18 @@ is already running; otherwise tell the user to restart Emacs or run
 Useful Jinx verification after `doom sync`:
 
 ```sh
-emacs --batch -L ~/.config/emacs/.local/straight/repos/jinx \
+emacs --batch -L ~/.config/emacs/.local/straight/build-30.2/compat \
+  -L ~/.config/emacs/.local/straight/build-30.2/jinx \
   --eval "(progn (require 'jinx) (message \"jinx loads OK: %s\" (featurep 'jinx)))"
+strings ~/.config/emacs/.local/straight/build-30.2/jinx/jinx.elc | grep -E '\\bincf\\b' || true
 ```
+
+If `M-$`, `SPC s c`, or unrelated Org commands report `Error running timer
+'nil': (void-function incf)`, the idle Jinx timer is loading bytecode that still
+contains legacy `incf` calls. Confirm the `:pre-build` patch is present in
+`packages.el`, run `doom sync`, and verify `strings .../jinx.elc` no longer
+prints `incf`. See `references/jinx-incf-timer.md` for the root cause,
+verification commands, and cleanup guidance once upstream fixes it.
 
 For multilingual setups, extend `jinx-languages`, e.g. `"en_US de_DE"`, but
 start with the user's primary dictionary unless they ask for more.
@@ -438,10 +459,45 @@ This skill lives at `.agents/skills/doom-emacs/SKILL.md` — the repo itself
 is the canonical source. Anyone who clones this repo gets the full skill and
 API reference.
 
+For a first-time clone, the repo skill is already usable from this path. If the
+user wants Hermes to auto-load it from the normal runtime skill location, run:
+
+```sh
+scripts/sync-doom-skill-mirror.sh
+scripts/check-doom-skill-mirror.sh
+```
+
 The Hermes runtime mirror at `~/.hermes/skills/emacs/doom-emacs-config/` exists
-only for auto-loading. When you update this skill, sync repo to mirror with
-`cp` so Hermes agents can discover it without reading the repo first. Do not
-hand-edit the mirror line by line.
+only for auto-loading. When you update this skill, sync repo to mirror with an
+exact generated-copy workflow. Do not hand-edit the mirror line by line.
+
+Recommended invariant:
+
+```text
+~/.hermes/skills/emacs/doom-emacs-config/ == ~/.config/doom/.agents/skills/doom-emacs/
+```
+
+Use destructive replacement of the mirror so stale mirror-only files cannot
+survive:
+
+```sh
+SRC="$HOME/.config/doom/.agents/skills/doom-emacs"
+DST="$HOME/.hermes/skills/emacs/doom-emacs-config"
+
+test -f "$SRC/SKILL.md"
+rm -rf "$DST"
+mkdir -p "$(dirname "$DST")"
+cp -a "$SRC" "$DST"
+diff -qr "$SRC" "$DST"
+```
+
+If the repo provides `scripts/sync-doom-skill-mirror.sh` and
+`scripts/check-doom-skill-mirror.sh`, use those instead of retyping the command.
+See `references/doom-skill-mirror-sync.md` for the full rationale and workflow.
+
+If the mirror contains a file that the repo source does not contain, treat that
+as drift. Either copy the valuable file into `.agents/skills/doom-emacs/` first,
+or let the exact sync remove it from the generated mirror.
 
 ### AGENTS.md / README.md Sync Protocol
 
@@ -572,6 +628,9 @@ are caught locally before Doom rebuilds the profile.
   lessons around README/init.el drift, tracked runtime SQLite artifacts,
   `doom doctor` warning classification, stale upstream template comments, and
   documenting snippets.
+- `references/jinx-incf-timer.md` captures the durable Jinx timer failure pattern
+  where bytecode containing legacy `incf` causes `(void-function incf)`, plus the
+  straight `:pre-build` patch and verification commands.
 
 ## Reference Sources
 

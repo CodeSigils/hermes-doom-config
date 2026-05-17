@@ -47,9 +47,10 @@ For Doom API details, macro reference, and procedures, load the
 - Run `doom sync` after requested Doom config edits unless explicitly told not
   to, including config-only edits.
 - Run `doom doctor` after `doom sync`.
-- If the repo skill changes, sync `.agents/skills/doom-emacs/` to the Hermes
-  runtime mirror at `~/.hermes/skills/emacs/doom-emacs-config/` with `cp` from
-  repo to mirror. Do not hand-edit the mirror line by line.
+- If the repo skill changes, run `scripts/sync-doom-skill-mirror.sh`, then
+  `scripts/check-doom-skill-mirror.sh`. The Hermes runtime mirror at
+  `~/.hermes/skills/emacs/doom-emacs-config/` is generated state; do not
+  hand-edit it.
 - Finish with `git diff --check`, `git status --short`, and a concise summary.
 
 ## Config-Specific Policies
