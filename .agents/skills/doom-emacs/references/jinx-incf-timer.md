@@ -13,27 +13,30 @@ It may appear after `M-$`, `SPC s c`, or unrelated Org commands such as `C-c C-,
 
 ## Root Cause
 
-Jinx 2.7 uses legacy `(incf ...)` and `(decf ...)` calls while requiring `cl-lib`. Modern Emacs with `cl-lib` provides `cl-incf` and `cl-decf`; the unprefixed forms only appear when deprecated `cl` is loaded. If Jinx bytecode still contains `incf` or `decf`, the idle timer fails at runtime.
+Jinx 2.7 uses legacy `(incf ...)` and `(decf ...)` calls while requiring `cl-lib`. Modern Emacs with `cl-lib` provides `cl-incf` and `cl-decf`; the unprefixed forms only appear when deprecated `cl` is loaded. Jinx also requires compat 31 for `completion-table-with-metadata`, so Doom's older compat pin can break correction UI commands with `(void-function completion-table-with-metadata)`.
 
 ## Durable Fix Pattern
 
-Patch the straight checkout before byte-compilation in `packages.el`:
+Use plain Jinx package declaration, unpin compat, and provide runtime aliases in `config.el`:
 
 ```elisp
-;; Jinx 2.7 currently calls legacy `incf`/`decf` while only requiring `cl-lib`.
-;; Patch the straight checkout before byte-compilation so timers use cl-lib names.
+;; packages.el
+(unpin! compat)
+
 (package! jinx
-  :recipe (:host github :repo "minad/jinx"
-           :pre-build
-           (with-temp-buffer
-             (insert-file-contents "jinx.el")
-             (dolist (replacement '(("(incf " . "(cl-incf ")
-                                    ("(decf " . "(cl-decf ")))
-               (goto-char (point-min))
-               (while (search-forward (car replacement) nil t)
-                 (replace-match (cdr replacement) nil t)))
-             (write-region nil nil "jinx.el"))))
+  :recipe (:host github :repo "minad/jinx"))
+
+;; config.el, before `(use-package! jinx ...)`
+(require 'cl-lib)
+(unless (fboundp 'incf)
+  (defalias 'incf #'cl-incf))
+(unless (fboundp 'decf)
+  (defalias 'decf #'cl-decf))
 ```
+
+Do not use a straight `:pre-build` patch for this repo: it modifies the Jinx
+checkout before `doom sync -u` fetches updates, leaving a dirty worktree and
+forcing an interactive discard/stash prompt.
 
 Then run:
 
@@ -46,23 +49,18 @@ Restart Emacs afterward; a running Emacs may still have the old bytecode loaded.
 
 ## Verification
 
-Check the built bytecode does not contain legacy `incf` or `decf`:
-
-```sh
-strings ~/.config/emacs/.local/straight/build-30.2/jinx/jinx.elc | grep -E '\b(incf|decf)\b' || true
-```
-
-Expected: no output.
-
-Optional load check:
+Check Jinx loads with compat 31 and the runtime aliases available:
 
 ```sh
 emacs --batch \
   -L ~/.config/emacs/.local/straight/build-30.2/compat \
   -L ~/.config/emacs/.local/straight/build-30.2/jinx \
-  --eval "(progn (require 'jinx) (message \"jinx loads OK: %s\" (featurep 'jinx)))"
+  --eval "(progn (require 'cl-lib) (unless (fboundp 'incf) (defalias 'incf #'cl-incf)) (unless (fboundp 'decf) (defalias 'decf #'cl-decf)) (require 'compat) (require 'jinx) (message \"jinx loads OK: %s, completion metadata: %s\" (featurep 'jinx) (fboundp 'completion-table-with-metadata)))"
+git -C ~/.config/emacs/.local/straight/repos/jinx status --short
 ```
+
+Expected: load check succeeds and Jinx repo status is empty.
 
 ## Cleanup Later
 
-When upstream Jinx replaces `incf`/`decf` with `cl-incf`/`cl-decf` or otherwise fixes the issue, remove the `:pre-build` patch and run `doom sync`. Verify with the same `strings` command.
+When upstream Jinx replaces `incf`/`decf` with `cl-incf`/`cl-decf` or otherwise fixes the issue, remove the runtime aliases from `config.el` and run `doom sync`. Keep `(unpin! compat)` while Jinx or other unpinned packages require compat 31.

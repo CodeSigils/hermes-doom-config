@@ -56,12 +56,22 @@
 (global-subword-mode 1)
 
 ;; Fast async spell checking via Enchant/Hunspell.
+;; Jinx 2.7 still calls legacy bare `incf`/`decf` at runtime. Emacs 30 only
+;; provides the cl-lib names, so install tiny compatibility aliases before Jinx
+;; autoloaded commands can run. Keep this out of straight's repo checkout so
+;; `doom sync -u` can update Jinx without a dirty worktree prompt.
+(require 'cl-lib)
+(unless (fboundp 'incf)
+  (defalias 'incf #'cl-incf))
+(unless (fboundp 'decf)
+  (defalias 'decf #'cl-decf))
+
 (use-package! jinx
   :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
   :config
   (setq jinx-languages "en_US")
-  (map! :map jinx-mode-map
-        "M-$" #'jinx-correct
+  (map! "M-$" #'jinx-correct
+        "C-M-$" #'jinx-languages
         :leader
         (:prefix ("s" . "spelling")
          :desc "Correct word" "c" #'jinx-correct

@@ -368,27 +368,30 @@ Use this Doom-native configuration:
 ;; (spell +flyspell)
 
 ;; packages.el
-;; Jinx 2.7 currently calls legacy `incf`/`decf` while only requiring `cl-lib`.
-;; Patch the straight checkout before byte-compilation so timers use cl-lib names.
+;; Jinx requires compat 31 for `completion-table-with-metadata'. Doom pins can
+;; lag behind, so unpin compat when Jinx reports that symbol as void.
+(unpin! compat)
+
 (package! jinx
-  :recipe (:host github :repo "minad/jinx"
-           :pre-build
-           (with-temp-buffer
-             (insert-file-contents "jinx.el")
-             (dolist (replacement '(("(incf " . "(cl-incf ")
-                                    ("(decf " . "(cl-decf ")))
-               (goto-char (point-min))
-               (while (search-forward (car replacement) nil t)
-                 (replace-match (cdr replacement) nil t)))
-             (write-region nil nil "jinx.el"))))
+  :recipe (:host github :repo "minad/jinx"))
 
 ;; config.el
+;; Jinx 2.7 still calls legacy bare `incf`/`decf` at runtime. Emacs 30 only
+;; provides the cl-lib names, so install aliases before autoloaded commands run.
+;; Prefer aliases over a straight :pre-build source patch: the source patch dirties
+;; the checkout and makes `doom sync -u` stop for an interactive dirty-tree prompt.
+(require 'cl-lib)
+(unless (fboundp 'incf)
+  (defalias 'incf #'cl-incf))
+(unless (fboundp 'decf)
+  (defalias 'decf #'cl-decf))
+
 (use-package! jinx
   :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
   :config
   (setq jinx-languages "en_US")
-  (map! :map jinx-mode-map
-        "M-$" #'jinx-correct
+  (map! "M-$" #'jinx-correct
+        "C-M-$" #'jinx-languages
         :leader
         (:prefix ("s" . "spelling")
          :desc "Correct word" "c" #'jinx-correct
@@ -406,17 +409,19 @@ Useful Jinx verification after `doom sync`:
 ```sh
 emacs --batch -L ~/.config/emacs/.local/straight/build-30.2/compat \
   -L ~/.config/emacs/.local/straight/build-30.2/jinx \
-  --eval "(progn (require 'jinx) (message \"jinx loads OK: %s\" (featurep 'jinx)))"
-strings ~/.config/emacs/.local/straight/build-30.2/jinx/jinx.elc | grep -E '\\b(incf|decf)\\b' || true
+  --eval "(progn (require 'cl-lib) (unless (fboundp 'incf) (defalias 'incf #'cl-incf)) (unless (fboundp 'decf) (defalias 'decf #'cl-decf)) (require 'compat) (require 'jinx) (message \"jinx loads OK: %s, completion metadata: %s\" (featurep 'jinx) (fboundp 'completion-table-with-metadata)))"
+git -C ~/.config/emacs/.local/straight/repos/jinx status --short
 ```
+
+Expected: Jinx loads, `completion-table-with-metadata` is defined, and the Jinx
+straight checkout is clean.
 
 If `M-$`, `SPC s c`, or unrelated Org commands report `Error running timer
 'nil': (void-function incf)` or `(void-function decf)`, the idle Jinx timer is
-loading bytecode that still contains legacy `incf`/`decf` calls. Confirm the
-`:pre-build` patch is present in
-`packages.el`, run `doom sync`, and verify `strings .../jinx.elc` no longer
-prints `incf` or `decf`. See `references/jinx-incf-timer.md` for the root cause,
-verification commands, and cleanup guidance once upstream fixes it.
+loading bytecode that still calls legacy `incf`/`decf`. Confirm the aliases are
+present before `(use-package! jinx ...)`, run `doom sync`, restart Emacs, and
+retest. See `references/jinx-incf-timer.md` for the root cause and cleanup
+guidance once upstream fixes it.
 
 For multilingual setups, extend `jinx-languages`, e.g. `"en_US de_DE"`, but
 start with the user's primary dictionary unless they ask for more.

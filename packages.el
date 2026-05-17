@@ -58,19 +58,14 @@
 (package! websocket)
 (package! org-roam-ui)
 (package! rainbow-delimiters)
-;; Jinx 2.7 currently calls legacy `incf`/`decf` while only requiring `cl-lib`.
-;; Patch the straight checkout before byte-compilation so timers use cl-lib names.
+
+;; Jinx 2.7 requires compat 31 for `completion-table-with-metadata'. Doom's
+;; pinned compat can lag behind that, so let straight install the package's
+;; current compat dependency instead of Doom's older pin.
+(unpin! compat)
+
 (package! jinx
-  :recipe (:host github :repo "minad/jinx"
-           :pre-build
-           (with-temp-buffer
-             (insert-file-contents "jinx.el")
-             (dolist (replacement '(("(incf " . "(cl-incf ")
-                                    ("(decf " . "(cl-decf ")))
-               (goto-char (point-min))
-               (while (search-forward (car replacement) nil t)
-                 (replace-match (cdr replacement) nil t)))
-             (write-region nil nil "jinx.el"))))
+  :recipe (:host github :repo "minad/jinx"))
 
 ;; Native Org supports remote inline images via
 ;; `org-display-remote-inline-images'. Keep org-remoteimg disabled; its advice
