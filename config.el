@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-;; Place your private configuration here! Remember, you do not need to run 'doom
-;; sync' after modifying this file!
+;; Place your private configuration here. This repo intentionally runs `doom
+;; sync' after requested config changes; see AGENTS.md for the local workflow.
 
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
@@ -50,8 +50,7 @@
       confirm-kill-emacs nil
       confirm-kill-processes nil
       evil-want-fine-undo t
-      truncate-string-ellipsis "..."
-      password-cache-expiry nil)
+      truncate-string-ellipsis "...")
 
 (global-prettify-symbols-mode 1)
 (global-subword-mode 1)
