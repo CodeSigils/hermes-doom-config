@@ -58,15 +58,18 @@
 (package! websocket)
 (package! org-roam-ui)
 (package! rainbow-delimiters)
-;; Jinx 2.7 currently calls legacy `incf` while only requiring `cl-lib`.
-;; Patch the straight checkout before byte-compilation so timers use `cl-incf`.
+;; Jinx 2.7 currently calls legacy `incf`/`decf` while only requiring `cl-lib`.
+;; Patch the straight checkout before byte-compilation so timers use cl-lib names.
 (package! jinx
   :recipe (:host github :repo "minad/jinx"
            :pre-build
            (with-temp-buffer
              (insert-file-contents "jinx.el")
-             (while (search-forward "(incf " nil t)
-               (replace-match "(cl-incf " nil t))
+             (dolist (replacement '(("(incf " . "(cl-incf ")
+                                    ("(decf " . "(cl-decf ")))
+               (goto-char (point-min))
+               (while (search-forward (car replacement) nil t)
+                 (replace-match (cdr replacement) nil t)))
              (write-region nil nil "jinx.el"))))
 
 ;; Native Org supports remote inline images via

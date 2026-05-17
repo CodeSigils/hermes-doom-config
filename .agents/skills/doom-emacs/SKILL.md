@@ -136,7 +136,8 @@ To resolve a flag's meaning: put cursor on the flag in `init.el` and press
 See `references/doom-api.md` for a table of common flags. See
 `references/agent-shell-evaluation.md` for the conservative Agent Shell pilot
 configuration and ACP transport cautions. See `references/jinx-incf-timer.md`
-for the Jinx 2.7 idle-timer `incf` failure and straight `:pre-build` patch.
+for the Jinx 2.7 idle-timer `incf`/`decf` failure and straight `:pre-build`
+patch.
 
 ### Doom Variables
 
@@ -367,15 +368,18 @@ Use this Doom-native configuration:
 ;; (spell +flyspell)
 
 ;; packages.el
-;; Jinx 2.7 currently calls legacy `incf` while only requiring `cl-lib`.
-;; Patch the straight checkout before byte-compilation so timers use `cl-incf`.
+;; Jinx 2.7 currently calls legacy `incf`/`decf` while only requiring `cl-lib`.
+;; Patch the straight checkout before byte-compilation so timers use cl-lib names.
 (package! jinx
   :recipe (:host github :repo "minad/jinx"
            :pre-build
            (with-temp-buffer
              (insert-file-contents "jinx.el")
-             (while (search-forward "(incf " nil t)
-               (replace-match "(cl-incf " nil t))
+             (dolist (replacement '(("(incf " . "(cl-incf ")
+                                    ("(decf " . "(cl-decf ")))
+               (goto-char (point-min))
+               (while (search-forward (car replacement) nil t)
+                 (replace-match (cdr replacement) nil t)))
              (write-region nil nil "jinx.el"))))
 
 ;; config.el
@@ -403,14 +407,15 @@ Useful Jinx verification after `doom sync`:
 emacs --batch -L ~/.config/emacs/.local/straight/build-30.2/compat \
   -L ~/.config/emacs/.local/straight/build-30.2/jinx \
   --eval "(progn (require 'jinx) (message \"jinx loads OK: %s\" (featurep 'jinx)))"
-strings ~/.config/emacs/.local/straight/build-30.2/jinx/jinx.elc | grep -E '\\bincf\\b' || true
+strings ~/.config/emacs/.local/straight/build-30.2/jinx/jinx.elc | grep -E '\\b(incf|decf)\\b' || true
 ```
 
 If `M-$`, `SPC s c`, or unrelated Org commands report `Error running timer
-'nil': (void-function incf)`, the idle Jinx timer is loading bytecode that still
-contains legacy `incf` calls. Confirm the `:pre-build` patch is present in
+'nil': (void-function incf)` or `(void-function decf)`, the idle Jinx timer is
+loading bytecode that still contains legacy `incf`/`decf` calls. Confirm the
+`:pre-build` patch is present in
 `packages.el`, run `doom sync`, and verify `strings .../jinx.elc` no longer
-prints `incf`. See `references/jinx-incf-timer.md` for the root cause,
+prints `incf` or `decf`. See `references/jinx-incf-timer.md` for the root cause,
 verification commands, and cleanup guidance once upstream fixes it.
 
 For multilingual setups, extend `jinx-languages`, e.g. `"en_US de_DE"`, but
@@ -629,8 +634,9 @@ are caught locally before Doom rebuilds the profile.
   `doom doctor` warning classification, stale upstream template comments, and
   documenting snippets.
 - `references/jinx-incf-timer.md` captures the durable Jinx timer failure pattern
-  where bytecode containing legacy `incf` causes `(void-function incf)`, plus the
-  straight `:pre-build` patch and verification commands.
+  where bytecode containing legacy `incf`/`decf` causes `(void-function incf)` or
+  `(void-function decf)`, plus the straight `:pre-build` patch and verification
+  commands.
 
 ## Reference Sources
 
