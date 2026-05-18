@@ -66,8 +66,10 @@ Doom skill.
 - Company path completion is intentionally expanded in `config.el` with
   `company-files` via `set-company-backend!`; preserve that when editing
   completion behavior.
-- Keep Corfu present as a commented `init.el` module line, but do not enable
-  Corfu/Cape/CAPF configuration unless explicitly requested.
+- Keep Corfu present as a commented `init.el` module line, but do not switch
+  the completion system to Corfu/Cape (the `company-capf` backends in
+  `config.el` are Company backends, not Corfu configuration -- leave them
+  untouched).
 - Do not remove lines from `init.el`; comment disabled modules/settings instead
   so the original Doom module list stays visible and recoverable.
 - Do not run chezmoi sync/update actions for Doom work (`chezmoi add`,
