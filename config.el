@@ -262,43 +262,6 @@
   (setf (alist-get 'gfm-mode apheleia-mode-alist) 'prettier-markdown))
 
 
-;;; MARKDOWN EWW PREVIEW
-;; Render markdown in EWW via markdown_py (installed via uv tool).
-;; Wraps output with github-markdown CSS for proper rendering.
-;; Bound to SPC m k in markdown-mode.
-(defun sand/markdown-eww ()
-  "Render current markdown buffer in EWW using markdown_py."
-  (interactive)
-  (let ((buf (get-buffer-create "*markdown-eww*"))
-        (file (buffer-file-name)))
-    (unless file
-      (user-error "Buffer must be visiting a file"))
-    (save-buffer)
-    (with-current-buffer buf
-      (erase-buffer)
-      (insert "<!doctype html><html><head><meta charset='utf-8'>"
-              "<meta name='viewport' content='width=device-width,initial-scale=1'>"
-              "<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css'>"
-              "<style>body.markdown-body{box-sizing:border-box;max-width:740px;width:100%;margin:40px auto;padding:0 10px}</style>"
-              "</head><body class='markdown-body'>\n")
-      (let ((p (point)))
-        (call-process "markdown_py" file t nil)
-        (goto-char p)
-        (unless (search-forward "<" nil t)
-          (erase-buffer)
-          (insert "<p>markdown_py failed — is it installed?</p>")))
-      (goto-char (point-max))
-      (insert "\n</body></html>")
-      (goto-char (point-min))
-      (eww-mode))
-    (pop-to-buffer buf)))
-
-(map! :after markdown-mode
-      :map markdown-mode-map
-      :localleader
-      :desc "Preview in EWW" "k" #'sand/markdown-eww)
-
-
 ;; Prefer Doom-native configuration forms in this repo:
 ;;
 ;;   - `after!' for deferred package/module configuration
