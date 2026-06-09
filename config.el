@@ -251,9 +251,15 @@
 ;;; MARKDOWN FORMATTING (prettier)
 ;; Prettier handles markdown structure: tables, list indentation, fences.
 ;; Installed globally via pnpm at ~/.local/share/pnpm/bin/prettier.
-(after! markdown-mode
-  (set-formatter! 'prettier "prettier --parser markdown"
-    :modes '(markdown-mode gfm-mode)))
+;; Directly set apheleia alists instead of using set-formatter!, because
+;; Doom's markdown module may register its own formatter entry that
+;; overrides set-formatter! when markdown-mode is loaded lazily.
+(use-package! apheleia
+  :config
+  (setf (alist-get 'prettier-markdown apheleia-formatters)
+        '("prettier" "--parser" "markdown"))
+  (setf (alist-get 'markdown-mode apheleia-mode-alist) 'prettier-markdown)
+  (setf (alist-get 'gfm-mode apheleia-mode-alist) 'prettier-markdown))
 
 
 ;; Prefer Doom-native configuration forms in this repo:
