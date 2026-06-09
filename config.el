@@ -3,6 +3,12 @@
 ;; Place your private configuration here. This repo intentionally runs `doom
 ;; sync' after requested config changes; see AGENTS.md for the local workflow.
 
+;; Ensure pnpm global binaries are on exec-path for formatters (prettier, etc.)
+;; pnpm stores globals at ~/.local/share/pnpm/bin/ — independent of fnm.
+(let ((pnpm-global (expand-file-name "~/.local/share/pnpm/bin")))
+  (when (file-directory-p pnpm-global)
+    (add-to-list 'exec-path pnpm-global)))
+
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
