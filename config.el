@@ -40,9 +40,6 @@
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/notes/org/")
 
 ;;; EMACS DEFAULTS
 (setq delete-by-moving-to-trash t
@@ -82,6 +79,10 @@
   (show-smartparens-global-mode 1))
 
 ;;; ORG
+;; If you use `org' and don't want your org files in the default location below,
+;; change `org-directory'. It must be set before org loads!
+(setq org-directory "~/notes/org/")
+
 (defun sand/org-display-inline-images-only-in-org (fn &rest args)
   "Only run Org inline-image display in Org buffers."
   (when (derived-mode-p 'org-mode)
@@ -230,6 +231,15 @@
 ;;; RAINBOW DELIMITERS
 (use-package! rainbow-delimiters
   :hook ((org-mode prog-mode) . rainbow-delimiters-mode))
+
+
+;;; PYTHON FORMATTING (ruff)
+;; Ruff is on PATH at ~/.local/bin/ruff, installed via pnpm global.
+;; Doom's (format +onsave) + apheleia autodetects it, but be explicit.
+(after! python
+  (set-formatter! 'ruff "ruff format --stdin-filename=%b -"
+    :modes '(python-mode))
+  (setq +format-with-lsp nil))  ;; prefer ruff over lsp formatting
 
 
 ;; Prefer Doom-native configuration forms in this repo:
