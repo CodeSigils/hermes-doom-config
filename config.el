@@ -242,6 +242,14 @@
   (setq +format-with-lsp nil))  ;; prefer ruff over lsp formatting
 
 
+;;; MARKDOWN FORMATTING (prettier)
+;; Prettier handles markdown structure: tables, list indentation, fences.
+;; Installed globally via pnpm at ~/.local/share/pnpm/bin/prettier.
+(after! markdown-mode
+  (set-formatter! 'prettier "prettier --parser markdown"
+    :modes '(markdown-mode gfm-mode)))
+
+
 ;; Prefer Doom-native configuration forms in this repo:
 ;;
 ;;   - `after!' for deferred package/module configuration

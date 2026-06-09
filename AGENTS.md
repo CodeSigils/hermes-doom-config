@@ -100,14 +100,17 @@ Doom skill.
 
 - Do not use emoji in any Markdown file in this repository, including generated
   memory summaries, status labels, tables, and agent notes.
-- Markdown files are NOT auto-formatted on save (prettier was removed).
-  Formatting is manual via `M-q` (fill-paragraph).
+- Markdown files are auto-formatted on save via prettier (`--parser markdown`).
+  This handles tables, list indentation, and fence consistency without touching
+  prose content.
+- Prettier is installed globally via `pnpm add -g prettier` at
+  `~/.local/share/pnpm/bin/prettier` — survives fnm Node migrations.
 
 ## Python Policy
 
-- Ruff is the Python formatter and linter. Installed globally via `pnpm add -g
-  ruff` at `~/.local/bin/ruff`. If Emacs cannot find ruff, check that
-  `exec-path` includes `~/.local/bin/`.
+- Ruff is the Python formatter and linter (not prettier — prettier is for
+  markdown only). Installed globally via `pnpm add -g ruff` at
+  `~/.local/bin/ruff`.
 - Format on save is configured in `config.el` via `(format +onsave)` with
   explicit `set-formatter! 'ruff` for Python buffers.
 - Type checking is done via `mypy` (run in CI/terminal), not via LSP in the
