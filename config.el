@@ -270,8 +270,7 @@
   "Render current markdown buffer in EWW using markdown_py."
   (interactive)
   (let ((buf (get-buffer-create "*markdown-eww*"))
-        (file (buffer-file-name))
-        (max-wait 10))
+        (file (buffer-file-name)))
     (unless file
       (user-error "Buffer must be visiting a file"))
     (save-buffer)
