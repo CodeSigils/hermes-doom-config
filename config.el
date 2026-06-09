@@ -281,7 +281,8 @@
     (pop-to-buffer buf)))
 
 (map! :after markdown-mode
-      :map markdown-mode-command-map
+      :map markdown-mode-map
+      :localleader
       :desc "Preview in EWW" "k" #'sand/markdown-eww)
 
 
