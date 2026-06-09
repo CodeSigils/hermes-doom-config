@@ -261,6 +261,10 @@
   (setf (alist-get 'markdown-mode apheleia-mode-alist) 'prettier-markdown)
   (setf (alist-get 'gfm-mode apheleia-mode-alist) 'prettier-markdown))
 
+;; Use marked for compilation so markdown-open renders HTML in BrowserOS
+;; via xdg-open (text/html now routed to browseros.desktop).
+(setq markdown-open-command nil)
+
 
 ;; Prefer Doom-native configuration forms in this repo:
 ;;
