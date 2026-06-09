@@ -280,8 +280,9 @@
       (eww-mode))
     (pop-to-buffer buf)))
 
-(map! :map markdown-mode-command-map
-      :desc "Preview in EWW" "k" #'sand/markdown-eww)
+(after! markdown-mode
+  (map! :map markdown-mode-command-map
+        :desc "Preview in EWW" "k" #'sand/markdown-eww))
 
 
 ;; Prefer Doom-native configuration forms in this repo:
