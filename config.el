@@ -262,9 +262,16 @@
   (setf (alist-get 'gfm-mode apheleia-mode-alist) 'prettier-markdown))
 
 ;; Use marked for compilation so markdown-open renders HTML in BrowserOS
-;; via xdg-open (text/html now routed to browseros.desktop).
+;; via browse-url-of-buffer (text/html now routed to browseros.desktop).
+;; markdown-open-command can be a function; markdown-mode now rejects nil.
 (after! markdown-mode
-  (setq markdown-open-command nil))
+  (setq markdown-open-command
+        (defun sand/markdown-open ()
+          "Compile with marked and open rendered HTML in browser."
+          (interactive)
+          (browse-url-of-buffer
+           (markdown-standalone
+            (generate-new-buffer-name "*marked-output*"))))))
 
 
 ;; Prefer Doom-native configuration forms in this repo:
