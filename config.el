@@ -263,7 +263,8 @@
 
 ;; Use marked for compilation so markdown-open renders HTML in BrowserOS
 ;; via xdg-open (text/html now routed to browseros.desktop).
-(setq markdown-open-command nil)
+(after! markdown-mode
+  (setq markdown-open-command nil))
 
 
 ;; Prefer Doom-native configuration forms in this repo:
