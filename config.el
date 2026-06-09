@@ -268,8 +268,9 @@
   (setq markdown-open-command
         (lambda ()
           (interactive)
-          (browse-url-of-buffer
-           (markdown-standalone (generate-new-buffer-name "*marked*"))))))
+          (let ((browse-url-browser-function 'browse-url-xdg-open))
+            (browse-url-of-buffer
+             (markdown-standalone (generate-new-buffer-name "*marked*")))))))
 
 
 ;; Prefer Doom-native configuration forms in this repo:
