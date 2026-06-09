@@ -266,12 +266,10 @@
 ;; markdown-open-command can be a function; markdown-mode now rejects nil.
 (after! markdown-mode
   (setq markdown-open-command
-        (defun sand/markdown-open ()
-          "Compile with marked and open rendered HTML in browser."
+        (lambda ()
           (interactive)
           (browse-url-of-buffer
-           (markdown-standalone
-            (generate-new-buffer-name "*marked-output*"))))))
+           (markdown-standalone (generate-new-buffer-name "*marked*"))))))
 
 
 ;; Prefer Doom-native configuration forms in this repo:
