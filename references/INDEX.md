@@ -1,95 +1,10 @@
 # Doom Emacs Reference Index
 
-Purpose: catalogue of Doom Emacs reference material organized for agent
-consultation. An agent reading this file discovers what is possible, then
-evaluates against the user's actual config and needs. This is an inspiration
-catalogue, not a copy-paste library.
+Catalogue of Doom Emacs reference material organized for agent consultation.
+Browse categories below to discover what is possible. Every config is personal
+— learn the pattern, write it fresh using your own conventions.
 
----
-
-### Core Principle: Learn, Don't Copy
-
-Every Emacs config is personal and idiomatic — the product of its author's
-habits, modules, naming, and workflow. References in this file show what is
-possible with Doom Emacs. They are not instructions to adopt.
-
-An agent must never treat external configs as code to transplant. Instead:
-
-1. **Learn** — understand what the feature does and why it exists
-2. **Evaluate** — check against the user's PROFILE.md policies, existing config
-   structure, completion backend, window rules, and naming conventions
-3. **Suggest** — present the option to the user with what it enables and what
-   it costs (conflicts, complexity, performance impact), using the user's own
-   style conventions
-4. **Only implement on request** — never apply external patterns unilaterally
-
-The user's running config at `~/.config/doom/init.el` + `config.el` +
-`packages.el` is the single source of truth. Everything else is inspiration.
-
-### Evaluation Checklist
-
-When an agent encounters a reference feature and is considering whether to
-propose it, these checks determine if it's compatible:
-
-1. **Module conflict** — does it require a module or flag not in `init.el`?
-   If so, note what to add.
-2. **Completion backend** — does it assume Corfu/Cape (alternative
-   completions), LSP-specific completion, or any behavior that conflicts with
-   the Company + vertico setup?
-3. **Window management** — does it advise low-level window primitives, change
-   `display-buffer-alist` broadly, or assume a single-monitor layout?
-4. **Keybinding** — does it use `define-key` or `global-set-key` where a
-   `map!` form would be more idiomatic? Does it shadow an Evil binding?
-5. **External dependency** — does it require a binary, API key, or system
-   package not listed in the environment profile?
-6. **Doom version** — is it compatible with the monolithic Doom repo at
-   `~/.config/emacs/`? (Does not assume the new core/modules split.)
-7. **Config style** — does it assume `config.org` literate setup,
-   `use-package` without Doom's `use-package!` wrapper, or other patterns
-   that differ from this config's approach?
-8. **Performance cost** — does it enable expensive features (Tree-sitter on
-   every buffer, global mode on large hook, frequent timers)?
-
-If any check produces a conflict, flag it to the user with the specific
-incompatibility and let them decide. Do not silently adapt the reference code
-to work around the conflict.
-
----
-
-### Agent Strategy: How to Use This File
-
-When asked a Doom Emacs question:
-
-1. **Check this file first** — scan the relevant category for pointers.
-2. **For Doom API/macro questions** — consult `DOOM-API.md` first (top-level,
-   visible to any agent). For deeper reference, see the skill at
-   `.agents/skills/doom-emacs/SKILL.md`.
-3. **For module questions** — the local source at `~/.config/emacs/modules/` is
-   the definitive reference. Each module directory has a `README.org` or
-   `config.el` with its docs.
-4. **For package questions** — check `~/.config/emacs/.local/straight/repos/`
-   for installed package source code. This is more reliable than MELPA docs.
-5. **For troubleshooting** — start with Section 7, then consult the Doom FAQ
-   at `~/.config/emacs/docs/faq.org`.
-6. **When suggesting config changes** — first check `PROFILE.md` for the
-   current config setup, then cross-reference against AGENTS.md policies
-   (completion system, window rules, naming conventions). These take priority
-   over any external reference. Run the **Evaluation Checklist** above before
-   proposing anything found in a reference link.
-7. **When exploring possibilities** — Sections 11 and 12 catalogue inspiring
-   community configs and features the user does not currently use. Browse
-   these when the user asks "what could I do with X?" or "show me what's
-   possible."
-
-### Agent Prohibitions
-
-- Do not add new modules, flags, or packages to `init.el` without user request
-- Do not copy code from any external config into this config. Every config is
-  personal — learn the pattern, write it fresh using this config's conventions
-- Do not use external variable names, keybinding prefixes, or module flags that
-  differ from this config's patterns without flagging the difference to the user
-- Do not replace the user's existing patterns (Company for completion, sand/
-  prefix, config.el over config.org) with references from external configs
+This is an inspiration catalogue, not a copy-paste library.
 
 ## 1. Official Resources
 
@@ -112,10 +27,9 @@ inside Emacs: `M-x doom/help` opens an interactive info browser with current
 documentation matching the installed version.
 
 The Doom Emacs repo recently entered a transition phase. The monolithic
-`doomemacs/doomemacs` repo (this user's install) is being split into
+`doomemacs/doomemacs` repo is being split into
 `doomemacs/core` + per-module repos. Modules that have moved are tracked in
-`~/.config/emacs/sources/`. The monolithic repo still works; the split affects
-upstream development, not this config.
+`~/.config/emacs/sources/`.
 
 ## 2. Local Source Anatomy
 
@@ -219,15 +133,6 @@ against the local `~/.config/emacs/` source when examples don't work.
 - DistroTube Doom Emacs overviews (YouTube)
 - "Emacs From Scratch" series by System Crafters (YouTube)
 
-### This Config
-
-This config's documentation (see `PROFILE.md` for the full overview):
-
-- `../AGENTS.md` — agent behavior policies and workflow
-- `../DOOM-API.md` — idiomatic Doom patterns reference
-- `.agents/skills/doom-emacs/SKILL.md` — full Doom procedures and pitfalls
-- `../init.el` — source of truth for enabled modules
-
 ## 6. Tips, Tricks, and Patterns
 
 ### Doom Macros (Use These, Not Vanilla)
@@ -245,12 +150,11 @@ This config's documentation (see `PROFILE.md` for the full overview):
 | `load!`                | `load-file`                    | Load relative to doom-user-dir |
 | `featurep!`            | `featurep`                     | Compile-time module check      |
 
-For full syntax and examples, see `.agents/skills/doom-emacs/SKILL.md` section
-"Doom API Essentials (Compact)".
+For full syntax and examples, see `DOOM-API.md` at the repo root.
 
 ### Common Module Flags
 
-Flags toggle features within a module. Examples from this config:
+Flags toggle features within a module. Examples:
 
 | Flag          | Module           | Effect                           |
 | ------------- | ---------------- | -------------------------------- |
@@ -304,7 +208,6 @@ When in doubt, check the upstream module source at
 | LSP not working for a language | Missing LSP server binary                    | Install server, verify with `doom doctor` |
 | Keybinding not working         | Wrong keymap or missing `:after` keyword     | Use `:after` inside `map!`, not wrapped   |
 | Format on save broken          | Missing formatter on `exec-path`             | Install tool, verify `exec-path`          |
-| `void-function incf` error     | Jinx timer calling legacy `incf`/`decf`      | Add `cl-incf` alias (see config.el)       |
 
 ### Debugging Walkthrough
 
@@ -319,10 +222,8 @@ Step-by-step for "something is broken":
 
 ## 8. Doom API Reference (Compact)
 
-The canonical Doom API guide is `DOOM-API.md` at the repo root — read that
-first for idiomatic patterns and macro decisions. This section is a compact
-reference for quick lookup. For the full reference with examples, see
-`.agents/skills/doom-emacs/SKILL.md`.
+This section is a compact reference for common Doom API macros and
+commands. For full syntax and examples, see `DOOM-API.md`.
 
 ### Key Variables
 
@@ -346,7 +247,7 @@ reference for quick lookup. For the full reference with examples, see
 | `+eval/buffer`             | `SPC b e`   | Eval current buffer           |
 | `+eval/region`             | `SPC c e`   | Eval selected region          |
 
-### Module Lookup from config.el
+### Module Lookup
 
 When you encounter an unknown variable or function:
 
@@ -408,7 +309,7 @@ After `doom upgrade`:
 
 A catalogue of what is possible with Doom Emacs, organized by what each config
 teaches. These are exploration material — browse to learn patterns and features,
-never to extract code. Every config is personal (see Core Principle).
+never to extract code. Every config is personal.
 
 ### Tecosaur's Emacs Config
 
@@ -428,25 +329,15 @@ config with deep coverage of:
 The HTML rendering of his config at the link above is itself an artifact of his
 org-publish pipeline — the config is self-hosting.
 
-**Reference note:** Tecosaur runs a very different set of modules and a
-literate config.org setup. His org-mode depth is exceptional. The value for
-this config is seeing what org-mode can do and evaluating whether those
-features suit your workflow.
-
 ### Doom's Canonical Example Config
 
 `~/.config/emacs/static/config.example.el` — the official example shipped with
-Doom. Shows every module category with representative flags. Useful as a
-starting point for understanding Doom's module system, but the configuration is
-minimal by design.
+Doom. Shows every module category with representative flags.
 
 ### Community Config Links
 
 https://github.com/doomemacs/doomemacs/wiki — Doom wiki page listing community
-config repos. Browse to discover different organizational styles, package
-choices, and module combinations.
-
-User's own README.md and AGENTS.md — authoritative for this setup.
+config repos.
 
 ### Video (Community)
 
@@ -460,13 +351,3 @@ User's own README.md and AGENTS.md — authoritative for this setup.
 - https://blog.doomemacs.org/ — Official Doom blog
 - Emacs Reddit: /r/emacs and /r/doomemacs — frequent config discussion
 - Various GitHub gists: search "doom emacs config" for community examples
-
-## How to Contribute to This File
-
-- Add links in the appropriate section with URL + brief description
-- Verify links are current before adding
-- Keep the agent strategy section at the top — it's the first thing a reader
-  (human or machine) sees
-- Prefer local paths (`~/.config/emacs/...`) over remote URLs when the
-  information lives locally
-- Prefer stable links (GitHub permalinks) over blog posts that may go stale
