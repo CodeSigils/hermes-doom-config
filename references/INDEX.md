@@ -365,11 +365,6 @@ troubleshooting — is documented at:
 
 - `references/package-management.md` — full lifecycle reference
 
-For the authoritative list of extra packages used in this config, see
-`PROFILE.md` (Packages Installed section).
-
-The actual declarations live in `packages.el` at the repo root.
-
 ## 10. Maintenance and Upgrades
 
 ### Doom Update Commands

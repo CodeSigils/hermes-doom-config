@@ -31,8 +31,8 @@ macro before it can be installed.
 
 This installs from MELPA, ELPA, or Emacsmirror depending on where it's found.
 Doom pins all built-in packages to a specific commit. Extra packages outside
-that pin list (like this config's `rainbow-delimiters`) resolve to their latest
-available version unless a `:recipe` or `:pin` is provided.
+that pin list resolve to their latest available version unless a `:recipe` or
+`:pin` is provided.
 
 ### Options
 
@@ -65,18 +65,6 @@ The `:recipe` option uses straight.el's recipe format:
 
 The full recipe format is documented at:
 https://github.com/radian-software/straight.el#the-recipe-format
-
-### This Config's `packages.el`
-
-Extra packages used by this config:
-
-| Package              | Declaration                                        | Reason for custom form                 |
-| -------------------- | -------------------------------------------------- | -------------------------------------- |
-| `websocket`          | `(package! websocket)`                             | Standard                               |
-| `org-roam-ui`        | `(package! org-roam-ui)`                           | Standard                               |
-| `rainbow-delimiters` | `(package! rainbow-delimiters)`                    | Standard                               |
-| `jinx`               | `(package! jinx :recipe (:host github :repo ...))` | Skip Doom's pin; use latest from minad |
-| `compat`             | `(unpin! compat)` (no `package!` needed)           | Doom pins it; unpin for Jinx compat    |
 
 ### Lookup Reference
 
@@ -137,13 +125,13 @@ This is the single command that:
 
 ### When to Run
 
-| Event                                | Required?                     |
-| ------------------------------------ | ----------------------------- |
-| Added a `package!` to `packages.el`  | Yes                           |
-| Removed a `package!`                 | Yes                           |
-| Changed `init.el` modules            | Yes                           |
-| Changed `config.el` (config only)    | Usually — `doom sync` is safe |
-| Changed `DOOM-API.md` or `AGENTS.md` | No                            |
+| Event                               | Required?                     |
+| ----------------------------------- | ----------------------------- |
+| Added a `package!` to `packages.el` | Yes                           |
+| Removed a `package!`                | Yes                           |
+| Changed `init.el` modules           | Yes                           |
+| Changed `config.el` (config only)   | Usually — `doom sync` is safe |
+| Changed documentation files         | No                            |
 
 **After `doom sync`, always run `doom doctor`** to catch errors.
 
@@ -177,9 +165,6 @@ doom upgrade
 
 Updates the Doom framework itself (core, modules, CLI) plus all packages.
 **Must be followed by `doom sync && doom doctor`.**
-
-See `references/INDEX.md` section 10 for upgrade safety procedures (backup
-before upgrade, rollback recovery).
 
 ### Cleanup
 
