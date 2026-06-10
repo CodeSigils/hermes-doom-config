@@ -102,5 +102,6 @@ For full policy text see `AGENTS.md`:
 | `DOOM-API.md`                        | Idiomatic Doom patterns — which macros to use when and why |
 | `AGENTS.md`                          | Agent behavior policies and workflow                       |
 | `references/INDEX.md`                | External Doom Emacs reference catalogue                    |
+| `references/package-management.md`   | Doom package lifecycle: declaration, sync, update, pinning |
 | `.agents/skills/doom-emacs/SKILL.md` | Doom API reference and procedures                          |
 | `README.md`                          | Human-facing quick start                                   |

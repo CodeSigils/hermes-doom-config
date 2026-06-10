@@ -359,11 +359,16 @@ When you encounter an unknown variable or function:
 
 ## 9. Package Ecosystem
 
-See `PROFILE.md` (Packages Installed section) for the authoritative list of
-extra packages in this config — this file defers to that source.
+Doom's package workflow — declaration (`package!`), configuration
+(`use-package!`), installation (`doom sync`), updating, pinning, and
+troubleshooting — is documented at:
 
-For Jinx-specific troubleshooting (compat module, incf aliases), see
-`references/jinx-incf-timer.md` in the doom-emacs-config skill directory.
+- `references/package-management.md` — full lifecycle reference
+
+For the authoritative list of extra packages used in this config, see
+`PROFILE.md` (Packages Installed section).
+
+The actual declarations live in `packages.el` at the repo root.
 
 ## 10. Maintenance and Upgrades
 
