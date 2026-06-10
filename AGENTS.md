@@ -67,7 +67,7 @@ blocking.
 | ----------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Do automatically                    | Routine maintenance within documented patterns                          | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add custom functions with `sand/` prefix, run `doom sync` + `doom doctor` |
 | Propose (ask first)                 | Structural changes that affect behavior or files beyond the edit target | Create new top-level files, introduce new modules, change completion backend, override Doom's core macro usage, modify popup rules broadly         |
-| Never without explicit user request | Destructive or irreversible operations                                  | `doom upgrade`, removing lines from `init.el` instead of commenting, editing generated state under `.agents/skills/`, running `chezmoi` operations |
+| Never without explicit user request | Destructive or irreversible operations                                  | `doom upgrade`, removing lines from `init.el` instead of commenting, editing generated state under `.agents/skills/` |
 
 When in doubt, propose and wait. The cost of asking is lower than the cost of
 reverting.
@@ -86,21 +86,8 @@ reverting.
   untouched).
 - Do not remove lines from `init.el`; comment disabled modules/settings instead
   so the original Doom module list stays visible and recoverable.
-- Do not run chezmoi sync/update actions for Doom work (`chezmoi add`,
-  `chezmoi apply`, `chezmoi forget`, etc.) until the user explicitly says so.
 - After changing `init.el` completion modules, `packages.el`, or requested
   config-only behavior, run `doom sync` unless explicitly told not to.
-
-## Window Management Policy
-
-- Do not advise low-level window primitives such as `window-split`.
-- Prefer documented window/display controls: `split-window-preferred-function`,
-  `display-buffer-alist`, Doom `set-popup-rule!`, explicit keybindings, and
-  mode/package hooks.
-- Preserve monitor-aware initial frame sizing through `sand/initial-frame-size`;
-  do not replace it with a single fixed frame size unless explicitly requested.
-- Prefer targeted popup rules for known transient buffers over broad catch-all
-  star-buffer rules.
 
 ## Defensive Config Policy
 
@@ -154,3 +141,22 @@ When editing or reviewing `.el` files, ensure they follow `DOOM-API.md`
 patterns. Doom's macros (`setq!`, `use-package!`, `after!`, `map!`,
 `add-hook!`, etc.) are preferred over their Emacs equivalents. If existing
 code uses the Emacs form, convert it as part of the edit.
+
+## AI Context for Config Questions
+
+When asking an AI (or another agent) about this Doom config, provide context
+to get accurate, verifiable answers:
+
+**Minimum context to include:**
+- Doom version: `doom version` output
+- File being edited: `config.el`, `init.el`, or `packages.el`
+- What you're trying to achieve
+- What you've already tried
+- Any error messages (exact text)
+
+**Helper script:** Run `./scripts/ai-context.sh [file]` to auto-generate this
+context block (captures version, git status, file content, recent commits).
+
+**Why this works:** AI agents have no persistent memory of your config. The
+context window is limited and position-biased — see `agent-concepts-study`
+memory surfaces note. Explicit context eliminates guessing.
