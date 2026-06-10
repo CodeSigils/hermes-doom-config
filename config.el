@@ -4,51 +4,19 @@
 ;; sync' after requested config changes; see AGENTS.md for the local workflow.
 
 ;; Ensure pnpm global binaries are on exec-path for formatters (prettier, etc.)
-;; pnpm stores globals at ~/.local/share/pnpm/bin/ — independent of fnm.
+;; pnpm stores globals at ~/.local/share/pnpm/bin/ -- independent of fnm.
 (let ((pnpm-global (expand-file-name "~/.local/share/pnpm/bin")))
   (when (file-directory-p pnpm-global)
     (add-to-list 'exec-path pnpm-global)))
 
-
-;; Some functionality uses this to identify you, e.g. GPG configuration, email
-;; clients, file templates and snippets. It is optional.
-;; (setq user-full-name "John Doe"
-;;       user-mail-address "john@doe.com")
-;;
-
-;; Doom exposes five (optional) variables for controlling fonts in Doom:
-;;
-;; - `doom-font' -- the primary font to use
-;; - `doom-variable-pitch-font' -- a non-monospace font (where applicable)
-;; - `doom-big-font' -- used for `doom-big-font-mode'; use this for
-;;   presentations or streaming.
-;; - `doom-symbol-font' -- for symbols
-;; - `doom-serif-font' -- for the `fixed-pitch-serif' face
-;;
-;; See 'C-h v doom-font' for documentation and more examples of what they
-;; accept. For example:
-;;
-;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
-;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-;;
-;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
-;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
-;; refresh your font settings. If Emacs still can't find your font, it likely
-;; wasn't installed correctly. Font issues are rarely Doom issues!
-
-(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 22)
+(setq! doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 22)
       doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font" :size 20))
 
-;; There are two ways to load a theme. Both assume the theme is installed and
-;; available. You can either set `doom-theme' or manually load a theme with the
-;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-tokyo-night)
-;; This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+(setq! doom-theme 'doom-tokyo-night)
+(setq! display-line-numbers-type t)
 
 ;;; EMACS DEFAULTS
-(setq delete-by-moving-to-trash t
+(setq! delete-by-moving-to-trash t
       window-combination-resize t
       confirm-kill-emacs nil
       confirm-kill-processes nil
@@ -72,7 +40,7 @@
 (use-package! jinx
   :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
   :config
-  (setq jinx-languages "en_US")
+  (setq! jinx-languages "en_US")
   (map! "M-$" #'jinx-correct
         "C-M-$" #'jinx-languages
         :leader
@@ -85,9 +53,7 @@
   (show-smartparens-global-mode 1))
 
 ;;; ORG
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/notes/org/")
+(setq! org-directory "~/notes/org/")
 
 (defun sand/org-display-inline-images-only-in-org (fn &rest args)
   "Only run Org inline-image display in Org buffers."
@@ -96,10 +62,10 @@
 
 (after! org
   (require 'org-tempo)
-  (add-hook 'org-mode-hook #'+org-pretty-mode)
+  (add-hook! 'org-mode-hook #'+org-pretty-mode)
 
   ;; Inline images
-  (setq org-startup-with-inline-images t
+  (setq! org-startup-with-inline-images t
         org-display-remote-inline-images 'cache
         org-image-actual-width 600)
 
@@ -113,32 +79,30 @@
                    #'org-display-user-inline-images)))
 
 ;;; ORG ROAM
-(setq org-roam-directory "~/notes/org/roam")
+(setq! org-roam-directory "~/notes/org/roam")
 
 (after! org-roam
   (when (fboundp 'org-roam-db-autosync-mode)
     (org-roam-db-autosync-mode 1)))  ;; Enables automatic sync
 
-;; Org roam UI - external package
 (use-package! org-roam-ui
   :after org-roam
   :commands org-roam-ui-mode
   :config
-  (setq org-roam-ui-sync-theme t
+  (setq! org-roam-ui-sync-theme t
         org-roam-ui-follow t
         org-roam-ui-update-on-save t))
 
 ;;; DABBREV
-;; (setq-default abbrev-mode t)
-(setq abbrev-file-name (expand-file-name "abbrev.el" doom-user-dir))
-(setq save-abbrevs nil)
+(setq! abbrev-file-name (expand-file-name "abbrev.el" doom-user-dir))
+(setq! save-abbrevs nil)
 
 ;;; COMPANY
 (after! company
   ;; Doom's Company module is enabled, but its default backend lists do not put
   ;; `company-files' in the common mode backends. Add it explicitly so paths are
   ;; suggested after prefixes like ./, ../, ~/, /, and Org file: links.
-  (setq company-idle-delay 0.2
+  (setq! company-idle-delay 0.2
         company-minimum-prefix-length 1
         company-tooltip-limit 12
         company-tooltip-align-annotations t
@@ -170,13 +134,13 @@
 
 ;;; BROWSER
 (when-let ((browser (getenv "BROWSER")))
-  (setq browse-url-browser-function 'browse-url-generic
+  (setq! browse-url-browser-function 'browse-url-generic
         browse-url-generic-program browser))
 
 ;;; WINDOW
 ;; Use Doom/window display rules rather than advising low-level window
 ;; primitives like `window-split'.
-(setq switch-to-buffer-obey-display-actions t)
+(setq! switch-to-buffer-obey-display-actions t)
 
 (winner-mode 1)
 
@@ -190,7 +154,7 @@
              (with-selected-window window
                (split-window-below))))))
 
-(setq split-window-preferred-function #'sand/split-window-sensibly)
+(setq! split-window-preferred-function #'sand/split-window-sensibly)
 
 ;; Keep common transient/help buffers out of the main editing layout without
 ;; capturing every star buffer.
@@ -209,7 +173,7 @@
    ((>= (display-pixel-width) 1920) '((width . 124) (height . 55)))
    (t '((width . 100) (height . 45)))))
 
-(setq initial-frame-alist
+(setq! initial-frame-alist
       (append '((top . 1) (left . 1))
               (sand/initial-frame-size)))
 
@@ -218,26 +182,25 @@
 (map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)
 
 (after! dirvish
-  (setq dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
-  (setq dirvish-subtree-state-style 'nerd)
-  (setq dirvish-path-separators
+  (setq! dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
+  (setq! dirvish-subtree-state-style 'nerd)
+  (setq! dirvish-path-separators
         (list (format " %s " (nerd-icons-codicon "nf-cod-home"))
               (format " %s " (nerd-icons-codicon "nf-cod-root_folder"))
               (format " %s " (nerd-icons-faicon "nf-fa-angle_right")))))
 
 ;;; TIME
-(setq display-time-24hr-format t)
+(setq! display-time-24hr-format t)
 (display-time-mode 1)
 
 ;;; WHICH KEY
 (after! which-key
-  (setq which-key-min-display-lines 12
+  (setq! which-key-min-display-lines 12
         which-key-idle-delay 0.3))
 
 ;;; RAINBOW DELIMITERS
 (use-package! rainbow-delimiters
   :hook ((org-mode prog-mode) . rainbow-delimiters-mode))
-
 
 ;;; PYTHON FORMATTING (ruff)
 ;; Ruff is on PATH at ~/.local/bin/ruff, installed via pnpm global.
@@ -245,8 +208,7 @@
 (after! python
   (set-formatter! 'ruff "ruff format --stdin-filename=%b -"
     :modes '(python-mode))
-  (setq +format-with-lsp nil))  ;; prefer ruff over lsp formatting
-
+  (setq! +format-with-lsp nil))  ;; prefer ruff over lsp formatting
 
 ;;; MARKDOWN FORMATTING (prettier)
 ;; Prettier handles markdown structure: tables, list indentation, fences.
@@ -265,24 +227,9 @@
 ;; via browse-url-of-buffer (text/html now routed to browseros.desktop).
 ;; markdown-open-command can be a function; markdown-mode now rejects nil.
 (after! markdown-mode
-  (setq markdown-open-command
+  (setq! markdown-open-command
         (lambda ()
           (interactive)
           (let ((browse-url-browser-function 'browse-url-xdg-open))
             (browse-url-of-buffer
              (markdown-standalone (generate-new-buffer-name "*marked*")))))))
-
-
-;; Prefer Doom-native configuration forms in this repo:
-;;
-;;   - `after!' for deferred package/module configuration
-;;   - `use-package!' for external packages declared in packages.el
-;;   - `map!' for keybindings
-;;   - `load!' for local config modules relative to this file
-;;
-;; Avoid vanilla `with-eval-after-load' and standard `use-package' here; Doom's
-;; macros integrate with its module and package lifecycle.
-;;
-;; File/directory variables (like `org-directory'), variables that must be set
-;; before package load, and Doom variables (`doom-*' or `+') can stay at top
-;; level. For symbol help, use `K' (or `C-c c k') on the symbol, or `C-h o'.

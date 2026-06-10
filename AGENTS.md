@@ -133,3 +133,10 @@ change:
 
 Run `git diff --check` before committing. Stale documentation is worse than
 missing documentation because the agent cannot distinguish it from truth.
+
+## Doom API Compliance
+
+When editing or reviewing `.el` files, ensure they follow `DOOM-API.md`
+patterns. Doom's macros (`setq!`, `use-package!`, `after!`, `map!`,
+`add-hook!`, etc.) are preferred over their Emacs equivalents. If existing
+code uses the Emacs form, convert it as part of the edit.
