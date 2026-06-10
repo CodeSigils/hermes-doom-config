@@ -14,8 +14,10 @@ doom sync
 doom doctor
 ```
 
-If you're an AI agent working in this repo, read `AGENTS.md` first. The repo's
-required Doom skill is self-contained at `.agents/skills/doom-emacs/SKILL.md`.
+If you're an AI agent working in this repo, read `AGENTS.md` first, then
+`PROFILE.md` (what this config is), then `DOOM-API.md` (idiomatic Doom
+patterns). The repo's required Doom skill is self-contained at
+`.agents/skills/doom-emacs/SKILL.md`.
 If your Hermes installation also has `emacs-lisp-expert`, load it as an optional
 companion skill for general Emacs Lisp guidance. If it is missing, consider
 installing it for deeper Emacs Lisp help, but do not require it for basic repo
@@ -29,31 +31,13 @@ scripts/sync-doom-skill-mirror.sh
 scripts/check-doom-skill-mirror.sh
 ```
 
-Agent workflow: work sequentially, check `git status --short` before edits,
-inspect files before patching, verify README module lists against `init.el`, run
-`check-parens` for changed `.el` files, run `doom sync` after requested Doom
-config edits unless told not to, and run `doom doctor` after `doom sync`.
+For the full agent workflow and configuration policies, see `AGENTS.md`.
 
 ## Notable Enabled Modules
 
-`init.el` is the source of truth for this list.
-
-- `:completion company +childframe +tng` and `vertico`
-- `:ui doom, doom-dashboard, hl-todo, indent-guides, modeline, ophints, popup
-  +all +defaults, smooth-scroll, vc-gutter +pretty, vi-tilde-fringe,
-  window-select, workspaces, zen`
-- `:editor evil +everywhere, file-templates, fold, format +onsave, snippets,
-  whitespace +guess +trim, word-wrap`
-- `:emacs dired +icons +dirvish, electric, eww, ibuffer +icons, tramp, undo,
-  vc`
-- `:term vterm`
-- `:checkers syntax`
-- `:tools ansible, direnv, docker, eval +overlay, lookup, lsp +eglot, magit,
-  pdf, tree-sitter`
-- `:lang data, emacs-lisp, json, latex, markdown, org +roam +babel +dragndrop,
-  python +lsp, sh +zsh +lsp, yaml +lsp`
-- `:app everywhere`
-- `:config default +bindings +smartparens`
+See `PROFILE.md` for the full module table with flags by category, and
+`DOOM-API.md` section 3 for how the module system works. `init.el` is the
+source of truth.
 
 Not currently enabled: Doom's `mu4e`, `irc`, `rss`, `rest`, `web`, `treemacs`,
 `nav-flash`, `multiple-cursors`, `rotate-text`, and `editorconfig` modules are

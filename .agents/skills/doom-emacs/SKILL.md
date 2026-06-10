@@ -8,7 +8,19 @@ metadata:
   hermes:
     tags: [doom, emacs, emacs-lisp, config, elisp]
     related_skills: [emacs-lisp-expert]
-    trigger_keywords: [doom, config.el, init.el, packages.el, emacs config, doom sync, doom doctor, doom upgrade, use-package, after!]
+    trigger_keywords:
+      [
+        doom,
+        config.el,
+        init.el,
+        packages.el,
+        emacs config,
+        doom sync,
+        doom doctor,
+        doom upgrade,
+        use-package,
+        after!,
+      ]
 ---
 
 # Doom Emacs Config
@@ -133,8 +145,8 @@ To resolve a flag's meaning: put cursor on the flag in `init.el` and press
 `K` (`C-c c k`) for docs, or `gd` (`C-c c d`) to jump to its definition in
 `~/.config/emacs/modules/<cat>/<mod>/+<flag>.el`.
 
-See `references/doom-api.md` for a table of common flags. See
-`references/agent-shell-evaluation.md` for the conservative Agent Shell pilot
+See `DOOM-API.md` at the repo root for a table of common flags and the
+canonical Doom API guide. See `references/agent-shell-evaluation.md` for the conservative Agent Shell pilot
 configuration and ACP transport cautions. See `references/jinx-incf-timer.md`
 for the Jinx 2.7 idle-timer `incf`/`decf` failure and straight `:pre-build`
 patch.
@@ -184,7 +196,7 @@ you've enabled, not both.
 
 ## Doom API Essentials (Compact)
 
-See `references/doom-api.md` for the full syntax and examples. These are the
+See `DOOM-API.md` for the full syntax and examples (canonical source). These are the
 patterns Hermes most often gets wrong — commit them to memory:
 
 - **`after!`** — defer config until a feature loads. Use instead of

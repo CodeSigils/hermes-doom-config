@@ -1,5 +1,15 @@
 # Doom Emacs API Quick Reference
 
+**This reference has moved to the top-level `DOOM-API.md` in this repo.**
+Go there for the canonical, up-to-date version with rationale for when and why
+to use each pattern. This file is retained as a redirect and may be removed in
+a future sync.
+
+The original content below remains for offline reference but `DOOM-API.md` is
+the authoritative source.
+
+---
+
 Doom wraps standard Emacs with its own macros and helpers. These are the ones
 you need to know to write correct config. Using the standard equivalent instead
 of Doom's version is the most common source of bugs.
