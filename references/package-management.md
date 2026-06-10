@@ -169,11 +169,12 @@ Updates the Doom framework itself (core, modules, CLI) plus all packages.
 ### Cleanup
 
 ```sh
-doom purge
+doom gc
 ```
 
-Removes orphaned repos and stale bytecode. Run after removing `package!`
-declarations or after a `doom upgrade` that may have left stale builds.
+Removes orphaned repos and stale builds (aliased as `doom purge` for
+backward compatibility). Run after removing `package!` declarations or
+after a `doom upgrade` that may have left stale builds.
 
 ---
 
@@ -181,8 +182,9 @@ declarations or after a `doom upgrade` that may have left stale builds.
 
 ### How Pinning Works
 
-Doom pins every built-in package to a specific commit. The pin list is in
-`~/.config/emacs/pinfile.el` (or similar). This ensures reproducible installs
+Doom pins every built-in package to a specific commit. Pins are read from
+`:pin` declarations in `packages.el` (via `package!` or `unpin!`) and
+merged with straight's lockfile mechanism. This ensures reproducible installs
 across `doom sync` runs.
 
 ### Unpinning (`unpin!`)
@@ -226,11 +228,10 @@ If a package update breaks compatibility, pin to a known-good commit:
 
 Doom uses straight.el as its package manager. Key facts:
 
-| Directory                                   | Contents                         |
-| ------------------------------------------- | -------------------------------- |
-| `~/.config/emacs/.local/straight/repos/`    | Full git clones of every package |
-| `~/.config/emacs/.local/straight/build/`    | Built/compiled package bytecode  |
-| `~/.config/emacs/.local/straight/versions/` | Lock files recording commit SHAs |
+| Directory                                | Contents                         |
+| ---------------------------------------- | -------------------------------- |
+| `~/.config/emacs/.local/straight/repos/` | Full git clones of every package |
+| `~/.config/emacs/.local/straight/build/` | Built/compiled package bytecode  |
 
 Because repos are full git clones, you can inspect local source:
 
@@ -274,11 +275,9 @@ Unknown macro: unpin!
 
 ### Stale Bytecode
 
-After major Doom upgrades, old `.elc` files can cause confusing errors:
-
-```sh
-doom sync && doom clean
-```
+After major Doom upgrades, old `.elc` files can cause confusing errors.
+Run `doom gc` to remove orphaned builds, or force a full reinstall with
+`doom sync -u` (see below).
 
 ### Want to Start Fresh
 
@@ -296,13 +295,12 @@ definitive.
 
 ### File Locations
 
-| File / Dir                                  | Purpose                                |
-| ------------------------------------------- | -------------------------------------- |
-| `~/.config/doom/packages.el`                | Package declarations (`package!`)      |
-| `~/.config/doom/config.el`                  | Package configuration (`use-package!`) |
-| `~/.config/emacs/.local/straight/repos/`    | Cloned source repos                    |
-| `~/.config/emacs/.local/straight/build/`    | Built/compiled packages                |
-| `~/.config/emacs/.local/straight/versions/` | Lock files with pinned commits         |
+| File / Dir                               | Purpose                                |
+| ---------------------------------------- | -------------------------------------- |
+| `~/.config/doom/packages.el`             | Package declarations (`package!`)      |
+| `~/.config/doom/config.el`               | Package configuration (`use-package!`) |
+| `~/.config/emacs/.local/straight/repos/` | Cloned source repos                    |
+| `~/.config/emacs/.local/straight/build/` | Built/compiled packages                |
 
 ### Command Reference
 
@@ -314,6 +312,4 @@ definitive.
 | `doom update <pkg>` | Update a single package                        |
 | `doom update`       | Update all packages                            |
 | `doom upgrade`      | Upgrade Doom framework + all packages          |
-| `doom purge`        | Remove orphaned repos and stale bytecode       |
-| `doom rollback`     | Revert last `doom upgrade`                     |
-| `doom clean`        | Remove stale bytecode only                     |
+| `doom gc`           | Remove orphaned packages and stale builds      |

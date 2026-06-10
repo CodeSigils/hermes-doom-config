@@ -197,21 +197,20 @@ to its definition.
 
 Common flags used in this config:
 
-| Module               | Flag          | Effect                                    |
-| -------------------- | ------------- | ----------------------------------------- |
-| `company`            | `+childframe` | Display completions in a childframe       |
-| `company`            | `+tng`        | Tab-and-go: Tab completes, Enter selects  |
-| `org`                | `+roam`       | Enable org-roam (knowledge base)          |
-| `org`                | `+babel`      | Enable org-babel (executable code blocks) |
-| `org`                | `+dragndrop`  | Drag-and-drop images into org buffers     |
-| `lsp`                | `+eglot`      | Use eglot backend (not lsp-mode)          |
-| `format`             | `+onsave`     | Auto-format on save                       |
-| `dired`              | `+icons`      | Icons in dired                            |
-| `dired`              | `+dirvish`    | Dirvish sidebar replacement               |
-| `popup`              | `+all`        | Enable all built-in popup rules           |
-| `popup`              | `+defaults`   | Enable default popup rules                |
-| `vc-gutter`          | `+pretty`     | Prettier fringe indicators                |
-| `(evil +everywhere)` | `+everywhere` | Evil in non-programming buffers           |
+| Module               | Flag          | Effect                                   |
+| -------------------- | ------------- | ---------------------------------------- |
+| `company`            | `+childframe` | Display completions in a childframe      |
+| `company`            | `+tng`        | Tab-and-go: Tab completes, Enter selects |
+| `org`                | `+roam`       | Enable org-roam (knowledge base)         |
+| `org`                | `+dragndrop`  | Drag-and-drop images into org buffers    |
+| `lsp`                | `+eglot`      | Use eglot backend (not lsp-mode)         |
+| `format`             | `+onsave`     | Auto-format on save                      |
+| `dired`              | `+icons`      | Icons in dired                           |
+| `dired`              | `+dirvish`    | Dirvish sidebar replacement              |
+| `popup`              | `+all`        | Enable all built-in popup rules          |
+| `popup`              | `+defaults`   | Enable default popup rules               |
+| `vc-gutter`          | `+pretty`     | Prettier fringe indicators               |
+| `(evil +everywhere)` | `+everywhere` | Evil in non-programming buffers          |
 
 ### Module Categories (the 13 groups)
 

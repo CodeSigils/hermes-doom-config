@@ -10,6 +10,17 @@
 | `.agents/skills/doom-emacs/SKILL.md` | Full Doom skill with procedures, pitfalls, extended API reference    |
 | `README.md`                          | Human quick-start (verify module lists against `init.el`)            |
 
+## Source-First Reference Policy
+
+The installed Doom source at `~/.config/emacs/` is the authoritative reference
+for this config — not upstream docs, not community configs. Before editing
+`config.el`, `init.el`, or `packages.el`, consult the corresponding module
+source at `~/.config/emacs/modules/<cat>/<mod>/` to verify flags, patterns,
+and configuration options. When the user asks about a package, flag, or
+feature, answer from the module source (README.org for flags, config.el for
+implementation patterns, lisp/ for core macros). External references
+supplement, never replace, the installed source.
+
 `PROFILE.md` is the first file an agent should read when entering this repo
 for the first time — it describes what this config is. `DOOM-API.md` teaches
 the idiomatic Doom patterns. `references/INDEX.md` is the file to browse when
@@ -39,6 +50,8 @@ blocking.
   lookups in `init.el`). If the file is wrong or outdated, propose a fix — it
   is a living document meant to stay current with Doom upstream.
 - Finish with `git diff --check`, `git status --short`, and a concise summary.
+- Run `scripts/check-stale-patterns.sh` before committing markdown changes to
+  catch stale commands, flags, or module references.
 - When consulting reference material (`references/INDEX.md`, community configs,
   Doom upstream), follow the "Learn, Don't Copy" pattern: understand the
   feature, evaluate compatibility against PROFILE.md policies, suggest to the
@@ -46,16 +59,15 @@ blocking.
   evaluation.
 - When a command fails (`check-parens`, `doom sync`, `doom doctor`), stop and
   present the failure output. Do not proceed past a failed validation step
-  without confirmation. See `README.md` for `doom rollback` and backup recovery
-  procedures.
+  without confirmation. See `README.md` for backup recovery procedures.
 
 ## Decision Thresholds
 
-| Authority level | What the agent does | Examples |
-| --------------- | ------------------- | -------- |
-| Do automatically | Routine maintenance within documented patterns | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add custom functions with `sand/` prefix, run `doom sync` + `doom doctor` |
-| Propose (ask first) | Structural changes that affect behavior or files beyond the edit target | Create new top-level files, introduce new modules, change completion backend, override Doom's core macro usage, modify popup rules broadly |
-| Never without explicit user request | Destructive or irreversible operations | `doom upgrade`, `doom rollback`, removing lines from `init.el` instead of commenting, editing generated state under `.agents/skills/`, running `chezmoi` operations |
+| Authority level                     | What the agent does                                                     | Examples                                                                                                                                           |
+| ----------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Do automatically                    | Routine maintenance within documented patterns                          | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add custom functions with `sand/` prefix, run `doom sync` + `doom doctor` |
+| Propose (ask first)                 | Structural changes that affect behavior or files beyond the edit target | Create new top-level files, introduce new modules, change completion backend, override Doom's core macro usage, modify popup rules broadly         |
+| Never without explicit user request | Destructive or irreversible operations                                  | `doom upgrade`, removing lines from `init.el` instead of commenting, editing generated state under `.agents/skills/`, running `chezmoi` operations |
 
 When in doubt, propose and wait. The cost of asking is lower than the cost of
 reverting.
@@ -123,13 +135,15 @@ reverting.
 When you change a source of truth, update its dependent files in the same
 change:
 
-| Source of truth | Dependent files | What to update |
-| --------------- | --------------- | -------------- |
-| `init.el` | `PROFILE.md` module table, `README.md` notable modules | Add/remove modules, adjust flags |
-| `packages.el` | `PROFILE.md` packages table | Add/remove packages with purpose notes |
-| `config.el` | `PROFILE.md` custom functions table, `DOOM-API.md` patterns | Update function signatures, add new patterns |
-| `AGENTS.md` | `PROFILE.md` Config Policies Summary | Update policy one-liners if bounds change |
-| `.agents/skills/` skill files | `AGENTS.md` workflow (sync-command references) | Update script paths if reorganized |
+| Source of truth                       | Dependent files                                             | What to update                               |
+| ------------------------------------- | ----------------------------------------------------------- | -------------------------------------------- |
+| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules      | Add/remove modules, adjust flags             |
+| `packages.el`                         | `PROFILE.md` packages table                                 | Add/remove packages with purpose notes       |
+| `config.el`                           | `PROFILE.md` custom functions table, `DOOM-API.md` patterns | Update function signatures, add new patterns |
+| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary                        | Update policy one-liners if bounds change    |
+| `.agents/skills/` skill files         | `AGENTS.md` workflow (sync-command references)              | Update script paths if reorganized           |
+| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                 | Flag changes, new module features            |
+| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                          | Command changes, new subcommands             |
 
 Run `git diff --check` before committing. Stale documentation is worse than
 missing documentation because the agent cannot distinguish it from truth.

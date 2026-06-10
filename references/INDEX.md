@@ -6,6 +6,11 @@ Browse categories below to discover what is possible. Every config is personal
 
 This is an inspiration catalogue, not a copy-paste library.
 
+The authoritative reference for all Doom behavior is the installed source
+at `~/.config/emacs/` — module `README.org` files define flags, module
+`config.el` files show current patterns, and `lisp/` files document core
+macros. This index points to those sources.
+
 ## 1. Official Resources
 
 | Resource                 | URL / Path                                                               |
@@ -28,8 +33,8 @@ documentation matching the installed version.
 
 The Doom Emacs repo recently entered a transition phase. The monolithic
 `doomemacs/doomemacs` repo is being split into
-`doomemacs/core` + per-module repos. Modules that have moved are tracked in
-`~/.config/emacs/sources/`.
+`doomemacs/core` + per-module repos. This install uses the monolithic
+repo, which remains fully functional.
 
 ## 2. Local Source Anatomy
 
@@ -42,11 +47,12 @@ This Doom install lives at `~/.config/emacs/`. Key directories:
 | `~/.config/emacs/modules/<cat>/<mod>/`   | Individual module (config.el, packages.el, etc) |
 | `~/.config/emacs/core/`                  | Module system, CLI, bootstrap                   |
 | `~/.config/emacs/static/`                | Template example files                          |
-| `~/.config/emacs/sources/`               | Module-to-repo mapping (during transition)      |
+| `~/.config/emacs/profiles/`              | Profile system for multi-config switching       |
 | `~/.config/emacs/docs/`                  | Official docs in org format                     |
 | `~/.config/emacs/.local/straight/repos/` | Cloned package repos (read source here)         |
 | `~/.config/emacs/.local/straight/build/` | Built/compiled package bytecode                 |
 | `~/.config/emacs/.local/cache/`          | Cache files (eln-cache, etc)                    |
+| `~/.config/emacs/.local/state/`          | Persistent state (savehist, recentf, etc)       |
 
 ## 3. Module Documentation
 
@@ -158,13 +164,12 @@ Flags toggle features within a module. Examples:
 
 | Flag          | Module           | Effect                           |
 | ------------- | ---------------- | -------------------------------- |
-| `+icons`      | `:ui`            | Icon font support                |
 | `+lsp`        | `:lang <lang>`   | Enable LSP for that language     |
 | `+eglot`      | `:tools lsp`     | Use eglot backend (not lsp-mode) |
 | `+roam`       | `:lang org`      | Enable org-roam                  |
-| `+babel`      | `:lang org`      | Enable org-babel                 |
 | `+dragndrop`  | `:lang org`      | Drag-and-drop images in org      |
 | `+pretty`     | `:lang org`      | Org-pretty-mode                  |
+| `+icons`      | `:emacs`         | Icon font in dired, ibuffer      |
 | `+onsave`     | `:editor format` | Auto-format on save              |
 | `+dirvish`    | `:emacs dired`   | Dirvish file manager             |
 | `+childframe` | `:completion`    | Childframe for completion UI     |
@@ -177,7 +182,6 @@ Symptoms of config lagging behind Doom updates:
 
 - `doom doctor` warns about deprecated variables or functions
 - `byte-compile` warnings for obsolete API usage
-- Errors mentioning `setq!` instead of `setopt` (Doom 3 migration)
 - `after!` blocks that no longer fire (module was renamed or split)
 
 When in doubt, check the upstream module source at
@@ -237,15 +241,14 @@ commands. For full syntax and examples, see `DOOM-API.md`.
 
 ### Key Commands
 
-| Command                    | Binding     | Purpose                       |
-| -------------------------- | ----------- | ----------------------------- |
-| `doom/reload`              | (M-x)       | Reload config without restart |
-| `doom/open-private-config` | `SPC h p`   | Open `~/.config/doom/`        |
-| `doom/help`                | `SPC h d h` | Doom help dashboard           |
-| `doom/help-modules`        | `SPC h d m` | Browse modules                |
-| `doom/debug`               | (M-x)       | Toggle debug mode             |
-| `+eval/buffer`             | `SPC b e`   | Eval current buffer           |
-| `+eval/region`             | `SPC c e`   | Eval selected region          |
+| Command                    | Binding     | Purpose                                             |
+| -------------------------- | ----------- | --------------------------------------------------- |
+| `doom/reload`              | `SPC h r r` | Reload config without restart (also M-x)            |
+| `doom/open-private-config` | `SPC f P`   | Open `~/.config/doom/` (also `C-h d c` in help-map) |
+| `doom/help`                | `SPC h d h` | Doom help dashboard                                 |
+| `doom/help-modules`        | `SPC h d m` | Browse modules                                      |
+| `doom/debug`               | (M-x)       | Toggle debug mode                                   |
+| `+eval/buffer-or-region`   | `SPC c e`   | Eval current buffer or selected region              |
 
 ### Module Lookup
 
@@ -276,8 +279,7 @@ troubleshooting — is documented at:
 | `doom sync`         | Recompile, sync profiles, update autoloads |
 | `doom update`       | Update all packages (without framework)    |
 | `doom update <pkg>` | Update a specific package                  |
-| `doom rollback`     | Revert last framework update               |
-| `doom clean`        | Remove stale bytecode and repos            |
+| `doom gc`           | Remove orphaned packages and stale builds  |
 | `doom doctor`       | Validate config after changes              |
 
 ### Upgrade Safety
@@ -293,8 +295,7 @@ After `doom upgrade`:
 
 1. Run `doom sync && doom doctor`
 2. Check doctor output for deprecation warnings
-3. If config breaks: `doom rollback` restores the framework; restore
-   `~/.config/doom.backup.*` if config files were affected
+3. If config still breaks, restore `~/.config/doom.backup.*` from the backup
 
 ### Avoiding Common Upgrade Pitfalls
 

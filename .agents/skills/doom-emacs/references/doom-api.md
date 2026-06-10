@@ -18,14 +18,14 @@ of Doom's version is the most common source of bugs.
 
 Only valid inside the `(doom! ...)` block at the top of `init.el`.
 
-| Pattern                                 | Meaning                                     |
-| :-------------------------------------- | :------------------------------------------ |
-| `(org +roam +babel)`                    | Enable org module with roam and babel flags |
-| `:completion (company +childframe)`     | Company with childframe UI                  |
-| `:ui (popup +all +defaults)`            | Popup system with all rules + defaults      |
-| `:editor (format +onsave)`              | Format on save                              |
-| `:checkers (spell +flyspell)`           | Flyspell spell checking                     |
-| `(:if (featurep :system 'macos) macos)` | Conditional module (platform check)         |
+| Pattern                                 | Meaning                                   |
+| :-------------------------------------- | :---------------------------------------- |
+| `(org +roam +dragndrop)`                | Enable org module with roam and dragndrop |
+| `:completion (company +childframe)`     | Company with childframe UI                |
+| `:ui (popup +all +defaults)`            | Popup system with all rules + defaults    |
+| `:editor (format +onsave)`              | Format on save                            |
+| `:checkers (spell +flyspell)`           | Flyspell spell checking                   |
+| `(:if (featurep :system 'macos) macos)` | Conditional module (platform check)       |
 
 **Rules:**
 
@@ -176,22 +176,22 @@ a lambda.
 
 ## Module Flag Reference (Common)
 
-| Module               | Common Flags                                                     |
-| :------------------- | :--------------------------------------------------------------- |
-| `company`            | `+childframe`, `+tng` (tab-and-go)                               |
-| `corfu`              | `+orderless`, `+dabbrev`                                         |
-| `org`                | `+roam`, `+babel`, `+dragndrop`, `+noter`, `+pandoc`, `+present` |
-| `org` (tempo)        | `+pretty` enables full `<s` Tab expansion; also requires         |
-|                      | `(require 'org-tempo)` inside `(after! org ...)`                 |
-| `lsp`                | `+eglot`, `+lsp-mode`                                            |
-| `format`             | `+onsave`                                                        |
-| `spell`              | `+flyspell`, `+aspell`, `+hunspell`                              |
-| `dired`              | `+icons`, `+dirvish`                                             |
-| `ibuffer`            | `+icons`                                                         |
-| `popup`              | `+all`, `+defaults`                                              |
-| `vc-gutter`          | `+pretty`                                                        |
-| `workspaces`         | `+auto`                                                          |
-| `(evil +everywhere)` | `+everywhere` (evil in non-programming buffers)                  |
+| Module               | Common Flags                                             |
+| :------------------- | :------------------------------------------------------- |
+| `company`            | `+childframe`, `+tng` (tab-and-go)                       |
+| `corfu`              | `+orderless`, `+dabbrev`                                 |
+| `org`                | `+roam`, `+dragndrop`, `+noter`, `+pandoc`, `+present`   |
+| `org` (tempo)        | `+pretty` enables full `<s` Tab expansion; also requires |
+|                      | `(require 'org-tempo)` inside `(after! org ...)`         |
+| `lsp`                | `+eglot`, `+lsp-mode`                                    |
+| `format`             | `+onsave`                                                |
+| `spell`              | `+flyspell`, `+aspell`, `+hunspell`                      |
+| `dired`              | `+icons`, `+dirvish`                                     |
+| `ibuffer`            | `+icons`                                                 |
+| `popup`              | `+all`, `+defaults`                                      |
+| `vc-gutter`          | `+pretty`                                                |
+| `workspaces`         | `+auto`                                                  |
+| `(evil +everywhere)` | `+everywhere` (evil in non-programming buffers)          |
 
 ## Org Snippet Style
 

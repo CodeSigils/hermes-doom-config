@@ -91,8 +91,7 @@ doom sync
 doom doctor
 ```
 
-If something breaks, `doom rollback` reverts the framework. Restore
-`~/.config/doom.backup.*` if config files were affected.
+If something breaks, restore `~/.config/doom.backup.*` from the backup.
 
 ## Notes
 

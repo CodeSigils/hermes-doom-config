@@ -253,7 +253,7 @@ but never require a missing local skill for basic repo maintenance.
 
 1. Find the appropriate section under `(doom! ...)`
 2. Uncomment the module line (comment disabled modules, never delete them)
-3. Add `+flag` suffixes as needed: `(org +roam +babel +dragndrop)`
+3. Add `+flag` suffixes as needed: `(org +roam +dragndrop)`
 4. Run: `doom sync`
 5. Restart Emacs
 
@@ -314,7 +314,7 @@ When `doom upgrade` is needed:
 2. **Run upgrade:** `doom upgrade`
 3. **Verify:** `doom sync && doom doctor`
 4. **Check doctor output** for deprecation warnings — macros sometimes change between versions
-5. **If something breaks:** `doom rollback` reverts the framework; restore `~/.config/doom.backup.*` if config files were affected
+5. **If something breaks:** restore `~/.config/doom.backup.*` from the backup.
 
 Do not skip the backup. `doom upgrade` modifies `~/.config/emacs/` but
 `~/.config/doom/` is yours — framework updates can introduce API changes that
@@ -469,8 +469,7 @@ is available.
 
 Also note: the org module needs the `+pretty` flag for full template expansion
 to work. If `<s` still doesn't expand after adding the require, verify the org
-module declaration in `init.el` includes `+pretty` (e.g., `(org +roam +babel
-+dragndrop +pretty)`) — or check with `M-x org-tempo-remember-template`.
+module declaration in `init.el` includes `+pretty` (e.g., `(org +roam +dragndrop +pretty)`) — or check with `M-x org-tempo-remember-template`.
 
 The yasnippet path is separate: `SPC h i` to insert a snippet, type `src`, and
 Tab. Org-tempo and yasnippet coexist — they are independent completion systems.
