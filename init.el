@@ -26,7 +26,7 @@
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;ivy               ; a search engine for love and life
-       vertico           ; the search engine of the future
+       vertico           ; the search engine of the future  ; Why: faster and more intuitive than ivy/counsel for file switching
 
        :ui
        ;;deft              ; notational velocity for Emacs
@@ -34,24 +34,24 @@
        doom-dashboard    ; a nifty splash screen for Emacs
        ;;doom-quit         ; DOOM quit-message prompts when you quit Emacs
        ;;(emoji +unicode)  ; 🙂
-       hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
+       hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW  ; Why: helps spot important comments and tasks at a glance
        indent-guides     ; highlighted indent columns
        ;;ligatures         ; ligatures and symbols to make your code pretty again
        ;;minimap           ; show a map of the code on the side
-       modeline          ; snazzy, Atom-inspired modeline, plus API
+       modeline          ; snazzy, Atom-inspired modeline, plus API  ; Why: provides useful information at a glance without being distracting
        ;;nav-flash         ; blink cursor line after big motions
        ;;neotree           ; a project drawer, like NERDTree for vim
-       ophints           ; highlight the region an operation acts on
+       ophints           ; highlight the region an operation acts on  ; Why: helps understand the scope of operations like replace, comment, etc.
        (popup +all +defaults)   ; tame sudden yet inevitable temporary windows
-       smooth-scroll     ; So smooth you won't believe it's not butter
+       smooth-scroll     ; So smooth you won't believe it's not butter  ; Why: reduces eye strain when scrolling through long files
        ;;tabs              ; a tab bar for Emacs
        ;;treemacs          ; a project drawer, like neotree but cooler
        ;;unicode           ; extended unicode support for various languages
        (vc-gutter +pretty) ; vcs diff in the fringe
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        window-select     ; visually switch windows
-       workspaces        ; tab emulation, persistence & separate workspaces
-       zen               ; distraction-free coding or writing
+       workspaces        ; tab emulation, persistence & separate workspaces  ; Why: gives us tab-like workspace management with persistence across restarts
+       zen               ; distraction-free coding or writing  ; Why: helps focus on writing or coding by minimizing visual distractions
 
        :editor
        (evil +everywhere); come to the dark side, we have cookies

@@ -9,11 +9,11 @@
   (when (file-directory-p pnpm-global)
     (add-to-list 'exec-path pnpm-global)))
 
-(setq! doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 22)
+(setq! doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 22);  ; Why: larger font for readability on high-resolution display
       doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font" :size 20))
 
-(setq! doom-theme 'doom-tokyo-night)
-(setq! display-line-numbers-type t)
+(setq! doom-theme 'doom-tokyo-night);  ; Why: dark theme with blue accents, easy on the eyes.
+(setq! display-line-numbers-type t);  ; Why: helps with code navigation and understanding structure.
 
 ;;; EMACS DEFAULTS
 (setq! delete-by-moving-to-trash t
@@ -21,10 +21,10 @@
       confirm-kill-emacs nil
       confirm-kill-processes nil
       evil-want-fine-undo t
-      truncate-string-ellipsis "...")
+      truncate-string-ellipsis "...");  ; Why: cleaner visual indicator for truncated text.
 
-(global-prettify-symbols-mode 1)
-(global-subword-mode 1)
+(global-prettify-symbols-mode 1);  ; Why: shows pretty symbols like λ for lambda in code.
+(global-subword-mode 1);  ; Why: enables subword navigation (camelCase, snake_case) for movement and editing.
 
 ;; Fast async spell checking via Enchant/Hunspell.
 ;; Jinx 2.7 still calls legacy bare `incf`/`decf` at runtime. Emacs 30 only
@@ -53,7 +53,7 @@
   (show-smartparens-global-mode 1))
 
 ;;; ORG
-(setq! org-directory "~/notes/org/")
+(setq! org-directory "~/notes/org/");  ; Why: central location for all Org files.
 
 (defun sand/org-display-inline-images-only-in-org (fn &rest args)
   "Only run Org inline-image display in Org buffers."
@@ -79,7 +79,7 @@
                    #'org-display-user-inline-images)))
 
 ;;; ORG ROAM
-(setq! org-roam-directory "~/notes/org/roam")
+(setq! org-roam-directory "~/notes/org/roam");  ; Why: separate directory for Org Roam notes to keep them organized.
 
 (after! org-roam
   (when (fboundp 'org-roam-db-autosync-mode)
@@ -207,7 +207,7 @@
 ;; Doom's (format +onsave) + apheleia autodetects it, but be explicit.
 (after! python
   (set-formatter! 'ruff "ruff format --stdin-filename=%b -"
-    :modes '(python-mode))
+    :modes '(python-mode));  ; Why: use ruff for fast, consistent Python formatting over LSP.
   (setq! +format-with-lsp nil))  ;; prefer ruff over lsp formatting
 
 ;;; MARKDOWN FORMATTING (prettier)
