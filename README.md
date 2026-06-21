@@ -29,6 +29,29 @@ scripts/check-doom-skill-mirror.sh
 
 For the full agent workflow and configuration policies, see `AGENTS.md`.
 
+## Agent Script Awareness
+
+All repo scripts live under `scripts/`. The canonical reference for every script -- purpose, invocation, and when to run
+-- is the Scripts table in `.agents/skills/doom-emacs/SKILL.md`.
+
+```
+  AGENTS.md > workflow bullets  --  generic prose, no paths stored here
+  AGENTS.md > Scripts section   --  points to SKILL.md table
+  ───
+  SKILL.md > Scripts table      --  single source of truth for all scripts
+  ───
+  scripts/check-stale-patterns.sh  Pass 3  --  auto-verifies every .sh in
+                                                 scripts/ has a SKILL.md entry
+                                                 (blocks commit if missing)
+```
+
+- `AGENTS.md` workflow bullets reference scripts generically ("run the stale check") without storing concrete paths --
+  nothing to drift if a script is renamed.
+- `SKILL.md` is the single source for script metadata. Add or rename a script there, update the table.
+- `check-stale-patterns.sh` Pass 3 enforces coverage automatically.
+- `scripts/config.sh` is a support library sourced by other scripts; it is never invoked directly and is excluded from
+  the coverage check.
+
 ## Notable Enabled Modules
 
 See `PROFILE.md` for the full module table with flags by category, and `DOOM-API.md` section 3 for how the module system
