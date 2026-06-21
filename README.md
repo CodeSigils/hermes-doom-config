@@ -40,17 +40,27 @@ All repo scripts live under `scripts/`. The canonical reference for every script
   ───
   SKILL.md > Scripts table      --  single source of truth for all scripts
   ───
-  scripts/check-stale-patterns.sh  Pass 3  --  auto-verifies every .sh (except config.sh) in
-                                                 scripts/ has a SKILL.md entry
-                                                 (blocks commit if missing)
+  scripts/check-stale-patterns.sh  --  delegates to validate-docs.py, which checks stale
+                                       guidance, local references, and script registration
+                                       in both directions
 ```
 
 - `AGENTS.md` workflow bullets reference scripts generically ("run the stale check") without storing concrete paths --
   nothing to drift if a script is renamed.
 - `SKILL.md` is the single source for script metadata. Add or rename a script there, update the table.
-- `check-stale-patterns.sh` Pass 3 enforces coverage automatically.
+- `check-stale-patterns.sh` enforces script-table coverage in both directions and preserves paths containing spaces.
 - `scripts/config.sh` is a support library sourced by other scripts; it is never invoked directly and is excluded from
   the coverage check.
+
+Run the network-free contracts before committing script changes:
+
+```sh
+scripts/run-offline-contracts.sh
+```
+
+CI follows the same boundaries: documentation/script checks run only for Markdown or script changes, shellcheck runs
+only for shell changes, and the Emacs `check-parens` job runs only for changed `.el` files. Snippet-only changes do not
+start the workflow.
 
 ## Notable Enabled Modules
 
@@ -107,6 +117,6 @@ If something breaks, restore `~/.config/doom.backup.*` from the backup.
   committing WAL/SHM database state
 - The repo skill is canonical; after skill edits, sync the Hermes runtime mirror (see
   `.agents/skills/doom-emacs/SKILL.md` Scripts table). Treat the runtime mirror as generated state, not an editable
-  source tree
+  source tree. Sync stages and validates a replacement before swapping it into place
 - Markdown files in this repo should not contain emoji, including generated status summaries or agent notes
 - Unused modules are commented out in `init.el`, never deleted

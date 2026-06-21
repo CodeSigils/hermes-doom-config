@@ -2,6 +2,8 @@
 .open-mem/*.db
 .open-mem/*.db-shm
 .open-mem/*.db-wal
+__pycache__/
+*.py[cod]
 
 # open-mem: Auto-generated folder context files.
 # Uncomment to exclude from version control (recommended for large projects):

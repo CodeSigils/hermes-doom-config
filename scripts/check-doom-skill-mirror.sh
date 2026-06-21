@@ -2,6 +2,7 @@
 # check-doom-skill-mirror.sh — Verify skill mirror matches repo source
 # Usage: ./scripts/check-doom-skill-mirror.sh
 set -euo pipefail
+# shellcheck source=scripts/config.sh
 . "$(dirname "$0")/config.sh"
 
 confirm_skill_src

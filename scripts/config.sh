@@ -20,44 +20,11 @@ REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 # ── Directories ───────────────────────────────────────────────────────
 DOOMDIR="${DOOMDIR:-$HOME/.config/doom}"
 SKILL_SRC="${SKILL_SRC:-$DOOMDIR/.agents/skills/doom-emacs}"
-SKILL_DST="${SKILL_DST:-$HOME/.hermes/skills/emacs/doom-emacs-config}"
+EXPECTED_SKILL_DST="$HOME/.hermes/skills/emacs/doom-emacs-config"
+SKILL_DST="${SKILL_DST:-$EXPECTED_SKILL_DST}"
+EXPECTED_SKILL_NAME="doom-emacs-config"
 
 # ── Helpers ───────────────────────────────────────────────────────────
-
-# grep_rn: portable recursive grep wrapper
-# Usage: grep_rn <pattern> [extra_grep_args...]
-# Recursively searches markdown files from repo root, excluding .git/
-grep_rn() {
-  local pattern="$1"
-  shift
-  grep -Ern --include='*.md' "$@" "$pattern" "$REPO_ROOT" \
-    | grep -vF "$REPO_ROOT/.git/" || true
-}
-
-# grep_md: same as grep_rn but for ERE patterns with no extra args
-# Shorthand for simple stale-pattern searches
-grep_md() {
-  grep_rn "$1"
-}
-
-# extract_paths: from stdin, extract backtick-quoted path references
-#   (references/, scripts/, .agents/ — leading ./ optional)
-# Usage: echo "$line" | extract_paths
-extract_paths() {
-  grep -Eo '`(\./)?(references/|scripts/|\.agents/)[^`]+`' \
-    | tr -d '`' || true
-}
-
-# find_path_refs: find all markdown files in REPO_ROOT containing
-# backtick-quoted path references. Used to drive cross-reference checks.
-# Output: file:line:content  (same format as grep -rn)
-find_path_refs() {
-  grep -Ern --include='*.md' \
-    '`(\./)?(references/|scripts/|\.agents/)' \
-    "$REPO_ROOT" \
-    | grep -vF "$REPO_ROOT/.git/" \
-    || true
-}
 
 # ensure_in_repo: die if cwd is outside the repo tree
 ensure_in_repo() {
@@ -68,18 +35,86 @@ ensure_in_repo() {
   cd "$REPO_ROOT"
 }
 
-# confirm_skill_src: die if SKILL_SRC/SKILL.md missing
+canonical_existing_path() {
+  local path="$1"
+  local dir
+  dir=$(cd "$(dirname "$path")" && pwd -P)
+  printf '%s/%s\n' "$dir" "$(basename "$path")"
+}
+
+skill_name() {
+  local skill_file="$1"
+  sed -nE 's/^name:[[:space:]]*["'\'']?([^"'\'']+)["'\'']?[[:space:]]*$/\1/p' \
+    "$skill_file" | head -1
+}
+
+# confirm_skill_src: verify the canonical in-repository source and skill identity
 confirm_skill_src() {
+  local git_root
+  git_root=$(git -C "$REPO_ROOT" rev-parse --show-toplevel 2>/dev/null) || {
+    printf 'Source repository is not a Git checkout: %s\n' "$REPO_ROOT" >&2
+    exit 1
+  }
+  if [[ "$(cd "$git_root" && pwd -P)" != "$REPO_ROOT" ]]; then
+    printf 'Script root does not match Git repository root: %s\n' "$REPO_ROOT" >&2
+    exit 1
+  fi
   if [[ ! -f "$SKILL_SRC/SKILL.md" ]]; then
     printf 'Source skill missing SKILL.md: %s\n' "$SKILL_SRC" >&2
     exit 1
   fi
+  local expected_src actual_src actual_name
+  expected_src=$(canonical_existing_path "$REPO_ROOT/.agents/skills/doom-emacs")
+  actual_src=$(canonical_existing_path "$SKILL_SRC")
+  if [[ "$actual_src" != "$expected_src" ]]; then
+    printf 'Refusing unexpected skill source: %s (expected %s)\n' \
+      "$actual_src" "$expected_src" >&2
+    exit 1
+  fi
+  actual_name=$(skill_name "$SKILL_SRC/SKILL.md")
+  if [[ "$actual_name" != "$EXPECTED_SKILL_NAME" ]]; then
+    printf 'Source skill identity mismatch: %s (expected %s)\n' \
+      "${actual_name:-missing}" "$EXPECTED_SKILL_NAME" >&2
+    exit 1
+  fi
 }
 
-# confirm_skill_dst: die if SKILL_DST/SKILL.md missing
+# confirm_skill_target: verify the destination is exactly the configured mirror
+confirm_skill_target() {
+  if [[ "$SKILL_DST" != "$EXPECTED_SKILL_DST" ]]; then
+    printf 'Refusing unexpected skill destination: %s (expected %s)\n' \
+      "$SKILL_DST" "$EXPECTED_SKILL_DST" >&2
+    exit 1
+  fi
+  if [[ -L "$SKILL_DST" ]]; then
+    printf 'Refusing symlinked skill destination: %s\n' "$SKILL_DST" >&2
+    exit 1
+  fi
+  local component
+  for component in \
+    "$HOME/.hermes" \
+    "$HOME/.hermes/skills" \
+    "$HOME/.hermes/skills/emacs"; do
+    if [[ -L "$component" ]]; then
+      printf 'Refusing destination beneath symlinked directory: %s\n' \
+        "$component" >&2
+      exit 1
+    fi
+  done
+}
+
+# confirm_skill_dst: verify an existing mirror has the expected skill identity
 confirm_skill_dst() {
+  confirm_skill_target
   if [[ ! -f "$SKILL_DST/SKILL.md" ]]; then
     printf 'Mirror skill missing SKILL.md: %s\n' "$SKILL_DST" >&2
+    exit 1
+  fi
+  local actual_name
+  actual_name=$(skill_name "$SKILL_DST/SKILL.md")
+  if [[ "$actual_name" != "$EXPECTED_SKILL_NAME" ]]; then
+    printf 'Mirror skill identity mismatch: %s (expected %s)\n' \
+      "${actual_name:-missing}" "$EXPECTED_SKILL_NAME" >&2
     exit 1
   fi
 }

@@ -2,7 +2,7 @@
 name: doom-emacs-config
 description: Configure Doom Emacs correctly — module system, package management, safe patterns, and verification steps. Load before modifying any Doom config file.
 metadata:
-  version: "1.4.0"
+  version: "1.4.1"
   author: Code Sigils
   tier: powerful
   hermes:
@@ -48,16 +48,16 @@ style, verification steps, etc.).
 This skill is organised as a compact core (task-agnostic essentials) with
 domain files for specific needs. Read only what your task needs:
 
-| When your task is...               | Read this section or file                          |
-| :--------------------------------- | :------------------------------------------------- |
-| First time in this repo            | Agent Workflow, Writing Conventions, Safety Checks |
-| Editing `init.el`                  | `domains/ARCHITECTURE.md`, Safety Checks           |
-| Adding a module or package         | `domains/PROCEDURES.md` (A, B)                     |
-| Setting a keybinding               | `domains/PROCEDURES.md` (E), Doom API Essentials   |
-| Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                   |
-| Writing custom Elisp               | `domains/ELISP.md`, Pitfalls                       |
-| Upgrading Doom framework           | `domains/PROCEDURES.md` (G), Safety Checks         |
-| Maintaining config repo scripts    | Skill Script Conventions                           |
+| When your task is...                  | Read this section or file                          |
+| :------------------------------------ | :------------------------------------------------- |
+| First time in this repo               | Agent Workflow, Writing Conventions, Safety Checks |
+| Editing `init.el`                     | `domains/ARCHITECTURE.md`, Safety Checks           |
+| Adding a module or package            | `domains/PROCEDURES.md` (A, B)                     |
+| Setting a keybinding                  | `domains/PROCEDURES.md` (E), Doom API Essentials   |
+| Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                       |
+| Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |
+| Upgrading Doom framework              | `domains/PROCEDURES.md` (G), Safety Checks         |
+| Maintaining config repo scripts       | Skill Script Conventions                           |
 
 ## Agent Workflow
 
@@ -172,22 +172,25 @@ its purpose changes, **update the Quick Index in the same change**:
 
 ## Scripts
 
-All repo scripts live under `scripts/`. Sourcing `scripts/config.sh` provides shared variables and grep wrappers; the
-other four are workflow tools you invoke directly:
+All repo scripts live under `scripts/`. Sourcing `scripts/config.sh` provides shared paths and safety checks; the
+registered workflow tools are:
 
-| Script                       | Purpose                                                              | When to run                                |
-| :--------------------------- | :------------------------------------------------------------------- | :----------------------------------------- |
-| `sync-doom-skill-mirror.sh`  | Copy skill tree to Hermes runtime mirror                             | After editing skill or domain files        |
-| `check-doom-skill-mirror.sh` | Verify mirror matches source                                         | After sync                                 |
-| `check-stale-patterns.sh`    | Scan for dead Doom 3 flags + broken cross-refs                       | Before committing markdown changes         |
-| `ai-context.sh`              | Generate AI prompt context block (version, git status, file content) | On demand when enlisting an external model |
+| Script                       | Purpose                                                                       | When to run                                |
+| :--------------------------- | :---------------------------------------------------------------------------- | :----------------------------------------- |
+| `sync-doom-skill-mirror.sh`  | Validate, stage, and atomically replace the Hermes runtime mirror             | After editing skill or domain files        |
+| `check-doom-skill-mirror.sh` | Verify source/destination identity and byte-level mirror equality             | After sync                                 |
+| `check-stale-patterns.sh`    | Run the documentation and script-registry validator                           | Before committing documentation or scripts |
+| `validate-docs.py`           | Check active stale guidance, local references, and script registry both ways  | Called by `check-stale-patterns.sh`        |
+| `run-offline-contracts.sh`   | Exercise documentation and disposable mirror-safety contracts                 | Before committing script changes           |
+| `ai-context.sh`              | Report config, mirror, tool, and Git context; file content is explicit opt-in | On demand when enlisting an external model |
 
 ## Skill Script Conventions
 
 Scripts under `scripts/` source `scripts/config.sh` for shared variables:
-`SKILL_SRC`, `SKILL_DST`, `DOOMDIR`, `REPO_ROOT`. Never duplicate paths.
+`SKILL_SRC`, `SKILL_DST`, `DOOMDIR`, `REPO_ROOT`, and expected skill identity. Never duplicate paths.
 
 Grep within scripts follows cross-platform conventions:
+
 - Use `grep -E` (ERE), not `-P` (Perl) — not available on BSD/macOS.
 - Use `grep -F` for fixed-string searches — faster, no accidental regex.
 - Use literal backtick characters `` ` ``, never `\x60` hex escapes.
@@ -195,10 +198,15 @@ Grep within scripts follows cross-platform conventions:
 - Brackets for literal metacharacters: `[+]enable` not `\\+enable`.
 
 Available via `config.sh` after sourcing:
-- `grep_md <pattern>` — ERE grep over repo markdown, excluding `.git/`
-- `extract_paths` — extracts backtick-quoted path refs from stdin
-- `find_path_refs` — finds markdown files with path references
-- `ensure_in_repo`, `confirm_skill_src`, `confirm_skill_dst`
+
+- `ensure_in_repo`
+- `confirm_skill_src`, `confirm_skill_target`, `confirm_skill_dst`
+- `canonical_existing_path`, `skill_name`
+
+The documentation validator treats stale Doom commands as blocking active
+guidance. A deliberately preserved historical example must carry
+`<!-- stale-check: allow -->` on the same line; do not use the marker to
+suppress current instructions.
 
 ## Keeping the Config Repo Self-Contained
 
@@ -211,10 +219,11 @@ scripts/sync-doom-skill-mirror.sh
 scripts/check-doom-skill-mirror.sh
 ```
 
-The sync uses destructive replacement (`rm -rf` then `cp -a`) to keep the
-mirror byte-for-byte identical to the repo — no stale mirror-only files can
-survive. See `AGENTS.md` for the two-clone protocol, source-destruction
-invariant, and drift-detection steps.
+The sync copies into a temporary sibling directory, validates identity and
+byte-level equality, and only then swaps it into place. The prior valid mirror
+is retained until replacement succeeds, so stale mirror-only files cannot
+survive and a failed copy does not remove the working mirror. See `AGENTS.md`
+for the source/mirror invariant and drift-detection steps.
 
 ## Reference Sources
 

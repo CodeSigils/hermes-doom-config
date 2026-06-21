@@ -48,6 +48,7 @@ companion, then continue without blocking.
   hand-edit it.
 - Verify `DOOM-API.md` patterns against Doom source (`~/.config/emacs/`). If wrong, propose a fix.
 - Before every commit, run the stale-patterns check (see [Scripts](#scripts) table).
+- Before committing script changes, run the network-free contracts (see [Scripts](#scripts) table).
 - When consulting references, follow "Learn, Don't Copy" — understand first, propose, implement only on request.
 - On failure, stop and present output. Do not proceed past a failed step without confirmation.
 
@@ -60,8 +61,8 @@ The canonical reference for all repo scripts — purpose, invocation, and when t
 `.agents/skills/doom-emacs/SKILL.md` (Scripts section).
 
 The Hermes runtime mirror at `~/.hermes/skills/emacs/doom-emacs-config/` is generated state — do not hand-edit it.
-`sync-doom-skill-mirror.sh` uses destructive replacement (`rm -rf` then `cp -a`); stale mirror-only files cannot
-survive. The invariant is:
+`sync-doom-skill-mirror.sh` stages and validates a complete replacement before swapping it into place; stale
+mirror-only files cannot survive, and the previous mirror is restored if replacement fails. The invariant is:
 
 ```text
 ~/.hermes/skills/emacs/doom-emacs-config/ == ~/.config/doom/.agents/skills/doom-emacs/
@@ -73,7 +74,7 @@ survive. The invariant is:
 | ----------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Do automatically                    | Routine maintenance within documented patterns                          | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add custom functions with `sand/` prefix, run `doom sync` + `doom doctor` |
 | Propose (ask first)                 | Structural changes that affect behavior or files beyond the edit target | Create new top-level files, introduce new modules, change completion backend, override Doom's core macro usage, modify popup rules broadly         |
-| Never without explicit user request | Destructive or irreversible operations                                  | `doom upgrade`, removing lines from `init.el` instead of commenting, editing generated state under `.agents/skills/`                               |
+| Never without explicit user request | Destructive or irreversible operations                                  | `doom upgrade`, removing lines from `init.el` instead of commenting, hand-editing the generated runtime mirror under `~/.hermes/skills/`           |
 
 When in doubt, propose and wait. The cost of asking is lower than the cost of reverting.
 
@@ -117,17 +118,18 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 
 When you change a source of truth, update its dependent files in the same change:
 
-| Source of truth                       | Dependent files                                                       | What to update                                  |
-| ------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------- |
-| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                | Add/remove modules, adjust flags                |
-| `packages.el`                         | `PROFILE.md` packages table                                           | Add/remove packages with purpose notes          |
-| `config.el`                           | `PROFILE.md` custom functions table, `DOOM-API.md` patterns           | Update function signatures, add new patterns    |
-| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary, `README.md` agent entry section | Update reading order, companion skill mentions  |
-| `scripts/` files                      | `SKILL.md` Scripts table, `AGENTS.md` workflow                        | Add/rename script rows, update invocation paths |
-| `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                            | Update diagram, path descriptions               |
-| `domains/` files                      | `SKILL.md` Quick Index table                                          | Add/remove/rename rows to match domain files    |
-| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                           | Flag changes, new module features               |
-| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                    | Command changes, new subcommands                |
+| Source of truth                       | Dependent files                                                       | What to update                                           |
+| ------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------- |
+| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                | Add/remove modules, adjust flags                         |
+| `packages.el`                         | `PROFILE.md` packages table                                           | Add/remove packages with purpose notes                   |
+| `config.el`                           | `PROFILE.md` custom functions table, `DOOM-API.md` patterns           | Update function signatures, add new patterns             |
+| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary, `README.md` agent entry section | Update reading order, companion skill mentions           |
+| `scripts/` files                      | `SKILL.md` Scripts table, `AGENTS.md` workflow, CI routing            | Register scripts, update generic workflow and path gates |
+| `.github/workflows/ci.yml`            | `README.md` maintenance guidance, script contracts                    | Keep path routing aligned with invoked checks            |
+| `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                            | Update diagram, path descriptions                        |
+| `domains/` files                      | `SKILL.md` Quick Index table                                          | Add/remove/rename rows to match domain files             |
+| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                           | Flag changes, new module features                        |
+| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                    | Command changes, new subcommands                         |
 
 Run `git diff --check` before committing. Stale documentation is worse than missing documentation because the agent
 cannot distinguish it from truth.

@@ -77,6 +77,8 @@ For full policy text see `AGENTS.md`:
 
 - **Completion Policy** — Company preferred, Corfu disabled as commented module
 - **Defensive Config Policy** — `fboundp` guards for optional packages; global defaults stay global
+- **Skill Source Policy** — `.agents/skills/doom-emacs/` is canonical; the Hermes mirror is generated and not hand-edited
+- **Script Safety Policy** — mirror updates validate identity, stage replacement, and restore the prior mirror on failure
 
 ## Environment
 

@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "**/*.md"
+      - "**/*.el"
+      - "scripts/**"
+      - ".github/workflows/**"
+  pull_request:
+    branches: [master]
+    paths:
+      - "**/*.md"
+      - "**/*.el"
+      - "scripts/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      docs: ${{ steps.classify.outputs.docs }}
+      shell: ${{ steps.classify.outputs.shell }}
+      elisp: ${{ steps.classify.outputs.elisp }}
+      scripts: ${{ steps.classify.outputs.scripts }}
+      elisp_files: ${{ steps.classify.outputs.elisp_files }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+      - id: classify
+        name: Classify changed paths
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            git diff --name-only "origin/$BASE_REF...HEAD" > changed-files.txt
+          elif [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]]; then
+            git diff-tree --root --no-commit-id --name-only -r HEAD > changed-files.txt
+          else
+            git diff --name-only "$BEFORE..HEAD" > changed-files.txt
+          fi
+
+          docs=false
+          shell=false
+          elisp=false
+          scripts=false
+          while IFS= read -r path; do
+            case "$path" in
+              *.md) docs=true ;;
+            esac
+            case "$path" in
+              scripts/*.sh) shell=true ;;
+            esac
+            case "$path" in
+              *.el) elisp=true ;;
+            esac
+            case "$path" in
+              scripts/*) scripts=true ;;
+            esac
+            case "$path" in
+              .github/workflows/*)
+                docs=true
+                shell=true
+                elisp=true
+                scripts=true
+                ;;
+            esac
+          done < changed-files.txt
+
+          {
+            echo "docs=$docs"
+            echo "shell=$shell"
+            echo "elisp=$elisp"
+            echo "scripts=$scripts"
+            elisp_files=$(awk '/[.]el$/' changed-files.txt | base64 -w0)
+            echo "elisp_files=$elisp_files"
+          } >>"$GITHUB_OUTPUT"
+
+  docs-and-contracts:
+    needs: changes
+    if: needs.changes.outputs.docs == 'true' || needs.changes.outputs.scripts == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Validate documentation
+        run: bash scripts/check-stale-patterns.sh
+      - name: Run offline contracts
+        if: needs.changes.outputs.scripts == 'true'
+        run: bash scripts/run-offline-contracts.sh
+
+  shellcheck:
+    needs: changes
+    if: needs.changes.outputs.shell == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Run shellcheck
+        run: shellcheck -x scripts/*.sh
+
+  elisp:
+    needs: changes
+    if: needs.changes.outputs.elisp == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Install Emacs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y emacs-nox
+      - name: Check changed Elisp parentheses
+        env:
+          ELISP_FILES: ${{ needs.changes.outputs.elisp_files }}
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(printf '%s' "$ELISP_FILES" | base64 --decode)
+          for file in "${files[@]}"; do
+            [[ -f "$file" ]] || continue
+            emacs --batch "$file" \
+              --eval '(progn (check-parens) (message "check-parens OK"))'
+          done
