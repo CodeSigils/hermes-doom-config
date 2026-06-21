@@ -213,8 +213,8 @@ loads them lazily, so an explicit `require` is needed:
 )
 ```
 
-The org module also needs the `+pretty` flag. If `<s` still doesn't expand after adding the require, verify the
-`init.el` module declaration includes `+pretty`, e.g. `(org +roam +dragndrop +pretty)`.
+The current `init.el` declaration is `(org +roam +dragndrop)`. If `<s` still doesn't expand after adding the require,
+consider adding the `+pretty` flag: `(org +roam +dragndrop +pretty)`.
 
 The yasnippet path is separate: `SPC h i` to insert a snippet, type `src`, and Tab. Org-tempo and yasnippet are
 independent completion systems and coexist.

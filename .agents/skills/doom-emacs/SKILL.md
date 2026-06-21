@@ -2,7 +2,7 @@
 name: doom-emacs-config
 description: Configure Doom Emacs correctly — module system, package management, safe patterns, and verification steps. Load before modifying any Doom config file.
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
   author: Code Sigils
   tier: powerful
   hermes:
@@ -20,49 +20,62 @@ metadata:
         doom upgrade,
         use-package,
         after!,
+        config.sh,
+        cross-platform grep,
       ]
 ---
 
 # Doom Emacs Skill
 
-A general guide for configuring and troubleshooting Doom Emacs. Load this whenever touching files under
-`~/.config/doom/` or when the user asks about Emacs config. This skill is meant to serve a new user — it teaches Doom
+A general guide for configuring and troubleshooting Doom Emacs. Load this
+whenever touching files under `~/.config/doom/` or when the user asks about
+Emacs config. This skill is meant to serve a new user — it teaches Doom
 conventions, not just this repo's specific choices.
 
-**Companion skill:** If `emacs-lisp-expert` is installed, load it too — it covers Emacs Lisp fundamentals that this
-skill builds on. If it is not installed, do not block: use this skill's Doom-specific guidance plus the Emacs Lisp guide
-at `domains/ELISP.md` for non-trivial elisp. Suggest installing `emacs-lisp-expert` once as an optional companion for
-deeper Emacs Lisp work. This repo must remain self-contained for new users and agents.
+**Companion skill:** If `emacs-lisp-expert` is installed, load it too — it
+covers Emacs Lisp fundamentals that this skill builds on. If it is not
+installed, do not block: use this skill's Doom-specific guidance plus the
+Emacs Lisp guide at `domains/ELISP.md` for non-trivial elisp. Suggest
+installing `emacs-lisp-expert` once as an optional companion for deeper Emacs
+Lisp work. This repo must remain self-contained for new users and agents.
 
-**Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it exists — it contains user-specific
-policies (completion preference, Markdown style, verification steps, etc.).
+**Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it
+exists — it contains user-specific policies (completion preference, Markdown
+style, verification steps, etc.).
 
 ## Quick Index
 
-Domain files provide depth on demand. Read them when the trigger condition matches your task.
+This skill is organised as a compact core (task-agnostic essentials) with
+domain files for specific needs. Read only what your task needs:
 
-| File                         | When to read                                                                    | Trigger                                         |
-| :--------------------------- | :------------------------------------------------------------------------------ | :---------------------------------------------- |
-| `domains/ARCHITECTURE.md`    | Understanding Doom's module system, categories, flags, reload, LSP, diagnostics | First time in repo, or before editing `init.el` |
-| `domains/PROCEDURES.md`      | Adding a module, installing a package, setting a keybinding, upgrading Doom     | Any step-by-step config change                  |
-| `domains/ELISP.md`           | Writing custom Emacs Lisp (defun, let, advice, debugging)                       | Before writing non-trivial elisp                |
-| `domains/TROUBLESHOOTING.md` | Emacs won't start, package fails, LSP down, hangs, slow startup, recovery       | When something breaks                           |
+| When your task is...               | Read this section or file                          |
+| :--------------------------------- | :------------------------------------------------- |
+| First time in this repo            | Agent Workflow, Writing Conventions, Safety Checks |
+| Editing `init.el`                  | `domains/ARCHITECTURE.md`, Safety Checks           |
+| Adding a module or package         | `domains/PROCEDURES.md` (A, B)                     |
+| Setting a keybinding               | `domains/PROCEDURES.md` (E), Doom API Essentials   |
+| Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                   |
+| Writing custom Elisp               | `domains/ELISP.md`, Pitfalls                       |
+| Upgrading Doom framework           | `domains/PROCEDURES.md` (G), Safety Checks         |
+| Maintaining config repo scripts    | Skill Script Conventions                           |
 
 ## Agent Workflow
 
-Follow the workflow defined in `AGENTS.md` ("Agent Workflow" section). That is the single source of truth for how agents
-should operate in this repo.
+Follow the workflow defined in `AGENTS.md` ("Agent Workflow" section). That
+is the single source of truth for how agents should operate in this repo.
 
 The key steps are:
 
 1. Check `git status --short` before changing files.
 2. Inspect the relevant file before patching; do not guess from memory.
 3. Run `check-parens` on changed `.el` files before `doom sync`.
-4. Run `doom sync` after requested edits (including config-only), unless told not to.
+4. Run `doom sync` after requested edits (including config-only), unless told
+   not to.
 5. Run `doom doctor` after `doom sync`.
 6. Finish with `git diff --check`, `git status --short`, concise summary.
 
-See AGENTS.md for the full workflow with edge cases (failed commands, reference consultation, skill mirror sync).
+See AGENTS.md for the full workflow with edge cases (failed commands, reference
+consultation, skill mirror sync).
 
 ## File Roles — Know What Goes Where
 
@@ -169,7 +182,37 @@ other four are workflow tools you invoke directly:
 | `check-stale-patterns.sh`    | Scan for dead Doom 3 flags + broken cross-refs                       | Before committing markdown changes         |
 | `ai-context.sh`              | Generate AI prompt context block (version, git status, file content) | On demand when enlisting an external model |
 
-See `AGENTS.md` for the full two-clone protocol, sync-destruction invariant, and pre-commit discipline.
+## Skill Script Conventions
+
+Scripts under `scripts/` source `scripts/config.sh` for shared variables:
+`SKILL_SRC`, `SKILL_DST`, `DOOMDIR`, `REPO_ROOT`. Never duplicate paths.
+
+Grep within scripts follows cross-platform conventions:
+- Use `grep -E` (ERE), not `-P` (Perl) — not available on BSD/macOS.
+- Use `grep -F` for fixed-string searches — faster, no accidental regex.
+- Use literal backtick characters `` ` ``, never `\x60` hex escapes.
+- Avoid BRE `\|`, `\?`, `\+` — use `grep -E` with unescaped `|`, `?`, `+`.
+- Brackets for literal metacharacters: `[+]enable` not `\\+enable`.
+
+Available via `config.sh` after sourcing:
+- `grep_md <pattern>` — ERE grep over repo markdown, excluding `.git/`
+- `extract_paths` — extracts backtick-quoted path refs from stdin
+- `find_path_refs` — finds markdown files with path references
+- `ensure_in_repo`, `confirm_skill_src`, `confirm_skill_dst`
+
+## Keeping the Config Repo Self-Contained
+
+This skill lives at `.agents/skills/doom-emacs/SKILL.md`. Anyone who clones
+this repo gets the full skill with it. After editing the skill, sync the Hermes
+runtime mirror:
+
+```sh
+scripts/sync-doom-skill-mirror.sh
+scripts/check-doom-skill-mirror.sh
+```
+
+See `AGENTS.md` for the two-clone protocol, source-destruction invariant, and
+drift-detection steps.
 
 ## Reference Sources
 

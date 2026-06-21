@@ -152,5 +152,9 @@ When asking an AI (or another agent) about this Doom config, provide context to 
 
 **Helper script:** Run the AI context helper script (see [Scripts](#scripts) table) to auto-generate this context block.
 
+**Note on doom CLI:** The `doom` binary lives at `~/.config/emacs/bin/doom`. If `doom doctor` or other `doom` commands fail
+with "command not found," use the full path or ensure the bin directory is on `$PATH`:
+`export PATH="$HOME/.config/emacs/bin:$PATH"`.
+
 **Why this works:** AI agents have no persistent memory of your config. The context window is limited and
 position-biased — see `agent-concepts-study` memory surfaces note. Explicit context eliminates guessing.
