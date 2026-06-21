@@ -43,25 +43,39 @@ companion, then continue without blocking.
 - When README.md lists modules or feature inventory, verify against `init.el`.
 - For changed `.el` files, run `check-parens` before `doom sync`.
 - Run `doom sync` after requested Doom config edits unless explicitly told not to, including config-only edits.
-- Run `doom doctor` after `doom sync`.
-- If the repo skill changes, run `scripts/sync-doom-skill-mirror.sh`, then `scripts/check-doom-skill-mirror.sh`. The
-  Hermes runtime mirror at `~/.hermes/skills/emacs/doom-emacs-config/` is generated state; do not hand-edit it. The sync
-  script uses destructive replacement (`rm -rf` then `cp -a`) so stale mirror-only files cannot survive. The invariant
-  to preserve:
-  ```
-  ~/.hermes/skills/emacs/doom-emacs-config/ == ~/.config/doom/.agents/skills/doom-emacs/
-  ```
+- Run `doom doctor` after `doom sync`. |- If the repo skill changes, sync the Hermes runtime mirror (see
+  [Scripts](#scripts) table below). The | Hermes runtime is generated state; do not hand-edit it.
 - When consulting `DOOM-API.md`, verify its patterns against official Doom sources (`~/.config/emacs/core/`,
   `~/.config/emacs/modules/`, `K` and `gd` lookups in `init.el`). If the file is wrong or outdated, propose a fix — it
   is a living document meant to stay current with Doom upstream.
-- Finish with `git diff --check`, `git status --short`, and a concise summary.
-- Run `scripts/check-stale-patterns.sh` before committing markdown changes to catch stale commands, flags, or module
-  references.
+- Finish with `git diff --check`, `git status --short`, and a concise summary. |- Run the stale-patterns check (see
+  [Scripts](#scripts) table) before every commit to catch stale commands, flags, or module references.
 - When consulting reference material (`references/INDEX.md`, community configs, Doom upstream), follow the "Learn, Don't
   Copy" pattern: understand the feature, evaluate compatibility against PROFILE.md policies, suggest to the user, and
-  implement only on request. Never transplant external code without evaluation.
-- When a command fails (`check-parens`, `doom sync`, `doom doctor`), stop and present the failure output. Do not proceed
-  past a failed validation step without confirmation. See `README.md` for backup recovery procedures.
+  implement only on request. Never transplant external code without evaluation. |- When a command fails (`check-parens`,
+  `doom sync`, `doom doctor`), stop and present the failure output. Do not proceed | past a failed validation step
+  without confirmation. See `README.md` for backup recovery procedures.
+
+## Scripts
+
+| Script                               | Purpose                                                                                                                                           | When to run                                      |
+| :----------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------- |
+| `scripts/config.sh`                  | Shared variables, grep wrappers, validation helpers                                                                                               | Sourced by other scripts; never invoked directly |
+| `scripts/sync-doom-skill-mirror.sh`  | Copy skill tree to Hermes runtime mirror (`~/.hermes/skills/emacs/doom-emacs-config/`)                                                            | After editing `.agents/skills/doom-emacs/` files |
+| `scripts/check-doom-skill-mirror.sh` | Verify mirror matches source (enforces `src == dst` invariant)                                                                                    | After sync                                       |
+| `scripts/check-stale-patterns.sh`    | Pass 1: scan for dead Doom 3 flags. Pass 2: verify cross-references resolve. Pass 3: confirm every script is referenced in AGENTS.md and SKILL.md | Before every commit                              |
+| `scripts/ai-context.sh [file]`       | Generate AI prompt context block (version, git status, file content, recent commits)                                                              | On demand when enlisting an external model       |
+
+The Hermes runtime mirror at `~/.hermes/skills/emacs/doom-emacs-config/` is generated state — do not hand-edit it.
+`sync-doom-skill-mirror.sh` uses destructive replacement (`rm -rf` then `cp -a`); stale mirror-only files cannot
+survive. The invariant is:
+
+```text
+~/.hermes/skills/emacs/doom-emacs-config/ == ~/.config/doom/.agents/skills/doom-emacs/
+```
+
+All scripts require bash and `set -euo pipefail`. They resolve their own repo root from `scripts/config.sh`; you may
+invoke them from any working directory.
 
 ## Decision Thresholds
 
@@ -145,8 +159,8 @@ When asking an AI (or another agent) about this Doom config, provide context to 
 - What you've already tried
 - Any error messages (exact text)
 
-**Helper script:** Run `./scripts/ai-context.sh [file]` to auto-generate this context block (captures version, git
-status, file content, recent commits).
+**Helper script:** Run `scripts/ai-context.sh [file]` (see [Scripts](#scripts) table) to auto-generate this context
+block.
 
 **Why this works:** AI agents have no persistent memory of your config. The context window is limited and
 position-biased — see `agent-concepts-study` memory surfaces note. Explicit context eliminates guessing.
