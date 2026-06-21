@@ -16,8 +16,10 @@ doom doctor
 
 If you're an AI agent working in this repo, read `AGENTS.md` first, then
 `PROFILE.md` (what this config is), then `DOOM-API.md` (idiomatic Doom
-patterns). The repo's required Doom skill is self-contained at
-`.agents/skills/doom-emacs/SKILL.md`.
+patterns). The repo's required Doom skill lives at
+`.agents/skills/doom-emacs/SKILL.md` — a compact core with
+`domains/ARCHITECTURE.md`, `domains/PROCEDURES.md`, `domains/ELISP.md`, and
+`domains/TROUBLESHOOTING.md` for depth on demand.
 If your Hermes installation also has `emacs-lisp-expert`, load it as an optional
 companion skill for general Emacs Lisp guidance. If it is missing, consider
 installing it for deeper Emacs Lisp help, but do not require it for basic repo
@@ -52,9 +54,6 @@ commented out in `init.el`.
   prose and code comments/strings
 - **Org mode** — org-roam, org-roam-ui, org-tempo (`<s` Tab for src blocks),
   habit tracking, and GTD workflows
-- **Window management** — `set-popup-rule!` for transient buffers,
-  `split-window-preferred-function` for predictable splits, monitor-aware
-  initial frame sizing via `sand/initial-frame-size`
 - **Popup targets** — targeted rules for help, apropos, warnings, backtraces,
   messages, completions, compilation/shell command output, and `*doom:*`
   buffers
@@ -95,7 +94,6 @@ If something breaks, restore `~/.config/doom.backup.*` from the backup.
 
 ## Notes
 
-- `~/.config/doom/` is a git repo, not chezmoi managed
 - Runtime SQLite artifacts under `.open-mem/` are ignored; keep durable notes in
   human-readable files instead of committing WAL/SHM database state
 - The repo skill is canonical; after skill edits, run
