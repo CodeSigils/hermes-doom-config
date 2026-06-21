@@ -37,24 +37,22 @@ companion, then continue without blocking.
 
 ## Agent Workflow
 
-- Work sequentially. Prefer one concern per edit and one concern per commit.
+- Work sequentially. One concern per edit, one concern per commit.
 - Check `git status --short` before changing files.
 - Inspect the relevant file before patching; do not guess from memory.
-- When README.md lists modules or feature inventory, verify against `init.el`.
+- Verify `README.md` module inventory against `init.el`.
 - For changed `.el` files, run `check-parens` before `doom sync`.
-- Run `doom sync` after requested Doom config edits unless explicitly told not to, including config-only edits.
-- Run `doom doctor` after `doom sync`. |- If the repo skill changes, sync the Hermes runtime mirror (see
-  [Scripts](#scripts) table below). The | Hermes runtime is generated state; do not hand-edit it.
-- When consulting `DOOM-API.md`, verify its patterns against official Doom sources (`~/.config/emacs/core/`,
-  `~/.config/emacs/modules/`, `K` and `gd` lookups in `init.el`). If the file is wrong or outdated, propose a fix — it
-  is a living document meant to stay current with Doom upstream.
-- Finish with `git diff --check`, `git status --short`, and a concise summary. |- Run the stale-patterns check (see
-  [Scripts](#scripts) table) before every commit to catch stale commands, flags, or module references.
-- When consulting reference material (`references/INDEX.md`, community configs, Doom upstream), follow the "Learn, Don't
-  Copy" pattern: understand the feature, evaluate compatibility against PROFILE.md policies, suggest to the user, and
-  implement only on request. Never transplant external code without evaluation. |- When a command fails (`check-parens`,
-  `doom sync`, `doom doctor`), stop and present the failure output. Do not proceed | past a failed validation step
-  without confirmation. See `README.md` for backup recovery procedures.
+- Run `doom sync` after config edits unless told not to.
+- Run `doom doctor` after `doom sync`.
+- When the skill changes, sync the Hermes runtime mirror (see [Scripts](#scripts) table). It is generated state; do not
+  hand-edit it.
+- Verify `DOOM-API.md` patterns against Doom source (`~/.config/emacs/`). If wrong, propose a fix.
+- Before every commit, run the stale-patterns check (see [Scripts](#scripts) table).
+- When consulting references, follow "Learn, Don't Copy" — understand first, propose, implement only on request.
+- On failure, stop and present output. Do not proceed past a failed step without confirmation.
+
+All script names and invocation details live in `.agents/skills/doom-emacs/SKILL.md` (Scripts section, linked above). Do
+not store script paths in this file.
 
 ## Scripts
 
@@ -152,7 +150,6 @@ When asking an AI (or another agent) about this Doom config, provide context to 
 - Any error messages (exact text)
 
 **Helper script:** Run the AI context helper script (see [Scripts](#scripts) table) to auto-generate this context block.
-block.
 
 **Why this works:** AI agents have no persistent memory of your config. The context window is limited and
 position-biased — see `agent-concepts-study` memory surfaces note. Explicit context eliminates guessing.
