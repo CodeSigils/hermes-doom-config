@@ -1,18 +1,16 @@
 # Doom Config Procedures
 
-Step-by-step instructions for common config tasks. Read this when you need
-to make a concrete change to `init.el`, `packages.el`, or `config.el`.
+Step-by-step instructions for common config tasks. Read this when you need to make a concrete change to `init.el`,
+`packages.el`, or `config.el`.
 
-**Parent skill:** `SKILL.md` — compact core with file roles, API essentials,
-safety checks, pitfalls, and the Quick Index for all domain files. Load
-SKILL.md first for the minimal context every Doom edit needs.
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick
+Index for all domain files. Load SKILL.md first for the minimal context every Doom edit needs.
 
 ## A. Adding a Module to init.el
 
 1. Find the appropriate category section under `(doom! ...)`
 2. Uncomment the module line (never delete commented modules)
-3. Consult the module's README.org at
-   `~/.config/emacs/modules/<cat>/<mod>/` to verify available flags
+3. Consult the module's README.org at `~/.config/emacs/modules/<cat>/<mod>/` to verify available flags
 4. Add `+flag` suffixes as needed, e.g. `(org +roam +dragndrop)`
 5. Run: `doom sync`
 6. Restart Emacs
@@ -26,8 +24,7 @@ SKILL.md first for the minimal context every Doom edit needs.
 3. Restart Emacs
 4. Configure in `config.el` with `use-package!` or `after!`
 
-See `references/package-management.md` for pinning, updates, straight recipes,
-and lockfile troubleshooting.
+See `references/package-management.md` for pinning, updates, straight recipes, and lockfile troubleshooting.
 
 ## C. Adding a Mode Hook
 
@@ -75,5 +72,4 @@ Use `map!` in `config.el`:
 4. **Check doctor output** for deprecation warnings
 5. **If something breaks:** restore `~/.config/doom.backup.*` from backup
 
-Do not skip the backup. Framework changes can introduce API changes that break
-your config.
+Do not skip the backup. Framework changes can introduce API changes that break your config.

@@ -9,11 +9,15 @@ Error running timer 'nil': (void-function incf)
 Error running timer 'nil': (void-function decf)
 ```
 
-It may appear after `M-$`, `SPC s c`, or unrelated Org commands such as `C-c C-,` because Jinx runs spell checking from an idle timer after the command.
+It may appear after `M-$`, `SPC s c`, or unrelated Org commands such as `C-c C-,` because Jinx runs spell checking from
+an idle timer after the command.
 
 ## Root Cause
 
-Jinx 2.7 uses legacy `(incf ...)` and `(decf ...)` calls while requiring `cl-lib`. Modern Emacs with `cl-lib` provides `cl-incf` and `cl-decf`; the unprefixed forms only appear when deprecated `cl` is loaded. Jinx also requires compat 31 for `completion-table-with-metadata`, so Doom's older compat pin can break correction UI commands with `(void-function completion-table-with-metadata)`.
+Jinx 2.7 uses legacy `(incf ...)` and `(decf ...)` calls while requiring `cl-lib`. Modern Emacs with `cl-lib` provides
+`cl-incf` and `cl-decf`; the unprefixed forms only appear when deprecated `cl` is loaded. Jinx also requires compat 31
+for `completion-table-with-metadata`, so Doom's older compat pin can break correction UI commands with
+`(void-function completion-table-with-metadata)`.
 
 ## Durable Fix Pattern
 
@@ -34,9 +38,8 @@ Use plain Jinx package declaration, unpin compat, and provide runtime aliases in
   (defalias 'decf #'cl-decf))
 ```
 
-Do not use a straight `:pre-build` patch for this repo: it modifies the Jinx
-checkout before `doom sync -u` fetches updates, leaving a dirty worktree and
-forcing an interactive discard/stash prompt.
+Do not use a straight `:pre-build` patch for this repo: it modifies the Jinx checkout before `doom sync -u` fetches
+updates, leaving a dirty worktree and forcing an interactive discard/stash prompt.
 
 Then run:
 
@@ -64,6 +67,10 @@ Expected: load check succeeds and Jinx repo status is empty.
 ## Cleanup Later
 
 ---
-**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick Index for all domain files.
 
-When upstream Jinx replaces `incf`/`decf` with `cl-incf`/`cl-decf` or otherwise fixes the issue, remove the runtime aliases from `config.el` and run `doom sync`. Keep `(unpin! compat)` while Jinx or other unpinned packages require compat 31.
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick
+Index for all domain files.
+
+When upstream Jinx replaces `incf`/`decf` with `cl-incf`/`cl-decf` or otherwise fixes the issue, remove the runtime
+aliases from `config.el` and run `doom sync`. Keep `(unpin! compat)` while Jinx or other unpinned packages require
+compat 31.

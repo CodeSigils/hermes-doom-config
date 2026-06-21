@@ -5,7 +5,8 @@ Context: evaluating `xenodium/agent-shell` for Doom Emacs usage.
 Summary:
 
 - Agent Shell is a native Emacs UI for ACP agents, built on `acp.el`, `shell-maker`, and `comint`.
-- It is actively maintained and has Doom install docs: `(package! shell-maker)`, `(package! acp)`, `(package! agent-shell)`, followed by `doom sync`.
+- It is actively maintained and has Doom install docs: `(package! shell-maker)`, `(package! acp)`,
+  `(package! agent-shell)`, followed by `doom sync`.
 - It includes provider adapters for Hermes, Claude, Codex, Gemini, Goose, OpenCode, Qwen, Kiro, and others.
 - It stores project data under `.agent-shell/` by default and may auto-add that directory to `.gitignore`.
 
@@ -35,17 +36,21 @@ If GUI Emacs has a reduced PATH, use an absolute Hermes command path instead of 
 
 Known pitfall:
 
-- `agent-shell-hermes-acp-command` was observed upstream as `'(hermes acp)`, a list of symbols. `executable-find` and `make-process` expect command strings, so override it with strings in Doom config.
+- `agent-shell-hermes-acp-command` was observed upstream as `'(hermes acp)`, a list of symbols. `executable-find` and
+  `make-process` expect command strings, so override it with strings in Doom config.
 
 OpenCode caution:
 
 - Agent Shell's OpenCode adapter defaults to `("opencode" "acp")`.
-- OpenCode ACP advertises TCP server options (`--port`, `--hostname`, mDNS). Do not assume compatibility with `acp.el`'s stdio process client; smoke-test before enabling OpenCode through Agent Shell.
+- OpenCode ACP advertises TCP server options (`--port`, `--hostname`, mDNS). Do not assume compatibility with `acp.el`'s
+  stdio process client; smoke-test before enabling OpenCode through Agent Shell.
 
 Safety defaults:
 
 - Keep `agent-shell-text-file-capabilities` nil for an initial trial.
 - Do not globally enable auto-approval helpers such as `agent-shell-permission-allow-always`.
 
-**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick Index for all domain files.
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick
+Index for all domain files.
+
 - Add keybindings only after the basic Hermes flow works.

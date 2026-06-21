@@ -18,7 +18,9 @@ This mirror is generated state, not an independently edited source tree.
 
 ## Durable Lesson
 
-A vague instruction such as "copy the repo skill to the mirror" is too easy to forget and too easy to implement as an additive copy. Additive copies allow stale mirror-only files to survive, which makes future agents load knowledge that is not present in the repo.
+A vague instruction such as "copy the repo skill to the mirror" is too easy to forget and too easy to implement as an
+additive copy. Additive copies allow stale mirror-only files to survive, which makes future agents load knowledge that
+is not present in the repo.
 
 The invariant should be stronger:
 
@@ -73,5 +75,7 @@ When any file under `.agents/skills/doom-emacs/` changes:
 3. Do not manually edit the runtime mirror.
 
 ---
-**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick Index for all domain files.
-4. If a mirror-only reference file looks valuable, copy it into the repo source first, then sync from repo to mirror.
+
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick
+Index for all domain files. 4. If a mirror-only reference file looks valuable, copy it into the repo source first, then
+sync from repo to mirror.

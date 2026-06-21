@@ -25,57 +25,48 @@ metadata:
 
 # Doom Emacs Skill
 
-A general guide for configuring and troubleshooting Doom Emacs. Load this
-whenever touching files under `~/.config/doom/` or when the user asks about
-Emacs config. This skill is meant to serve a new user — it teaches Doom
+A general guide for configuring and troubleshooting Doom Emacs. Load this whenever touching files under
+`~/.config/doom/` or when the user asks about Emacs config. This skill is meant to serve a new user — it teaches Doom
 conventions, not just this repo's specific choices.
 
-**Companion skill:** If `emacs-lisp-expert` is installed, load it too — it
-covers Emacs Lisp fundamentals that this skill builds on. If it is not
-installed, do not block: use this skill's Doom-specific guidance plus the
-Emacs Lisp guide at `domains/ELISP.md` for non-trivial elisp. Suggest
-installing `emacs-lisp-expert` once as an optional companion for deeper
-Emacs Lisp work. This repo must remain self-contained for new users and
-agents.
+**Companion skill:** If `emacs-lisp-expert` is installed, load it too — it covers Emacs Lisp fundamentals that this
+skill builds on. If it is not installed, do not block: use this skill's Doom-specific guidance plus the Emacs Lisp guide
+at `domains/ELISP.md` for non-trivial elisp. Suggest installing `emacs-lisp-expert` once as an optional companion for
+deeper Emacs Lisp work. This repo must remain self-contained for new users and agents.
 
-**Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it
-exists — it contains user-specific policies (completion preference, Markdown
-style, verification steps, etc.).
+**Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it exists — it contains user-specific
+policies (completion preference, Markdown style, verification steps, etc.).
 
 ## Quick Index
 
-Domain files provide depth on demand. Read them when the trigger condition
-matches your task.
+Domain files provide depth on demand. Read them when the trigger condition matches your task.
 
-| File | When to read | Trigger |
-| :--- | :--- | :--- |
-| `domains/ARCHITECTURE.md` | Understanding Doom's module system, categories, flags, reload, LSP, diagnostics | First time in repo, or before editing `init.el` |
-| `domains/PROCEDURES.md` | Adding a module, installing a package, setting a keybinding, upgrading Doom | Any step-by-step config change |
-| `domains/ELISP.md` | Writing custom Emacs Lisp (defun, let, advice, debugging) | Before writing non-trivial elisp |
-| `domains/TROUBLESHOOTING.md` | Emacs won't start, package fails, LSP down, hangs, slow startup, recovery | When something breaks |
+| File                         | When to read                                                                    | Trigger                                         |
+| :--------------------------- | :------------------------------------------------------------------------------ | :---------------------------------------------- |
+| `domains/ARCHITECTURE.md`    | Understanding Doom's module system, categories, flags, reload, LSP, diagnostics | First time in repo, or before editing `init.el` |
+| `domains/PROCEDURES.md`      | Adding a module, installing a package, setting a keybinding, upgrading Doom     | Any step-by-step config change                  |
+| `domains/ELISP.md`           | Writing custom Emacs Lisp (defun, let, advice, debugging)                       | Before writing non-trivial elisp                |
+| `domains/TROUBLESHOOTING.md` | Emacs won't start, package fails, LSP down, hangs, slow startup, recovery       | When something breaks                           |
 
 ## Agent Workflow
 
-Follow the workflow defined in `AGENTS.md` ("Agent Workflow" section). That
-is the single source of truth for how agents should operate in this repo.
+Follow the workflow defined in `AGENTS.md` ("Agent Workflow" section). That is the single source of truth for how agents
+should operate in this repo.
 
 The key steps are:
 
 1. Check `git status --short` before changing files.
 2. Inspect the relevant file before patching; do not guess from memory.
 3. Run `check-parens` on changed `.el` files before `doom sync`.
-4. Run `doom sync` after requested edits (including config-only), unless told
-   not to.
+4. Run `doom sync` after requested edits (including config-only), unless told not to.
 5. Run `doom doctor` after `doom sync`.
 6. Finish with `git diff --check`, `git status --short`, concise summary.
 
-See AGENTS.md for the full workflow with edge cases (failed commands, reference
-consultation, skill mirror sync).
+See AGENTS.md for the full workflow with edge cases (failed commands, reference consultation, skill mirror sync).
 
 ## File Roles — Know What Goes Where
 
-Doom splits config across three files. Putting the wrong thing in the wrong
-file is the most common mistake.
+Doom splits config across three files. Putting the wrong thing in the wrong file is the most common mistake.
 
 | File          | Purpose                                                  | `doom sync` needed? |
 | :------------ | :------------------------------------------------------- | :------------------ |
@@ -91,119 +82,103 @@ Patterns that apply to any Doom config:
 - Use `after!` for deferred config — never `with-eval-after-load`
 - Use `use-package!` for package configuration — never standard `use-package`
 - Use `map!` for keybindings; `:leader` prefix for global bindings
-- Use `fboundp` guards for optional package entrypoints (e.g.
-  `(when (fboundp 'some-command) (some-command 1))`)
+- Use `fboundp` guards for optional package entrypoints (e.g. `(when (fboundp 'some-command) (some-command 1))`)
 - Comment out unused modules in `init.el` — never delete lines
 - Snippets live under `<doom-user-dir>/snippets/<major-mode>/`
 
 ## Doom API Essentials (Compact)
 
-See `DOOM-API.md` for the full syntax and examples. These are the patterns
-agents most often get wrong — commit them to memory:
+See `DOOM-API.md` for the full syntax and examples. These are the patterns agents most often get wrong — commit them to
+memory:
 
-- **`after!`** — defer config until a feature loads. Use instead of
-  `with-eval-after-load`. `(after! org (setq org-adapt-indentation nil))`
-- **`use-package!`** — Doom's package declaration + config. Not the same as
-  `use-package` from MELPA. `(use-package! foo :defer t :config ...)`
-- **`map!`** — keybinding with evil state-aware prefixes:
-  `:leader` (`SPC`), `:n` (normal), `:i` (insert), `:v` (visual),
-  `:m` (motion). `(map! :leader :desc "Desc" "f f" #'find-file)`
+- **`after!`** — defer config until a feature loads. Use instead of `with-eval-after-load`.
+  `(after! org (setq org-adapt-indentation nil))`
+- **`use-package!`** — Doom's package declaration + config. Not the same as `use-package` from MELPA.
+  `(use-package! foo :defer t :config ...)`
+- **`map!`** — keybinding with evil state-aware prefixes: `:leader` (`SPC`), `:n` (normal), `:i` (insert), `:v`
+  (visual), `:m` (motion). `(map! :leader :desc "Desc" "f f" #'find-file)`
 - **`set-company-backend!`** — per-mode company backend configuration
-- **`add-hook!`** — multi-mode hook helper.
-  `(add-hook! '(a-mode b-mode) #'fn)`
-- **`setq-hook!`** — set buffer-local variables in a hook, cleaner than a
-  lambda. `(setq-hook! 'org-mode-hook truncate-lines nil)`
-- **`load!`** — load an Elisp file relative to `doom-user-dir`.
-  `(load! "modules/org")` loads `~/.config/doom/modules/org.el`
-- **`featurep!`** — compile-time module check.
-  `(when (featurep! :ui popup) ...)`
+- **`add-hook!`** — multi-mode hook helper. `(add-hook! '(a-mode b-mode) #'fn)`
+- **`setq-hook!`** — set buffer-local variables in a hook, cleaner than a lambda.
+  `(setq-hook! 'org-mode-hook truncate-lines nil)`
+- **`load!`** — load an Elisp file relative to `doom-user-dir`. `(load! "modules/org")` loads
+  `~/.config/doom/modules/org.el`
+- **`featurep!`** — compile-time module check. `(when (featurep! :ui popup) ...)`
 - **`set-popup-rule!`** — control popup buffer display
 - **`setq!`** — Doom's wrapper around `setq`. Use instead of `setq-default`.
 
 ## Safety Checks — Always Run After Changes
 
-| After this              | Run this                                                                           |
-| :---------------------- | :--------------------------------------------------------------------------------- |
-| Any requested Doom edit | `check-parens` for changed `.el` files, then `doom sync` unless told not to        |
-| `init.el` change        | `doom sync` (required after any module change)                                     |
-| `packages.el` change    | `doom sync` (required after any package change)                                    |
-| `config.el` change      | `M-x eval-buffer` or restart; `doom sync` works but check parens first             |
-| Any `.el` file change   | `check-parens` to verify balanced parens                                           |
-| After `doom sync`       | `doom doctor` — catches missing deps, wrong flags, broken recipes                  |
-| Emacs won't start (CLI) | `emacs --debug-init` for stack trace; `emacs --batch` for paren check              |
+| After this              | Run this                                                                    |
+| :---------------------- | :-------------------------------------------------------------------------- |
+| Any requested Doom edit | `check-parens` for changed `.el` files, then `doom sync` unless told not to |
+| `init.el` change        | `doom sync` (required after any module change)                              |
+| `packages.el` change    | `doom sync` (required after any package change)                             |
+| `config.el` change      | `M-x eval-buffer` or restart; `doom sync` works but check parens first      |
+| Any `.el` file change   | `check-parens` to verify balanced parens                                    |
+| After `doom sync`       | `doom doctor` — catches missing deps, wrong flags, broken recipes           |
+| Emacs won't start (CLI) | `emacs --debug-init` for stack trace; `emacs --batch` for paren check       |
 
-**Paren balancing is critical** — a missing paren in `config.el` can prevent
-Emacs from starting. Always verify before declaring done.
+**Paren balancing is critical** — a missing paren in `config.el` can prevent Emacs from starting. Always verify before
+declaring done.
 
-**Run `doom doctor` after every `doom sync`** — it catches module flag
-mismatches, missing system dependencies, and package recipe errors that would
-otherwise fail silently.
+**Run `doom doctor` after every `doom sync`** — it catches module flag mismatches, missing system dependencies, and
+package recipe errors that would otherwise fail silently.
 
 ## Pitfalls
 
-- **Do not edit `early-init.el` or `~/.emacs.d/init.el`** — Doom manages those.
-  All user config goes in `~/.config/doom/`.
+- **Do not edit `early-init.el` or `~/.emacs.d/init.el`** — Doom manages those. All user config goes in
+  `~/.config/doom/`.
 - **Do not use `with-eval-after-load`** — use Doom's `after!` macro instead.
-- **Do not use standard `use-package`** — use Doom's `use-package!` (with
-  trailing bang). They have different deferral semantics.
+- **Do not use standard `use-package`** — use Doom's `use-package!` (with trailing bang). They have different deferral
+  semantics.
 - **`(setq-default ...)`** is rarely needed in Doom. Prefer `(setq ...)`.
-- **`straight.el` (not `package.el`)** is Doom's package manager. If a user
-  runs `package-install`, it goes to the wrong place. Always use `package!`
-  in `packages.el` followed by `doom sync`.
-- **Never delete lines from `init.el`** — comment them out instead. Users rely
-  on seeing the full module list to know what's available.
-- **On‑save formatting** — if `format +onsave` is enabled, saving after
-  `doom sync` can break indentation. Run `M-x doom/reload` after `doom sync`.
-- **Stale template comments can mislead** — if restored upstream comments
-  recommend `with-eval-after-load` or standard `use-package`, replace or
-  annotate them to match your config's conventions.
-- **Bind launcher keys outside `after!`** — putting a keybinding inside
-  `(after! <pkg> ...)` delays the binding until the package loads. For
-  commands meant to be run immediately, bind them directly and defer only
-  the package configuration.
+- **`straight.el` (not `package.el`)** is Doom's package manager. If a user runs `package-install`, it goes to the wrong
+  place. Always use `package!` in `packages.el` followed by `doom sync`.
+- **Never delete lines from `init.el`** — comment them out instead. Users rely on seeing the full module list to know
+  what's available.
+- **On‑save formatting** — if `format +onsave` is enabled, saving after `doom sync` can break indentation. Run
+  `M-x doom/reload` after `doom sync`.
+- **Stale template comments can mislead** — if restored upstream comments recommend `with-eval-after-load` or standard
+  `use-package`, replace or annotate them to match your config's conventions.
+- **Bind launcher keys outside `after!`** — putting a keybinding inside `(after! <pkg> ...)` delays the binding until
+  the package loads. For commands meant to be run immediately, bind them directly and defer only the package
+  configuration.
 
 ## Domain Drift Governance
 
-The Quick Index table above is the single entry point to domain files.
-When a domain file is added, removed, renamed, or its purpose changes,
-**update the Quick Index in the same change**:
+The Quick Index table above is the single entry point to domain files. When a domain file is added, removed, renamed, or
+its purpose changes, **update the Quick Index in the same change**:
 
 - **Added domain** → add a row with file path, description, and trigger condition.
 - **Removed domain** → remove its row from the Quick Index.
 - **Renamed domain** → update the file path in its row.
 - **Scope change** → update the description and trigger to match.
-- Always verify the Reference Sources entry for `domains/` mentions every
-  domain file. Stale pointers are blocking — agents discover depth files
-  through this table, not by enumerating the filesystem.
+- Always verify the Reference Sources entry for `domains/` mentions every domain file. Stale pointers are blocking —
+  agents discover depth files through this table, not by enumerating the filesystem.
 
 ## Keeping the Config Repo Self-Contained
 
-This skill lives at `.agents/skills/doom-emacs/SKILL.md` with supplemental
-domain files under `domains/`. Anyone who clones this repo gets the full
-skill with it. After editing the skill or domain files, sync the Hermes
-runtime mirror:
+This skill lives at `.agents/skills/doom-emacs/SKILL.md` with supplemental domain files under `domains/`. Anyone who
+clones this repo gets the full skill with it. After editing the skill or domain files, sync the Hermes runtime mirror:
 
 ```sh
 scripts/sync-doom-skill-mirror.sh
 scripts/check-doom-skill-mirror.sh
 ```
 
-See `AGENTS.md` for the two-clone protocol, source-destruction invariant, and
-drift-detection steps.
+See `AGENTS.md` for the two-clone protocol, source-destruction invariant, and drift-detection steps.
 
 ## Reference Sources
 
-When you need to understand how a package or Doom module works, the source
-code is at your fingertips:
+When you need to understand how a package or Doom module works, the source code is at your fingertips:
 
 - **Doom framework source:** `~/.config/emacs/` — clone of the
-  [official Doom Emacs repo](https://github.com/doomemacs/doomemacs). Browse
-  `modules/` for built-in module definitions, `lisp/` for core libraries,
-  and `core/` for the module system.
-- **Installed package source:** `~/.config/emacs/.local/straight/repos/` —
-  each package has its own directory with full source.
-- **Doom Emacs Issues & Docs:** upstream GitHub repository for recent changes,
-  open issues, and pull requests.
+  [official Doom Emacs repo](https://github.com/doomemacs/doomemacs). Browse `modules/` for built-in module definitions,
+  `lisp/` for core libraries, and `core/` for the module system.
+- **Installed package source:** `~/.config/emacs/.local/straight/repos/` — each package has its own directory with full
+  source.
+- **Doom Emacs Issues & Docs:** upstream GitHub repository for recent changes, open issues, and pull requests.
 - **This repo's references:**
   - `references/INDEX.md` — external resource catalogue (community configs, keybinding reference, performance tips)
   - `references/package-management.md` — package lifecycle, pinning, straight internals, recovery
