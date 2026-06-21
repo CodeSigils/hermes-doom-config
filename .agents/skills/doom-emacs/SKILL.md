@@ -211,8 +211,10 @@ scripts/sync-doom-skill-mirror.sh
 scripts/check-doom-skill-mirror.sh
 ```
 
-See `AGENTS.md` for the two-clone protocol, source-destruction invariant, and
-drift-detection steps.
+The sync uses destructive replacement (`rm -rf` then `cp -a`) to keep the
+mirror byte-for-byte identical to the repo — no stale mirror-only files can
+survive. See `AGENTS.md` for the two-clone protocol, source-destruction
+invariant, and drift-detection steps.
 
 ## Reference Sources
 

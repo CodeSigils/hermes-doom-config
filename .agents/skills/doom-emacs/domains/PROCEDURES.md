@@ -73,3 +73,60 @@ Use `map!` in `config.el`:
 5. **If something breaks:** restore `~/.config/doom.backup.*` from backup
 
 Do not skip the backup. Framework changes can introduce API changes that break your config.
+
+## H. Running a Config Maintenance Audit
+
+Periodically audit the config repo for drift between documentation and actual state:
+
+1. Read `init.el` and derive the actual enabled module inventory (active vs commented).
+2. Compare README feature/module claims against that inventory — fix any claims for commented modules.
+3. Check `git status --short` and tracked runtime artifacts (`git ls-files`). Runtime DB files
+   (`.open-mem/memory.db*`, etc.) should be gitignored, not committed.
+4. Run `doom doctor` — classify warnings as expected optional dependencies or config issues.
+5. Run the stale-patterns check: `scripts/check-stale-patterns.sh`.
+6. Check comments in config files for stale upstream Doom template advice
+   (`with-eval-after-load`, standard `use-package`, deleting module lines, etc.).
+7. Verify the snippet directory (if present) is documented in README.
+
+## I. Evaluating a New Doom Package (Research Template)
+
+Use this template when researching a package not yet installed. Example: evaluating
+[xenodium/agent-shell](https://github.com/xenodium/agent-shell) — a native Emacs ACP agent UI.
+
+**Research notes template:**
+
+```markdown
+## <Package Name> — <Brief Purpose>
+
+**Current status:** not installed — evaluation only.
+
+**Doom install:**
+```elisp
+;; packages.el
+(package! <dependency-1>)
+(package! <dependency-2>)
+(package! <package-name>)
+
+;; config.el
+(after! <package-name>
+  (setq <option> <value>))
+```
+
+**Known pitfalls:**
+- List any gotchas found during evaluation.
+- Note provider-specific quirks (e.g. `agent-shell-hermes-acp-command` may use
+  symbols instead of strings — override with strings in Doom config).
+- Check whether `executable-find` and `make-process` expect command strings, not symbols.
+
+**Safety defaults for first trial:**
+- Start conservatively: disable file access, text file capabilities.
+- Do not globally enable auto-approval helpers.
+- Add keybindings only after the basic flow works.
+
+**Cross-check against upstream:**
+- Verify the package's Doom install docs match the current Doom version.
+- Check `doom doctor` for conflicts with enabled modules.
+- If the package needs a CLI tool, add it to PROFILE.md system dependencies.
+```
+
+Remove this section once the research concludes and the result (installed or rejected) is documented.
