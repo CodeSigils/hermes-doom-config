@@ -13,12 +13,12 @@ doom sync
 doom doctor
 ```
 
-If you're an AI agent working in this repo, read `AGENTS.md` first, then `PROFILE.md` (what this config is), then
-`DOOM-API.md` (idiomatic Doom patterns). The repo's required Doom skill lives at `.agents/skills/doom-emacs/SKILL.md` —
-a compact core with `domains/ARCHITECTURE.md`, `domains/PROCEDURES.md`, `domains/ELISP.md`, and
-`domains/TROUBLESHOOTING.md` for depth on demand. If your Hermes installation also has `emacs-lisp-expert`, load it as
-an optional companion skill for general Emacs Lisp guidance. If it is missing, consider installing it for deeper Emacs
-Lisp help, but do not require it for basic repo maintenance.
+If you're an AI agent working in this repo, read `PROFILE.md` first (what this config is), then `DOOM-API.md` (idiomatic
+Doom patterns), then `AGENTS.md` (workflow and policies). The repo's required Doom skill lives at
+`.agents/skills/doom-emacs/SKILL.md` — a compact core with `domains/ARCHITECTURE.md`, `domains/PROCEDURES.md`,
+`domains/ELISP.md`, and `domains/TROUBLESHOOTING.md` for depth on demand. If your Hermes installation also has
+`emacs-lisp-expert`, load it as an optional companion skill for general Emacs Lisp guidance. If it is missing, consider
+installing it for deeper Emacs Lisp help, but do not require it for basic repo maintenance.
 
 For first-time local Hermes use by agents, install the repo skill into the runtime mirror:
 
@@ -40,7 +40,7 @@ All repo scripts live under `scripts/`. The canonical reference for every script
   ───
   SKILL.md > Scripts table      --  single source of truth for all scripts
   ───
-  scripts/check-stale-patterns.sh  Pass 3  --  auto-verifies every .sh in
+  scripts/check-stale-patterns.sh  Pass 3  --  auto-verifies every .sh (except config.sh) in
                                                  scripts/ has a SKILL.md entry
                                                  (blocks commit if missing)
 ```
@@ -77,17 +77,16 @@ Not currently enabled: Doom's `mu4e`, `irc`, `rss`, `rest`, `web`, `treemacs`, `
 
 `doom doctor` reports missing optional tools for some enabled modules and workflows. Install only what you use.
 
-| Tool or package                        | Used by                        | Notes                                        |
-| :------------------------------------- | :----------------------------- | :------------------------------------------- |
-| Symbola or equivalent Unicode font     | Doom font checks               | Optional fallback symbol font                |
-| `ansible`                              | `:tools ansible`               | Needed for Ansible editing helpers           |
-| `dockfmt`                              | `:tools docker`                | Formats Dockerfiles                          |
-| Markdown compiler                      | Markdown preview/export        | Use the compiler expected by your Doom setup |
-| `maim`, `scrot`, or `gnome-screenshot` | org-download clipboard images  | Needed only for `org-download-clipboard`     |
-| `pyflakes`                             | Python syntax checking         | Optional Python checker                      |
-| `isort`                                | Python import sorting          | Optional formatter/import sorter             |
-| `pipenv`                               | Python environments            | Only needed for Pipenv projects              |
-| `nosetests`                            | Python test runner integration | Legacy; only needed for Nose-based projects  |
+| Tool or package                        | Used by                       | Notes                                        |
+| :------------------------------------- | :---------------------------- | :------------------------------------------- |
+| Symbola or equivalent Unicode font     | Doom font checks              | Optional fallback symbol font                |
+| `ansible`                              | `:tools ansible`              | Needed for Ansible editing helpers           |
+| `dockfmt`                              | `:tools docker`               | Formats Dockerfiles                          |
+| Markdown compiler                      | Markdown preview/export       | Use the compiler expected by your Doom setup |
+| `maim`, `scrot`, or `gnome-screenshot` | org-download clipboard images | Needed only for `org-download-clipboard`     |
+| `pyflakes`                             | Python syntax checking        | Optional Python checker                      |
+| `isort`                                | Python import sorting         | Optional formatter/import sorter             |
+| `pipenv`                               | Python environments           | Only needed for Pipenv projects              |
 
 ## Maintenance
 
@@ -106,7 +105,8 @@ If something breaks, restore `~/.config/doom.backup.*` from the backup.
 
 - Runtime SQLite artifacts under `.open-mem/` are ignored; keep durable notes in human-readable files instead of
   committing WAL/SHM database state
-- The repo skill is canonical; after skill edits, run `scripts/sync-doom-skill-mirror.sh`, then
-  `scripts/check-doom-skill-mirror.sh`. Treat the Hermes runtime mirror as generated state, not an editable source tree
+- The repo skill is canonical; after skill edits, sync the Hermes runtime mirror (see
+  `.agents/skills/doom-emacs/SKILL.md` Scripts table). Treat the runtime mirror as generated state, not an editable
+  source tree
 - Markdown files in this repo should not contain emoji, including generated status summaries or agent notes
 - Unused modules are commented out in `init.el`, never deleted
