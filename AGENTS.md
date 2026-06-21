@@ -7,7 +7,7 @@
 | `DOOM-API.md`                        | Idiomatic Doom patterns — which macros to use when and why           |
 | `PROFILE.md`                         | Config profile — modules, packages, custom functions, environment    |
 | `references/INDEX.md`                | Reference catalogue — Doom resources, community configs, exploration |
-| `.agents/skills/doom-emacs/SKILL.md` | General Doom Emacs guide with procedures, troubleshooting, API primer |
+| `.agents/skills/doom-emacs/SKILL.md` | Compact core: file roles, API essentials, pitfalls; plus `domains/` for depth |
 | `README.md`                          | Human quick-start (verify module lists against `init.el`)            |
 
 ## Read First — Agent Entry Order
@@ -20,7 +20,7 @@ When opening this repo cold, read files in this order:
 | 2 | `DOOM-API.md` | Idiomatic Doom patterns — which macros to use when | Learn the dialect before editing `.el` files |
 | 3 | This file (`AGENTS.md`) | Agent behavior policies and workflow for this repo | Know the rules before making changes |
 | 4 | `references/INDEX.md` | External Doom resources and community configs | Find what's possible outside this config |
-| 5 | `.agents/skills/doom-emacs/SKILL.md` | General Doom Emacs guide with procedures, troubleshooting, API primer | Deep reference on demand |
+| 5 | `.agents/skills/doom-emacs/SKILL.md` | Compact core: file roles, API essentials, pitfalls; plus `domains/` for depth | Deep reference on demand |
 
 `README.md` is human-facing; read it when you need quick-start or dependency info.
 
