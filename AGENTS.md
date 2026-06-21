@@ -117,16 +117,17 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 
 When you change a source of truth, update its dependent files in the same change:
 
-| Source of truth                       | Dependent files                                             | What to update                                  |
-| ------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------- |
-| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules      | Add/remove modules, adjust flags                |
-| `packages.el`                         | `PROFILE.md` packages table                                 | Add/remove packages with purpose notes          |
-| `config.el`                           | `PROFILE.md` custom functions table, `DOOM-API.md` patterns | Update function signatures, add new patterns    |
-| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary                        | Update policy one-liners if bounds change       |
-| `scripts/` files                      | `SKILL.md` Scripts table, `AGENTS.md` workflow              | Add/rename script rows, update invocation paths |
-| `domains/` files                      | `SKILL.md` Quick Index table                                | Add/remove/rename rows to match domain files    |
-| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                 | Flag changes, new module features               |
-| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                          | Command changes, new subcommands                |
+| Source of truth                       | Dependent files                                                       | What to update                                  |
+| ------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------- |
+| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                | Add/remove modules, adjust flags                |
+| `packages.el`                         | `PROFILE.md` packages table                                           | Add/remove packages with purpose notes          |
+| `config.el`                           | `PROFILE.md` custom functions table, `DOOM-API.md` patterns           | Update function signatures, add new patterns    |
+| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary, `README.md` agent entry section | Update reading order, companion skill mentions  |
+| `scripts/` files                      | `SKILL.md` Scripts table, `AGENTS.md` workflow                        | Add/rename script rows, update invocation paths |
+| `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                            | Update diagram, path descriptions               |
+| `domains/` files                      | `SKILL.md` Quick Index table                                          | Add/remove/rename rows to match domain files    |
+| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                           | Flag changes, new module features               |
+| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                    | Command changes, new subcommands                |
 
 Run `git diff --check` before committing. Stale documentation is worse than missing documentation because the agent
 cannot distinguish it from truth.
