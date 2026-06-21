@@ -157,17 +157,19 @@ its purpose changes, **update the Quick Index in the same change**:
 - Always verify the Reference Sources entry for `domains/` mentions every domain file. Stale pointers are blocking —
   agents discover depth files through this table, not by enumerating the filesystem.
 
-## Keeping the Config Repo Self-Contained
+## Scripts
 
-This skill lives at `.agents/skills/doom-emacs/SKILL.md` with supplemental domain files under `domains/`. Anyone who
-clones this repo gets the full skill with it. After editing the skill or domain files, sync the Hermes runtime mirror:
+All repo scripts live under `scripts/`. Sourcing `scripts/config.sh` provides shared variables and grep wrappers; the
+other four are workflow tools you invoke directly:
 
-```sh
-scripts/sync-doom-skill-mirror.sh
-scripts/check-doom-skill-mirror.sh
-```
+| Script                       | Purpose                                                              | When to run                                |
+| :--------------------------- | :------------------------------------------------------------------- | :----------------------------------------- |
+| `sync-doom-skill-mirror.sh`  | Copy skill tree to Hermes runtime mirror                             | After editing skill or domain files        |
+| `check-doom-skill-mirror.sh` | Verify mirror matches source                                         | After sync                                 |
+| `check-stale-patterns.sh`    | Scan for dead Doom 3 flags + broken cross-refs                       | Before committing markdown changes         |
+| `ai-context.sh`              | Generate AI prompt context block (version, git status, file content) | On demand when enlisting an external model |
 
-See `AGENTS.md` for the two-clone protocol, source-destruction invariant, and drift-detection steps.
+See `AGENTS.md` for the full two-clone protocol, sync-destruction invariant, and pre-commit discipline.
 
 ## Reference Sources
 
