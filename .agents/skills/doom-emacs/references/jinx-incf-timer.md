@@ -63,4 +63,7 @@ Expected: load check succeeds and Jinx repo status is empty.
 
 ## Cleanup Later
 
+---
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick Index for all domain files.
+
 When upstream Jinx replaces `incf`/`decf` with `cl-incf`/`cl-decf` or otherwise fixes the issue, remove the runtime aliases from `config.el` and run `doom sync`. Keep `(unpin! compat)` while Jinx or other unpinned packages require compat 31.

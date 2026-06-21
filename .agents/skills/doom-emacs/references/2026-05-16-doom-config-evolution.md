@@ -29,4 +29,7 @@ Session-derived workflow and configuration details for the user's `doom-emacs-co
 
 - Repo name: `doom-emacs-config`.
 - README and AGENTS should use that name.
+
+---
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick Index for all domain files.
 - The old one-off file `2026-05-16-emacs-aware-hermes.md` was removed after its content was absorbed into the skill and repo docs.

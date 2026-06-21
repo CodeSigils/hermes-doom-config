@@ -46,4 +46,6 @@ Safety defaults:
 
 - Keep `agent-shell-text-file-capabilities` nil for an initial trial.
 - Do not globally enable auto-approval helpers such as `agent-shell-permission-allow-always`.
+
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick Index for all domain files.
 - Add keybindings only after the basic Hermes flow works.

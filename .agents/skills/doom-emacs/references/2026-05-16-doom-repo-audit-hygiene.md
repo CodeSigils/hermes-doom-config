@@ -26,4 +26,7 @@ Session-specific detail for maintaining `~/.config/doom/` as both a working Doom
 4. Run Markdown lint when README/AGENTS/docs change.
 5. Run Elisp paren checks for changed `.el` files.
 6. Run `doom doctor`; classify warnings as expected optional dependencies or config issues.
+
+---
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick Index for all domain files.
 7. Check comments for stale upstream advice that contradicts repo policy (`with-eval-after-load`, standard `use-package`, deleting module lines, etc.).

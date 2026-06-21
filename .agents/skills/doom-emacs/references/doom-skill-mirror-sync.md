@@ -71,4 +71,7 @@ When any file under `.agents/skills/doom-emacs/` changes:
 1. Run the sync script before reporting done.
 2. Run the check script and require no diff.
 3. Do not manually edit the runtime mirror.
+
+---
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick Index for all domain files.
 4. If a mirror-only reference file looks valuable, copy it into the repo source first, then sync from repo to mirror.
