@@ -30,36 +30,34 @@ stale_patterns=(
   "[+]babel:Not a valid :lang org flag in Doom 3"
 )
 
-echo "=== Stale Pattern Scan ==="
-echo ""
+printf '=== Stale Pattern Scan ===\n\n'
 
 for entry in "${stale_patterns[@]}"; do
   pattern="${entry%%:*}"
   explanation="${entry#*:}"
   matches=$(grep_md "$pattern")
-  if [ -n "$matches" ]; then
-    echo "STALE: $explanation"
-    echo "$matches" | head -10
-    match_count=$(echo "$matches" | wc -l)
-    if [ "$match_count" -gt 10 ]; then
-      echo "  ... and $((match_count - 10)) more matches"
+  if [[ -n "$matches" ]]; then
+    printf 'STALE: %s\n' "$explanation"
+    printf '%s\n' "$matches" | head -10
+    match_count=$(printf '%s\n' "$matches" | wc -l)
+    if [[ "$match_count" -gt 10 ]]; then
+      printf '  ... and %d more matches\n' "$((match_count - 10))"
     fi
-    echo ""
+    printf '\n'
     errors=1
   fi
 done
 
-if [ $errors -eq 0 ]; then
-  echo "No stale patterns found."
+if [[ "$errors" -eq 0 ]]; then
+  printf 'No stale patterns found.\n'
 fi
-echo ""
+printf '\n'
 
 ##################################################
 # PASS 2: Cross-reference integrity
 ##################################################
 
-echo "=== Cross-Reference Integrity ==="
-echo ""
+printf '=== Cross-Reference Integrity ===\n\n'
 
 ref_errors=0
 
@@ -90,25 +88,26 @@ check_path() {
     resolved="${resolved#./}"
   fi
 
-  if [ -e "$resolved" ]; then
+  if [[ -e "$resolved" ]]; then
     return 0
   fi
 
   # Fallback for references from within the skill directory: the file may
   # live at repo root instead of under the skill dir (e.g. references/INDEX.md,
   # DOOM-API.md, scripts/check-stale-patterns.sh).
-  if [[ "$source_file" == ./.agents/skills/doom-emacs/* ]] && [ -e "$path" ]; then
+  if [[ "$source_file" == ./.agents/skills/doom-emacs/* ]] && [[ -e "$path" ]]; then
     return 0
   fi
 
-  echo "BROKEN: '$path' from $source_file:$source_line -- not found at '$resolved'"
+  printf "BROKEN: '%s' from %s:%s -- not found at '%s'\n" \
+    "$path" "$source_file" "$source_line" "$resolved"
   ref_errors=1
 }
 
 while IFS=: read -r file line _rest; do
   content=$(sed -n "${line}p" "$file" 2>/dev/null || true)
-  paths=$(echo "$content" | extract_paths)
-  if [ -z "$paths" ]; then
+  paths=$(printf '%s\n' "$content" | extract_paths)
+  if [[ -z "$paths" ]]; then
     continue
   fi
   for path in $paths; do
@@ -120,11 +119,11 @@ while IFS=: read -r file line _rest; do
   done
 done < <(find_path_refs)
 
-if [ $ref_errors -eq 0 ]; then
-  echo "All cross-references resolve."
+if [[ "$ref_errors" -eq 0 ]]; then
+  printf 'All cross-references resolve.\n'
 fi
 
-if [ $errors -eq 1 ] || [ $ref_errors -eq 1 ]; then
+if [[ "$errors" -eq 1 ]] || [[ "$ref_errors" -eq 1 ]]; then
   exit 1
 fi
 exit 0

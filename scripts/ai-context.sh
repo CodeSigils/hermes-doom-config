@@ -7,38 +7,35 @@ set -euo pipefail
 cd "$DOOMDIR"
 FILE="${1:-}"
 
-echo "=== Doom Emacs Config Context ==="
-echo
-echo "**Doom Version:**"
-doom version 2>/dev/null || echo "  (doom command not found)"
-echo
-echo "**Git Status:**"
+printf '=== Doom Emacs Config Context ===\n\n'
+printf '**Doom Version:**\n'
+doom version 2>/dev/null || printf '  (doom command not found)\n'
+printf '\n'
+printf '**Git Status:**\n'
 git status --short
-echo
+printf '\n'
 if [[ -n "$FILE" ]]; then
-    echo "**File Being Edited:** $FILE"
+    printf '**File Being Edited:** %s\n' "$FILE"
     if [[ -f "$FILE" ]]; then
-        echo
-        echo "**File Content (first 80 lines):**"
+        printf '\n**File Content (first 80 lines):**\n'
         head -80 "$FILE"
     else
-        echo "  (file does not exist yet)"
+        printf '  (file does not exist yet)\n'
     fi
-    echo
+    printf '\n'
 fi
-echo "**Relevant Config Files:**"
+printf '**Relevant Config Files:**\n'
 for f in init.el config.el packages.el; do
     if [[ -f "$f" ]]; then
-        echo "  $f ($(wc -l < "$f") lines)"
+        printf '  %s (%s lines)\n' "$f" "$(wc -l < "$f")"
     fi
 done
-echo
-echo "**Recent Commits:**"
+printf '\n'
+printf '**Recent Commits:**\n'
 git log --oneline -5
-echo
-echo "=== End Context ==="
-echo
-echo "Copy the above and paste into your AI prompt, then add:"
-echo "  - What you're trying to achieve"
-echo "  - What you've already tried"
-echo "  - Any error messages"
+printf '\n'
+printf '=== End Context ===\n\n'
+printf 'Copy the above and paste into your AI prompt, then add:\n'
+printf '  - What you are trying to achieve\n'
+printf '  - What you have already tried\n'
+printf '  - Any error messages\n'
