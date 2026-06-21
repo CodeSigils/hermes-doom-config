@@ -1,8 +1,7 @@
 # doom-emacs-config
 
-My personal Doom Emacs configuration repo. Designed for org-mode, GTD
-workflows, and general development with Company completion on a dual-monitor
-setup.
+My personal Doom Emacs configuration repo. Designed for org-mode, GTD workflows, and general development with Company
+completion on a dual-monitor setup.
 
 ## Quick Start
 
@@ -14,19 +13,14 @@ doom sync
 doom doctor
 ```
 
-If you're an AI agent working in this repo, read `AGENTS.md` first, then
-`PROFILE.md` (what this config is), then `DOOM-API.md` (idiomatic Doom
-patterns). The repo's required Doom skill lives at
-`.agents/skills/doom-emacs/SKILL.md` — a compact core with
-`domains/ARCHITECTURE.md`, `domains/PROCEDURES.md`, `domains/ELISP.md`, and
-`domains/TROUBLESHOOTING.md` for depth on demand.
-If your Hermes installation also has `emacs-lisp-expert`, load it as an optional
-companion skill for general Emacs Lisp guidance. If it is missing, consider
-installing it for deeper Emacs Lisp help, but do not require it for basic repo
-maintenance.
+If you're an AI agent working in this repo, read `AGENTS.md` first, then `PROFILE.md` (what this config is), then
+`DOOM-API.md` (idiomatic Doom patterns). The repo's required Doom skill lives at `.agents/skills/doom-emacs/SKILL.md` —
+a compact core with `domains/ARCHITECTURE.md`, `domains/PROCEDURES.md`, `domains/ELISP.md`, and
+`domains/TROUBLESHOOTING.md` for depth on demand. If your Hermes installation also has `emacs-lisp-expert`, load it as
+an optional companion skill for general Emacs Lisp guidance. If it is missing, consider installing it for deeper Emacs
+Lisp help, but do not require it for basic repo maintenance.
 
-For first-time local Hermes use by agents, install the repo skill into the
-runtime mirror:
+For first-time local Hermes use by agents, install the repo skill into the runtime mirror:
 
 ```sh
 scripts/sync-doom-skill-mirror.sh
@@ -37,35 +31,28 @@ For the full agent workflow and configuration policies, see `AGENTS.md`.
 
 ## Notable Enabled Modules
 
-See `PROFILE.md` for the full module table with flags by category, and
-`DOOM-API.md` section 3 for how the module system works. `init.el` is the
-source of truth.
+See `PROFILE.md` for the full module table with flags by category, and `DOOM-API.md` section 3 for how the module system
+works. `init.el` is the source of truth.
 
-Not currently enabled: Doom's `mu4e`, `irc`, `rss`, `rest`, `web`, `treemacs`,
-`nav-flash`, `multiple-cursors`, `rotate-text`, and `editorconfig` modules are
-commented out in `init.el`.
+Not currently enabled: Doom's `mu4e`, `irc`, `rss`, `rest`, `web`, `treemacs`, `nav-flash`, `multiple-cursors`,
+`rotate-text`, and `editorconfig` modules are commented out in `init.el`.
 
 ## Key Features
 
-- **Company completion** with file path expansion — `company-files` added to
-  `prog-mode`, `org-mode`, and `org-capture-mode`
+- **Company completion** with file path expansion — `company-files` added to `prog-mode`, `org-mode`, and
+  `org-capture-mode`
 - **Dirvish** — `SPC d d` launches `dirvish-dwim`
-- **Jinx spell checking** — fast Enchant/Hunspell-backed spell checking for
-  prose and code comments/strings
-- **Org mode** — org-roam, org-roam-ui, org-tempo (`<s` Tab for src blocks),
-  habit tracking, and GTD workflows
-- **Popup targets** — targeted rules for help, apropos, warnings, backtraces,
-  messages, completions, compilation/shell command output, and `*doom:*`
-  buffers
-- **Snippets** — Yasnippet snippets live under `snippets/<major-mode>/`; the
-  TypeScript snippets inherit JavaScript snippets through `.yas-parents`
-- **Defensive setup** — `fboundp` guards on optional packages,
-  `delete-by-moving-to-trash` globally
+- **Jinx spell checking** — fast Enchant/Hunspell-backed spell checking for prose and code comments/strings
+- **Org mode** — org-roam, org-roam-ui, org-tempo (`<s` Tab for src blocks), habit tracking, and GTD workflows
+- **Popup targets** — targeted rules for help, apropos, warnings, backtraces, messages, completions, compilation/shell
+  command output, and `*doom:*` buffers
+- **Snippets** — Yasnippet snippets live under `snippets/<major-mode>/`; the TypeScript snippets inherit JavaScript
+  snippets through `.yas-parents`
+- **Defensive setup** — `fboundp` guards on optional packages, `delete-by-moving-to-trash` globally
 
 ## Optional System Dependencies
 
-`doom doctor` reports missing optional tools for some enabled modules and
-workflows. Install only what you use.
+`doom doctor` reports missing optional tools for some enabled modules and workflows. Install only what you use.
 
 | Tool or package                        | Used by                        | Notes                                        |
 | :------------------------------------- | :----------------------------- | :------------------------------------------- |
@@ -94,12 +81,9 @@ If something breaks, restore `~/.config/doom.backup.*` from the backup.
 
 ## Notes
 
-- Runtime SQLite artifacts under `.open-mem/` are ignored; keep durable notes in
-  human-readable files instead of committing WAL/SHM database state
-- The repo skill is canonical; after skill edits, run
-  `scripts/sync-doom-skill-mirror.sh`, then
-  `scripts/check-doom-skill-mirror.sh`. Treat the Hermes runtime mirror as
-  generated state, not an editable source tree
-- Markdown files in this repo should not contain emoji, including generated
-  status summaries or agent notes
+- Runtime SQLite artifacts under `.open-mem/` are ignored; keep durable notes in human-readable files instead of
+  committing WAL/SHM database state
+- The repo skill is canonical; after skill edits, run `scripts/sync-doom-skill-mirror.sh`, then
+  `scripts/check-doom-skill-mirror.sh`. Treat the Hermes runtime mirror as generated state, not an editable source tree
+- Markdown files in this repo should not contain emoji, including generated status summaries or agent notes
 - Unused modules are commented out in `init.el`, never deleted
