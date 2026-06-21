@@ -3,6 +3,10 @@
 Full diagnostic guide. Read this only when something breaks — it is the
 longest domain file.
 
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials,
+safety checks, pitfalls, and the Quick Index for all domain files. Load
+SKILL.md first for the minimal context every Doom edit needs.
+
 ## Before you troubleshoot — collect diagnostics
 
 When something breaks, gather this information before changing anything:

@@ -33,9 +33,10 @@ conventions, not just this repo's specific choices.
 **Companion skill:** If `emacs-lisp-expert` is installed, load it too — it
 covers Emacs Lisp fundamentals that this skill builds on. If it is not
 installed, do not block: use this skill's Doom-specific guidance plus the
-Emacs Lisp for Doom Config section below. Suggest installing
-`emacs-lisp-expert` once as an optional companion for deeper Emacs Lisp work.
-This repo must remain self-contained for new users and agents.
+Emacs Lisp guide at `domains/ELISP.md` for non-trivial elisp. Suggest
+installing `emacs-lisp-expert` once as an optional companion for deeper
+Emacs Lisp work. This repo must remain self-contained for new users and
+agents.
 
 **Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it
 exists — it contains user-specific policies (completion preference, Markdown

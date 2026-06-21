@@ -4,6 +4,10 @@ Depth guide for understanding Doom's module system, flags, variables, reload
 semantics, and diagnostics. Read this when you need to understand how Doom is
 structured or before editing `init.el`.
 
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials,
+safety checks, pitfalls, and the Quick Index for all domain files. Load
+SKILL.md first for the minimal context every Doom edit needs.
+
 ## Config Modularity
 
 Split `config.el` into topic-specific files when a topic block exceeds ~50

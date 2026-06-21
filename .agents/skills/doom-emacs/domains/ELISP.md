@@ -3,6 +3,10 @@
 A new Doom user doesn't need full Emacs Lisp fluency. Most config work uses a
 small subset of the language. This guide covers what you'll encounter.
 
+**Parent skill:** `SKILL.md` — compact core with file roles, API essentials,
+safety checks, pitfalls, and the Quick Index for all domain files. Load
+SKILL.md first for the minimal context every Doom edit needs.
+
 ## Special Forms You Will Use
 
 | Form           | Purpose                          | Example                                        |
