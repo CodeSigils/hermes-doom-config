@@ -151,7 +151,7 @@ When asking an AI (or another agent) about this Doom config, provide context to 
 - What you've already tried
 - Any error messages (exact text)
 
-**Helper script:** Run `scripts/ai-context.sh [file]` (see [Scripts](#scripts) table) to auto-generate this context
+**Helper script:** Run the AI context helper script (see [Scripts](#scripts) table) to auto-generate this context block.
 block.
 
 **Why this works:** AI agents have no persistent memory of your config. The context window is limited and
