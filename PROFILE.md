@@ -1,33 +1,31 @@
 # PROFILE.md — Doom Emacs Config Profile
 
-Purpose: compact reference for what this Doom Emacs configuration is. An agent
-reads this to understand the user's setup before making suggestions or
-modifications.
+Purpose: compact reference for what this Doom Emacs configuration is. An agent reads this to understand the user's setup
+before making suggestions or modifications.
 
-This is a summary. The source of truth is `init.el`, `config.el`, and
-`packages.el`.
+This is a summary. The source of truth is `init.el`, `config.el`, and `packages.el`.
 
 ---
 
 ## Quick Reference
 
-| Property         | Value                                                             |
-| ---------------- | ----------------------------------------------------------------- |
-| Config dir       | `~/.config/doom/`                                                 |
-| Doom install     | `~/.config/emacs/` (old monolithic repo)                          |
-| Init file        | `init.el` (not `config.org` — not literate)                       |
-| Completion       | `:completion company +childframe +tng` + `vertico`                |
-| LSP backend      | `eglot` (not lsp-mode)                                            |
-| File manager     | Dirvish via `:emacs dired +dirvish`                               |
-| Spelling         | Jinx with Enchant/Hunspell (`en_US`)                              |
-| Git client       | magit                                                             |
-| Terminal         | vterm                                                             |
-| Tab/workspace    | workspaces module (tabspaces)                                     |
-| Formatting       | `format +onsave` — Ruff for Python, Prettier for Markdown         |
-| Custom prefix    | `sand/`                                                           |
-| Module style     | Comment out unused modules, never delete lines                    |
-| Keybinding style | `map!` with `:leader`; `:localleader` for major-mode maps         |
-| Package installs | via `(package! ...)` in `packages.el` + `doom sync`               |
+| Property         | Value                                                     |
+| ---------------- | --------------------------------------------------------- |
+| Config dir       | `~/.config/doom/`                                         |
+| Doom install     | `~/.config/emacs/` (old monolithic repo)                  |
+| Init file        | `init.el` (not `config.org` — not literate)               |
+| Completion       | `:completion company +childframe +tng` + `vertico`        |
+| LSP backend      | `eglot` (not lsp-mode)                                    |
+| File manager     | Dirvish via `:emacs dired +dirvish`                       |
+| Spelling         | Jinx with Enchant/Hunspell (`en_US`)                      |
+| Git client       | magit                                                     |
+| Terminal         | vterm                                                     |
+| Tab/workspace    | workspaces module (tabspaces)                             |
+| Formatting       | `format +onsave` — Ruff for Python, Prettier for Markdown |
+| Custom prefix    | `sand/`                                                   |
+| Module style     | Comment out unused modules, never delete lines            |
+| Keybinding style | `map!` with `:leader`; `:localleader` for major-mode maps |
+| Package installs | via `(package! ...)` in `packages.el` + `doom sync`       |
 
 ## Modules Enabled (by Category)
 
@@ -50,7 +48,7 @@ From `init.el`:
 |               | `(lsp +eglot)`, `magit`, `pdf`, `tree-sitter`                       |
 | `:os`         | `(:if (featurep :system 'macos) macos)` — conditional               |
 | `:lang`       | `data`, `emacs-lisp`, `json`, `latex`, `markdown`,                  |
-|               | `(org +roam +babel +dragndrop)`, `(python +lsp)`, `(sh +zsh +lsp)`, |
+|               | `(org +roam +dragndrop)`, `(python +lsp)`, `(sh +zsh +lsp)`,        |
 |               | `(yaml +lsp)`                                                       |
 | `:app`        | `everywhere`                                                        |
 | `:config`     | `(default +bindings +smartparens)`                                  |
@@ -69,9 +67,9 @@ Beyond Doom built-ins:
 
 ## Custom Functions (sand/ prefix)
 
-| Function                                     | Purpose                                    |
-| -------------------------------------------- | ------------------------------------------ |
-| `sand/org-display-inline-images-only-in-org` | Only display inline images in org-mode     |
+| Function                                     | Purpose                                |
+| -------------------------------------------- | -------------------------------------- |
+| `sand/org-display-inline-images-only-in-org` | Only display inline images in org-mode |
 
 ## Config Policies Summary
 
@@ -94,9 +92,8 @@ For full policy text see `AGENTS.md`:
 
 ### Spell Checking with Jinx
 
-This config uses Jinx for spelling instead of Doom's built-in Flyspell module.
-Jinx is async (avoids one subprocess per check), supports multiple languages
-simultaneously, and uses Enchant as a backend.
+This config uses Jinx for spelling instead of Doom's built-in Flyspell module. Jinx is async (avoids one subprocess per
+check), supports multiple languages simultaneously, and uses Enchant as a backend.
 
 Keep Doom's `(spell +flyspell)` line commented in `init.el`:
 
@@ -105,6 +102,7 @@ Keep Doom's `(spell +flyspell)` line commented in `init.el`:
 ```
 
 **packages.el:**
+
 ```elisp
 (unpin! compat)    ; Jinx needs compat 31+
 (package! jinx
@@ -112,6 +110,7 @@ Keep Doom's `(spell +flyspell)` line commented in `init.el`:
 ```
 
 **config.el:**
+
 ```elisp
 ;; Jinx 2.7 calls legacy bare incf/decf at runtime. Emacs 30 only has the
 ;; cl-lib names, so install aliases before autoloaded commands run.
@@ -138,10 +137,12 @@ Keep Doom's `(spell +flyspell)` line commented in `init.el`:
 ```
 
 **System dependencies** (Debian/PikaOS):
+
 - Runtime: `enchant-2`, `hunspell` or `nuspell`, `hunspell-en-us`
 - Build: `libenchant-2-dev` + `pkg-config` (provides `enchant-2.pc`)
 
 Probe commands:
+
 ```sh
 command -v enchant-2 || command -v enchant
 command -v pkg-config
@@ -150,6 +151,7 @@ pkg-config --exists enchant-2
 ```
 
 **Verification after `doom sync`:**
+
 ```sh
 emacs --batch -L ~/.config/emacs/.local/straight/build-30.2/compat \
   -L ~/.config/emacs/.local/straight/build-30.2/jinx \
@@ -157,19 +159,18 @@ emacs --batch -L ~/.config/emacs/.local/straight/build-30.2/compat \
 git -C ~/.config/emacs/.local/straight/repos/jinx status --short
 ```
 
-Expected result: Jinx loads, `completion-table-with-metadata` is defined, and
-the Jinx straight checkout is clean.
+Expected result: Jinx loads, `completion-table-with-metadata` is defined, and the Jinx straight checkout is clean.
 
-**`void-function incf` / `void-function decf`:** If `M-$`, `SPC s c`, or
-unrelated Org commands report `Error running timer 'nil': (void-function incf)`,
-the idle Jinx timer is loading bytecode that still calls legacy `incf`/`decf`.
-Confirm the aliases are present before `(use-package! jinx ...)`, run
-`doom sync`, restart Emacs, and retest.
+**`void-function incf` / `void-function decf`:** If `M-$`, `SPC s c`, or unrelated Org commands report
+`Error running timer 'nil': (void-function incf)`, the idle Jinx timer is loading bytecode that still calls legacy
+`incf`/`decf`. Confirm the aliases are present before `(use-package! jinx ...)`, run `doom sync`, restart Emacs, and
+retest.
 
-**Multilingual setup:** Extend `jinx-languages`, e.g. `"en_US de_DE"`. Start
-with the primary dictionary unless the user asks for more.
+**Multilingual setup:** Extend `jinx-languages`, e.g. `"en_US de_DE"`. Start with the primary dictionary unless the user
+asks for more.
 
 **Flyspell legacy pattern** (for reference only — do not reintroduce):
+
 ```elisp
 ;; init.el
 (spell +flyspell)
@@ -181,9 +182,8 @@ with the primary dictionary unless the user asks for more.
 
 ### Dirvish File Manager
 
-Dirvish replaces Dired as the primary file manager via the `+dirvish` flag.
-The launcher keybinding stays outside the `after!` block so it's available
-immediately and can autoload the command:
+Dirvish replaces Dired as the primary file manager via the `+dirvish` flag. The launcher keybinding stays outside the
+`after!` block so it's available immediately and can autoload the command:
 
 ```elisp
 ;; Launcher binding — keep outside after! for immediate availability
@@ -198,14 +198,13 @@ immediately and can autoload the command:
               (format " %s " (nerd-icons-faicon "nf-fa-angle_right")))))
 ```
 
-Pitfall: putting `SPC d d` inside `(after! dirvish ...)` delays the binding
-until dirvish loads. For launcher commands, bind first; customize after load.
+Pitfall: putting `SPC d d` inside `(after! dirvish ...)` delays the binding until dirvish loads. For launcher commands,
+bind first; customize after load.
 
 ### Org-Tempo (`<s` Tab Expansion)
 
-Org-tempo provides `<s` + Tab → `#+begin_src` template expansion in Org
-buffers. The templates are built-in but Doom loads them lazily, so an explicit
-`require` is needed:
+Org-tempo provides `<s` + Tab → `#+begin_src` template expansion in Org buffers. The templates are built-in but Doom
+loads them lazily, so an explicit `require` is needed:
 
 ```elisp
 (after! org
@@ -214,21 +213,19 @@ buffers. The templates are built-in but Doom loads them lazily, so an explicit
 )
 ```
 
-The org module also needs the `+pretty` flag. If `<s` still doesn't expand
-after adding the require, verify the `init.el` module declaration includes
-`+pretty`, e.g. `(org +roam +dragndrop +pretty)`.
+The org module also needs the `+pretty` flag. If `<s` still doesn't expand after adding the require, verify the
+`init.el` module declaration includes `+pretty`, e.g. `(org +roam +dragndrop +pretty)`.
 
-The yasnippet path is separate: `SPC h i` to insert a snippet, type `src`,
-and Tab. Org-tempo and yasnippet are independent completion systems and
-coexist.
+The yasnippet path is separate: `SPC h i` to insert a snippet, type `src`, and Tab. Org-tempo and yasnippet are
+independent completion systems and coexist.
 
 ## Related Files
 
-| File                                 | Purpose                                                    |
-| ------------------------------------ | ---------------------------------------------------------- |
-| `DOOM-API.md`                        | Idiomatic Doom patterns — which macros to use when and why |
-| `AGENTS.md`                          | Agent behavior policies and workflow                       |
-| `references/INDEX.md`                | External Doom Emacs reference catalogue                    |
-| `references/package-management.md`   | Doom package lifecycle: declaration, sync, update, pinning |
-| `.agents/skills/doom-emacs/SKILL.md` | General Doom Emacs guide with procedures and troubleshooting|
-| `README.md`                          | Human-facing quick start                                   |
+| File                                 | Purpose                                                      |
+| ------------------------------------ | ------------------------------------------------------------ |
+| `DOOM-API.md`                        | Idiomatic Doom patterns — which macros to use when and why   |
+| `AGENTS.md`                          | Agent behavior policies and workflow                         |
+| `references/INDEX.md`                | External Doom Emacs reference catalogue                      |
+| `references/package-management.md`   | Doom package lifecycle: declaration, sync, update, pinning   |
+| `.agents/skills/doom-emacs/SKILL.md` | General Doom Emacs guide with procedures and troubleshooting |
+| `README.md`                          | Human-facing quick start                                     |

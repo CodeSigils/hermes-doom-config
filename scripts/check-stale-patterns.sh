@@ -67,32 +67,40 @@ check_path() {
   local path="$1"
   local source_file="$2"
   local source_line="$3"
-  local filedir
+  local resolved
 
-  # Determine the base directory for resolution
-  case "$source_file" in
-    ./.agents/skills/doom-emacs/*)
-      filedir=".agents/skills/doom-emacs"
-      ;;
-    ./.agents/*)
-      filedir=".agents"
-      ;;
-    *)
-      filedir="."
-      ;;
-  esac
+  # Paths starting with . or ./ are repo-root relative; resolve as-is
+  if [[ "$path" == .* ]]; then
+    resolved="${path#./}"
+  else
+    # Relative paths: determine base directory from source file location
+    local filedir
+    case "$source_file" in
+      ./.agents/skills/doom-emacs/*)
+        filedir=".agents/skills/doom-emacs"
+        ;;
+      ./.agents/*)
+        filedir=".agents"
+        ;;
+      *)
+        filedir="."
+        ;;
+    esac
+    resolved="${filedir}/${path}"
+    resolved="${resolved#./}"
+  fi
 
-  local resolved="${filedir}/${path}"
-  # Normalize: remove leading ./ if any
-  resolved="${resolved#./}"
-
-  if [ -f "$resolved" ] || [ -d "$resolved" ]; then
+  if [ -e "$resolved" ]; then
     return 0
   fi
-  # If SKILL.md references DOOM-API.md, it lives at repo root, not in skill dir
-  if [[ "$filedir" == ".agents/skills/doom-emacs" ]] && [ -f "DOOM-API.md" ] && [[ "$resolved" == ".agents/skills/doom-emacs/DOOM-API.md" ]]; then
+
+  # Fallback for references from within the skill directory: the file may
+  # live at repo root instead of under the skill dir (e.g. references/INDEX.md,
+  # DOOM-API.md, scripts/check-stale-patterns.sh).
+  if [[ "$source_file" == ./.agents/skills/doom-emacs/* ]] && [ -e "$path" ]; then
     return 0
   fi
+
   echo "BROKEN: '$path' from $source_file:$source_line -- not found at '$resolved'"
   ref_errors=1
 }
@@ -100,22 +108,21 @@ check_path() {
 while IFS=: read -r file line _rest; do
   content=$(sed -n "${line}p" "$file" 2>/dev/null || true)
   # Match backtick-quoted paths: references/... or scripts/... or ./.agents/...
-  # But not URLs (http://), not email-like paths, not version strings
+  # Not URLs (http://), not email-like paths, not version strings
   paths=$(echo "$content" \
-    | grep -oP '\x60(?:\x2e/)?(?:references/|scripts/|\.agents/)[^\x60]+\x60' \
-    | tr -d '\x60' || true)
+    | grep -oP '`(?:\./)?(?:references/|scripts/|\.agents/)[^`]+`' \
+    | tr -d '`' || true)
   if [ -z "$paths" ]; then
     continue
   fi
   for path in $paths; do
-    # Known false positives to skip
-    case "$path" in
-      DOOM-API.md) continue ;;  # always at repo root
-      references/DOOM-API.md) continue ;;
-      *) check_path "$path" "$file" "$line" ;;
-    esac
+    # Skip paths containing shell placeholders like [file] or <name>
+    if [[ "$path" == *'['* ]] || [[ "$path" == *'<'* ]]; then
+      continue
+    fi
+    check_path "$path" "$file" "$line"
   done
-done < <(grep -rn '\x60\(\./\)\?\(references/\|scripts/\|\.agents/\)' --include='*.md' . | grep -v '.git/' || true)
+done < <(grep -rn '`\(\./\)\?\(references/\|scripts/\|\.agents/\)' --include='*.md' . | grep -v '.git/' || true)
 
 if [ $ref_errors -eq 0 ]; then
   echo "All cross-references resolve."
