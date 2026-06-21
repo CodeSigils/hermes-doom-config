@@ -161,6 +161,20 @@ otherwise fail silently.
   commands meant to be run immediately, bind them directly and defer only
   the package configuration.
 
+## Domain Drift Governance
+
+The Quick Index table above is the single entry point to domain files.
+When a domain file is added, removed, renamed, or its purpose changes,
+**update the Quick Index in the same change**:
+
+- **Added domain** → add a row with file path, description, and trigger condition.
+- **Removed domain** → remove its row from the Quick Index.
+- **Renamed domain** → update the file path in its row.
+- **Scope change** → update the description and trigger to match.
+- Always verify the Reference Sources entry for `domains/` mentions every
+  domain file. Stale pointers are blocking — agents discover depth files
+  through this table, not by enumerating the filesystem.
+
 ## Keeping the Config Repo Self-Contained
 
 This skill lives at `.agents/skills/doom-emacs/SKILL.md` with supplemental

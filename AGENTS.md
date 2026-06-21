@@ -142,6 +142,7 @@ change:
 | `config.el`                           | `PROFILE.md` custom functions table, `DOOM-API.md` patterns | Update function signatures, add new patterns |
 | `AGENTS.md`                           | `PROFILE.md` Config Policies Summary                        | Update policy one-liners if bounds change    |
 | `.agents/skills/` skill files         | `AGENTS.md` workflow (sync-command references)              | Update script paths if reorganized           |
+| `domains/` files                      | `SKILL.md` Quick Index table                                | Add/remove/rename rows to match domain files |
 | Doom module source (README.org)       | `references/INDEX.md` flags/features tables                 | Flag changes, new module features            |
 | Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                          | Command changes, new subcommands             |
 
