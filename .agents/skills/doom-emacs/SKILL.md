@@ -2,7 +2,7 @@
 name: doom-emacs-config
 description: Configure Doom Emacs correctly — module system, package management, safe patterns, and verification steps. Load before modifying any Doom config file.
 metadata:
-  version: "1.2.1"
+  version: "1.3.0"
   author: Code Sigils
   tier: powerful
   hermes:
@@ -23,89 +23,80 @@ metadata:
       ]
 ---
 
-# Doom Emacs Config
+# Doom Emacs Skill
 
-Skill for correctly modifying a Doom Emacs configuration. Load this whenever
-touching files under `~/.config/doom/` or when the user asks about Emacs config.
+A general guide for configuring and troubleshooting Doom Emacs. Load this
+whenever touching files under `~/.config/doom/` or when the user asks about
+Emacs config. This skill is meant to serve a new user — it teaches Doom
+conventions, not just this repo's specific choices.
 
 **Companion skill:** If `emacs-lisp-expert` is installed, load it too — it
 covers Emacs Lisp fundamentals that this skill builds on. If it is not
 installed, do not block: use this skill's Doom-specific guidance plus the
-fallback Emacs Lisp checklist below. When working with a user who does not have
-it installed, briefly suggest installing `emacs-lisp-expert` as an optional
-companion for deeper Emacs Lisp work. This repo must remain self-contained for
-new users and agents.
+Emacs Lisp for Doom Config section below. Suggest installing
+`emacs-lisp-expert` once as an optional companion for deeper Emacs Lisp work.
+This repo must remain self-contained for new users and agents.
 
 **Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it
-exists — it contains user-specific policies (completion preference, window
-management rules, Markdown style, verification steps, etc.).
+exists — it contains user-specific policies (completion preference, Markdown
+style, verification steps, etc.).
 
-## AI Agent Operating Loop
+## Agent Workflow
 
-Agents should work sequentially and make the smallest safe change that solves
-the user's request. Prefer one concern per edit and one concern per commit.
+Follow the workflow defined in `AGENTS.md` ("Agent Workflow" section). That
+is the single source of truth for how agents should operate in this repo.
 
-1. Load this skill before editing files under `~/.config/doom/`.
-2. Read `~/.config/doom/AGENTS.md` for repo-specific policy.
-3. Check `git status --short` before changing files.
-4. Inspect the relevant file before patching; do not guess from memory.
-5. Edit one concern at a time.
-6. For changed `.el` files, run `check-parens` before `doom sync`.
-7. Run `doom sync` after requested Doom config edits unless the user says not to.
-8. Run `doom doctor` after `doom sync`.
-9. If Markdown changed, run the repo Markdown linter before reporting done.
-10. When README.md describes enabled modules or feature inventory, verify it
-    against `init.el`; never trust README from memory or prior state.
-11. If this skill changed, replace the Hermes runtime mirror from the repo
-    source and verify equality. Do not hand-edit the mirror.
-12. Finish with `git diff --check`, `git status --short`, and a concise summary.
+The key steps are:
+
+1. Check `git status --short` before changing files.
+2. Inspect the relevant file before patching; do not guess from memory.
+3. Run `check-parens` on changed `.el` files before `doom sync`.
+4. Run `doom sync` after requested edits (including config-only), unless told
+   not to.
+5. Run `doom doctor` after `doom sync`.
+6. Finish with `git diff --check`, `git status --short`, concise summary.
+
+See AGENTS.md for the full workflow with edge cases (failed commands, reference
+consultation, skill mirror sync).
 
 ## File Roles — Know What Goes Where
 
 Doom splits config across three files. Putting the wrong thing in the wrong
 file is the most common mistake.
 
-| File          | Purpose                                                  | `doom sync` needed?                |
-| :------------ | :------------------------------------------------------- | :--------------------------------- |
-| `init.el`     | Declare which Doom modules are enabled, with their flags | Yes                                |
-| `packages.el` | Install external packages (MELPA, git repos)             | Yes                                |
-| `config.el`   | Settings, keybinds, hooks, advice, custom functions      | Normally no; this repo prefers yes |
+| File          | Purpose                                                  | `doom sync` needed? |
+| :------------ | :------------------------------------------------------- | :------------------ |
+| `init.el`     | Declare which Doom modules are enabled, with their flags | Yes                 |
+| `packages.el` | Install external packages (MELPA, git repos)             | Yes                 |
+| `config.el`   | Settings, keybinds, hooks, advice, custom functions      | Depends on config   |
 
 ## Writing Conventions
 
-Patterns established in this config that must be followed when adding new code:
+Patterns that apply to any Doom config:
 
 - Every `.el` file starts with `;;; <path> -*- lexical-binding: t; -*-`
 - Use `after!` for deferred config — never `with-eval-after-load`
 - Use `use-package!` for package configuration — never standard `use-package`
 - Use `map!` for keybindings; `:leader` prefix for global bindings
-- Use `set-popup-rule!` for popup buffer display rules
 - Use `fboundp` guards for optional package entrypoints (e.g.
-  `org-roam-db-autosync-mode`)
+  `(when (fboundp 'some-command) (some-command 1))`)
 - Comment out unused modules in `init.el` — never delete lines
-- Run `doom sync` after `init.el` or `packages.el` changes
-- Snippets live in `~/.config/doom/snippets/<major-mode>/` and are organized by
-  major mode
+- Snippets live under `<doom-user-dir>/snippets/<major-mode>/`
 
-## Config Modularity (When config.el Grows)
+## Config Modularity
 
-As `config.el` grows, consider splitting it into topic-specific files loaded
-from the main config via `load!`. This pattern is used in Diogo Doreto's config
-(see `~/.config/doom/dd/`):
+Split `config.el` into topic-specific files when a topic block exceeds ~50
+lines. Load them with `load!`:
 
 ```elisp
 ;; In config.el near the bottom:
-(load! "dd/org")
-(load! "dd/lsp")
-(load! "dd/terminal")
+(load! "modules/org")
+(load! "modules/lsp")
 ```
 
-Each file under `~/.config/doom/dd/<topic>.el` gets its own lexical-binding
-cookie. This keeps `config.el` readable and makes it easy to temporarily disable
-an area by commenting its `load!` line.
-
-This config currently keeps its main runtime customization in `config.el`.
-Suggest splitting when a single topic block exceeds ~50 lines.
+Each topic file gets its own lexical-binding cookie. This keeps `config.el`
+readable and makes it easy to temporarily disable an area by commenting its
+`load!` line.
 
 ## Doom Framework Architecture
 
@@ -127,7 +118,7 @@ which file to edit.
 | `:checkers`   | Syntax, spell, grammar                      |
 | `:tools`      | LSP, magit, lookup, direnv, docker, eval    |
 | `:os`         | OS-specific: macos, tty                     |
-| `:lang`       | Language support: python, org, rust, latex… |
+| `:lang`       | Language support: python, org, rust, latex  |
 | `:email`      | mu4e, notmuch, wanderlust                   |
 | `:app`        | Calendar, emms, everywhere, rss, irc        |
 | `:config`     | default (+bindings +smartparens), literate  |
@@ -142,47 +133,40 @@ Flags (`+keyword`) parametrize a module — switching backends (`+eglot` vs
 `+icons`), or pulling in packages (`+dirvish`).
 
 To resolve a flag's meaning: put cursor on the flag in `init.el` and press
-`K` (`C-c c k`) for docs, or `gd` (`C-c c d`) to jump to its definition in
-`~/.config/emacs/modules/<cat>/<mod>/+<flag>.el`.
+`K` (`C-c c k`) for inline docs, or `gd` (`C-c c d`) to jump to its
+definition in `~/.config/emacs/modules/<cat>/<mod>/+<flag>.el`.
 
-See `DOOM-API.md` at the repo root for a table of common flags and the
-canonical Doom API guide. See `references/agent-shell-evaluation.md` for the conservative Agent Shell pilot
-configuration and ACP transport cautions. See `references/jinx-incf-timer.md`
-for the Jinx 2.7 idle-timer `incf`/`decf` failure and straight `:pre-build`
-patch.
+See `DOOM-API.md` for a table of common flags used in this repo and the
+canonical Doom API guide.
 
 ### Doom Variables
 
-| Variable           | Value                           |
-| :----------------- | :------------------------------ |
-| `doom-user-dir`    | `~/.config/doom/`               |
-| `doom-cache-dir`   | `~/.config/emacs/.local/cache/` |
-| `doom-modules-dir` | `~/.config/emacs/modules/`      |
+| Variable           | Value                                    |
+| :----------------- | :--------------------------------------- |
+| `doom-user-dir`    | `~/.config/doom/`                        |
+| `doom-cache-dir`   | `~/.config/emacs/.local/cache/`          |
+| `doom-modules-dir` | `~/.config/emacs/modules/`               |
 
-These are safe to reference in config.el (e.g. `(expand-file-name \"foo.el\"
-doom-user-dir)`).
+These are safe to reference in config.el, e.g.
+`(expand-file-name "foo.el" doom-user-dir)`.
 
 ### Reload Without Restarting
 
-Doom runs an Emacs server by default. Instead of restarting:
-
 - **Inside Emacs:** `M-x doom/reload` — reloads config, no restart
 - **From terminal:** `emacsclient -e '(doom/reload)'`
-- **After `doom sync`:** run `doom/reload` last to avoid the format-on-save
-  indentation issue (see Pitfalls)
+- **After `doom sync`:** run `doom/reload` last to avoid format-on-save
+  indentation issues (see Pitfalls)
 
 ### `:tools lsp` — Two Backends
-
-The LSP module supports two backends via flag:
 
 | Flag        | Backend  | When                          |
 | :---------- | :------- | :---------------------------- |
 | `+eglot`    | eglot    | Simpler, built-in integration |
 | `+lsp-mode` | lsp-mode | More features, more config    |
 
-Language modules like `(python +lsp)` or `(rust +lsp)` inherit whichever
-backend is active — they don't select their own. Configure only the backend
-you've enabled, not both.
+Language modules like `(python +lsp)` inherit whichever backend is active —
+they don't select their own. Configure only the backend you've enabled, not
+both.
 
 ### Diagnostic Commands
 
@@ -196,8 +180,8 @@ you've enabled, not both.
 
 ## Doom API Essentials (Compact)
 
-See `DOOM-API.md` for the full syntax and examples (canonical source). These are the
-patterns Hermes most often gets wrong — commit them to memory:
+See `DOOM-API.md` for the full syntax and examples. These are the patterns
+agents most often get wrong — commit them to memory:
 
 - **`after!`** — defer config until a feature loads. Use instead of
   `with-eval-after-load`. `(after! org (setq org-adapt-indentation nil))`
@@ -205,57 +189,94 @@ patterns Hermes most often gets wrong — commit them to memory:
   `use-package` from MELPA. `(use-package! foo :defer t :config ...)`
 - **`map!`** — keybinding with evil state-aware prefixes:
   `:leader` (`SPC`), `:n` (normal), `:i` (insert), `:v` (visual),
-  `:m` (motion). `(map! :leader :desc \"Desc\" \"f f\" #'find-file)`
-  `(map! :n \"C-c C-f\" #'some-command)`
+  `:m` (motion). `(map! :leader :desc "Desc" "f f" #'find-file)`
 - **`set-company-backend!`** — per-mode company backend configuration
-- **`add-hook!`** — multi-mode hook helper. `(add-hook! '(a-mode b-mode) #'fn)`
-- **`setq-hook!`** — set buffer-local variables in a hook, cleaner than a lambda
-  `(setq-hook! 'org-mode-hook truncate-lines nil)`
-- **`load!`** — load an Elisp file relative to `doom-user-dir`
-  `(load! \"dd/org\")` loads `~/.config/doom/dd/org.el`
-- **`featurep!`** — compile-time module check
+- **`add-hook!`** — multi-mode hook helper.
+  `(add-hook! '(a-mode b-mode) #'fn)`
+- **`setq-hook!`** — set buffer-local variables in a hook, cleaner than a
+  lambda. `(setq-hook! 'org-mode-hook truncate-lines nil)`
+- **`load!`** — load an Elisp file relative to `doom-user-dir`.
+  `(load! "modules/org")` loads `~/.config/doom/modules/org.el`
+- **`featurep!`** — compile-time module check.
   `(when (featurep! :ui popup) ...)`
 - **`set-popup-rule!`** — control popup buffer display
+- **`setq!`** — Doom's wrapper around `setq`. Use instead of `setq-default`.
 
-## Emacs Lisp Companion Skill Strategy
+## Emacs Lisp for Doom Config
 
-`emacs-lisp-expert` is a useful optional companion skill, not a hard dependency
-of this repo. When working with users or agents who do not have it installed,
-suggest it once as an optional add-on for deeper Emacs Lisp help, then continue
-without blocking. New users who have Hermes installed can try to install it from
-their configured skill sources:
+A new Doom user doesn't need full Emacs Lisp fluency. Most config work uses a
+small subset of the language. This section covers what you'll encounter.
 
-```sh
-hermes skills search emacs-lisp-expert
-hermes skills install <matching-skill-id>
+### Special Forms You Will Use
+
+| Form           | Purpose                          | Example                                        |
+| :------------- | :------------------------------- | :--------------------------------------------- |
+| `setq`         | Set a variable's value           | `(setq company-idle-delay 0.2)`                |
+| `setq-local`   | Set value for current buffer     | `(setq-local truncate-lines nil)`              |
+| `when`/`unless`| Conditional execution            | `(when (fboundp 'jinx-mode) (jinx-mode 1))`    |
+| `let`          | Temporary local binding          | `(let ((url-package-name "foo")) ...)`          |
+| `defun`        | Define a named function          | `(defun sand/my-fn () (message "hi"))`         |
+
+### Key Patterns
+
+**Guard optional integrations:**
+```elisp
+(when (fboundp 'some-command)
+  (some-command 1))
 ```
 
-If no matching skill is available, continue with this fallback checklist before
-editing Emacs Lisp:
+**Prefer named functions over lambdas in hooks:**
+```elisp
+(defun sand/my-hook-fn () (setq-local truncate-lines nil))
+(add-hook 'org-mode-hook #'sand/my-hook-fn)
+```
 
-1. Prefer Doom macros over vanilla equivalents: `after!`, `use-package!`,
-   `map!`, `add-hook!`, `setq-hook!`, `set-popup-rule!`.
-2. Check whether a symbol exists before calling optional package entrypoints:
-   `(when (fboundp 'some-command) ...)`.
-3. Keep package installation in `packages.el`; keep runtime configuration in
-   `config.el`.
-4. Validate changed `.el` files with `check-parens` before running `doom sync`.
-5. When unsure about a function or variable, read its source in
-   `~/.config/emacs/` or `~/.config/emacs/.local/straight/repos/` instead of
-   guessing.
+**Custom prefix:** Use the user's custom prefix (e.g. `sand/`) for all custom
+functions, variables, and private state. Never use bare `my-` or no prefix —
+collisions with package-internal functions are silent and hard to debug.
 
-Repo policy: mention the companion skill as optional in AGENTS.md/README.md,
-but never require a missing local skill for basic repo maintenance.
+### Discovering Emacs APIs
+
+| Key / Command                | What it does                                  |
+| :--------------------------- | :-------------------------------------------- |
+| `C-h f`                      | Describe a function (args, docstring, source) |
+| `C-h v`                      | Describe a variable (current value, docstring)|
+| `C-h o`                      | Describe any symbol                           |
+| `C-h m`                      | List active minor modes in current buffer     |
+| `M-x find-library`           | Jump to a library's source code               |
+| `M-x toggle-debug-on-error`  | Show full backtrace on next error             |
+
+### Lexical Binding
+
+Every `.el` file must start with:
+```elisp
+;;; filename.el -*- lexical-binding: t; -*-
+```
+Without it, closures capture variables by reference, not by value, causing
+subtle bugs. The byte-compiler also produces better code with lexical binding.
+
+### Runtime Debugging
+
+- **`M-x toggle-debug-on-error`** — get a backtrace for errors that would
+  normally show only a message
+- **`M-x toggle-debug-on-quit`** (then `C-g`) — discover what's blocking on
+  hang
+- **`M-x profiler-start` / `M-x profiler-report`** — find performance
+  bottlenecks
+- **`(message "value: %s" my-var)`** — print to `*Messages*` buffer
+- **`(insert (prin1-to-string my-var))`** — insert value into current buffer
 
 ## Procedures
 
 ### A. Adding a Module to init.el
 
-1. Find the appropriate section under `(doom! ...)`
-2. Uncomment the module line (comment disabled modules, never delete them)
-3. Add `+flag` suffixes as needed: `(org +roam +dragndrop)`
-4. Run: `doom sync`
-5. Restart Emacs
+1. Find the appropriate category section under `(doom! ...)`
+2. Uncomment the module line (never delete commented modules)
+3. Consult the module's README.org at
+   `~/.config/emacs/modules/<cat>/<mod>/` to verify available flags
+4. Add `+flag` suffixes as needed, e.g. `(org +roam +dragndrop)`
+5. Run: `doom sync`
+6. Restart Emacs
 
 ### B. Installing a Package
 
@@ -265,6 +286,9 @@ but never require a missing local skill for basic repo maintenance.
 2. Run: `doom sync`
 3. Restart Emacs
 4. Configure in `config.el` with `use-package!` or `after!`
+
+See `references/package-management.md` for pinning, updates, straight recipes,
+and lockfile troubleshooting.
 
 ### C. Adding a Mode Hook
 
@@ -298,8 +322,6 @@ Use `map!` in `config.el`:
 
 ### F. Enabling a Minor Mode Globally
 
-In `config.el`:
-
 ```elisp
 (some-global-mode 1)
 ;; or via hooks when there's no global mode
@@ -308,273 +330,95 @@ In `config.el`:
 
 ### G. Upgrading the Doom Framework
 
-When `doom upgrade` is needed:
-
 1. **Backup first:** `cp -a ~/.config/doom ~/.config/doom.backup.$(date +%Y%m%d)`
 2. **Run upgrade:** `doom upgrade`
 3. **Verify:** `doom sync && doom doctor`
-4. **Check doctor output** for deprecation warnings — macros sometimes change between versions
-5. **If something breaks:** restore `~/.config/doom.backup.*` from the backup.
+4. **Check doctor output** for deprecation warnings
+5. **If something breaks:** restore `~/.config/doom.backup.*` from backup
 
-Do not skip the backup. `doom upgrade` modifies `~/.config/emacs/` but
-`~/.config/doom/` is yours — framework updates can introduce API changes that
-break your config.
+Do not skip the backup. Framework changes can introduce API changes that break
+your config.
 
-### H. Dirvish Launcher Binding
+## Troubleshooting
 
-When Doom's `dired +dirvish` module is enabled, configure Dirvish behavior in
-`config.el` with `after! dirvish`, but keep launcher keybindings outside the
-`after!` block so they are available immediately and can autoload the command.
+### Emacs fails to start
 
-Preferred pattern for this config:
+1. Run `emacs --debug-init` from the terminal. The stack trace identifies the
+   offending file and line.
+2. Check for unbalanced parens in recent `.el` edits:
+   ```sh
+   emacs --batch --eval "(progn (let ((check-parens t)) (check-parens)))"
+   ```
+   or in Emacs: `M-x check-parens`
+3. If the error mentions a specific file, check recent changes to that file.
+4. Isolate: comment out recent additions in blocks and re-test.
+5. Check `*doom*` buffer for compile warnings after `doom sync`.
 
-```elisp
-;;; DIRVISH
-;; Keep the launcher binding available immediately; the command is autoloaded.
-(map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)
+### Config changes not taking effect
 
-(after! dirvish
-  (setq dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
-  (setq dirvish-subtree-state-style 'nerd)
-  (setq dirvish-path-separators
-        (list (format " %s " (nerd-icons-codicon "nf-cod-home"))
-              (format " %s " (nerd-icons-codicon "nf-cod-root_folder"))
-              (format " %s " (nerd-icons-faicon "nf-fa-angle_right")))))
-```
+| Change in       | Required action                      |
+| :-------------- | :----------------------------------- |
+| `init.el`       | `doom sync` then restart             |
+| `packages.el`   | `doom sync` then restart             |
+| `config.el`     | `M-x doom/reload` or restart Emacs   |
 
-Pitfall: putting `SPC d d` inside `(after! dirvish ...)` can delay the binding
-until Dirvish has already loaded. For launcher commands, bind first; customize
-after load.
+Verify with:
+- `C-h v variable-name` — shows the current runtime value
+- `C-h m` — lists active minor modes in the current buffer
 
-### I. Enabling Spell Checking with Jinx
+### Keybinding doesn't work
 
-This repo uses Jinx for spelling. Treat Flyspell as historical context unless
-the user explicitly asks to restore it.
+- `C-h k <key-sequence>` — tells you what command the key runs
+- `C-h w <command>` — tells you what keys are bound to a command
+- Check evil state: `:n` bindings only work in normal mode
+- Check mode-specific maps: an `org-mode-map` binding doesn't apply in
+  `prog-mode`
+- If the binding looks correct but isn't picked up, run `doom sync` and restart
 
-Jinx is async, avoids one subprocess per check, and supports multiple languages
-simultaneously. It is not a Doom module flag: keep Doom's `(spell +flyspell)`
-line commented in `init.el`, install Jinx in `packages.el`, and configure it in
-`config.el` with `use-package!`.
+### Package install failures
 
-Before recommending Jinx, check system support. Jinx needs Enchant and a backend
-spell dictionary; on Debian/PikaOS-style systems the useful probes are:
+1. Run `doom doctor` — catches most recipe and dependency issues.
+2. Run `doom sync -u` — updates straight.el and retries the recipe.
+3. Check `*doom*` buffer for recipe errors — the exact cause is logged there.
+4. If a recipe fails with a missing git ref, the package may have been renamed
+   or removed upstream.
+5. Hard reset for a single package:
+   ```sh
+   rm -rf ~/.config/emacs/.local/straight/repos/<package>
+   doom sync
+   ```
 
-```sh
-command -v enchant-2 || command -v enchant
-command -v pkg-config
-command -v hunspell || command -v nuspell
-```
+See `references/package-management.md` for pin recovery, lockfile repair,
+and straight internals.
 
-Do not persist missing-package warnings as durable skill facts; they are local
-setup state. If missing, recommend the corresponding OS packages. For Jinx
-builds, the runtime Enchant package is not enough; the development package must
-provide the `enchant-2.pc` pkg-config file. On Debian/PikaOS-style systems this
-is typically `libenchant-2-dev` plus `pkg-config` and a Hunspell/Nuspell
-dictionary such as `hunspell-en-us`. If `pkg-config --exists enchant-2` fails,
-install `libenchant-2-dev` before running `doom sync`.
+### LSP not working
 
-Use this Doom-native configuration:
+- `M-x eglot-reconnect` — reconnects the LSP session
+- `M-x eglot-shutdown-all` then re-open the file
+- Verify the language server binary is installed: `which <language-server>`
+- Check `.eglot/` workspace logs in the project root
+- Run `doom doctor` to verify the LSP module has no flag conflicts
 
-```elisp
-;; init.el — keep the spell module commented; do not delete the line
-;; (spell +flyspell)
+### `void-function` errors
 
-;; packages.el
-;; Jinx requires compat 31 for `completion-table-with-metadata'. Doom pins can
-;; lag behind, so unpin compat when Jinx reports that symbol as void.
-(unpin! compat)
+- Package bytecode references a function that doesn't exist at runtime.
+- Common cause: the package calls legacy Emacs functions removed in newer
+  Emacs versions (e.g. bare `incf`/`decf` in older packages).
+- Fix: install aliases before the package loads:
+  ```elisp
+  (unless (fboundp 'incf) (defalias 'incf #'cl-incf))
+  ```
+- After adding aliases, run `doom sync` and restart Emacs.
+- Check the user's PROFILE.md or `references/` for config-specific workarounds.
 
-(package! jinx
-  :recipe (:host github :repo "minad/jinx"))
+### Slow Emacs startup
 
-;; config.el
-;; Jinx 2.7 still calls legacy bare `incf`/`decf` at runtime. Emacs 30 only
-;; provides the cl-lib names, so install aliases before autoloaded commands run.
-;; Prefer aliases over a straight :pre-build source patch: the source patch dirties
-;; the checkout and makes `doom sync -u` stop for an interactive dirty-tree prompt.
-(require 'cl-lib)
-(unless (fboundp 'incf)
-  (defalias 'incf #'cl-incf))
-(unless (fboundp 'decf)
-  (defalias 'decf #'cl-decf))
-
-(use-package! jinx
-  :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
-  :config
-  (setq jinx-languages "en_US")
-  (map! "M-$" #'jinx-correct
-        "C-M-$" #'jinx-languages
-        :leader
-        (:prefix ("s" . "spelling")
-         :desc "Correct word" "c" #'jinx-correct
-         :desc "Next misspelling" "n" #'jinx-next
-         :desc "Previous misspelling" "p" #'jinx-previous)))
-```
-
-Then run `doom sync`, restart or `doom/reload`, and run `doom doctor`. If using
-`emacsclient -e '(doom/reload)'`, remember it only works when the Emacs server
-is already running; otherwise tell the user to restart Emacs or run
-`M-x doom/reload` inside Emacs.
-
-Useful Jinx verification after `doom sync`:
-
-```sh
-emacs --batch -L ~/.config/emacs/.local/straight/build-30.2/compat \
-  -L ~/.config/emacs/.local/straight/build-30.2/jinx \
-  --eval "(progn (require 'cl-lib) (unless (fboundp 'incf) (defalias 'incf #'cl-incf)) (unless (fboundp 'decf) (defalias 'decf #'cl-decf)) (require 'compat) (require 'jinx) (message \"jinx loads OK: %s, completion metadata: %s\" (featurep 'jinx) (fboundp 'completion-table-with-metadata)))"
-git -C ~/.config/emacs/.local/straight/repos/jinx status --short
-```
-
-Expected: Jinx loads, `completion-table-with-metadata` is defined, and the Jinx
-straight checkout is clean.
-
-If `M-$`, `SPC s c`, or unrelated Org commands report `Error running timer
-'nil': (void-function incf)` or `(void-function decf)`, the idle Jinx timer is
-loading bytecode that still calls legacy `incf`/`decf`. Confirm the aliases are
-present before `(use-package! jinx ...)`, run `doom sync`, restart Emacs, and
-retest. See `references/jinx-incf-timer.md` for the root cause and cleanup
-guidance once upstream fixes it.
-
-For multilingual setups, extend `jinx-languages`, e.g. `"en_US de_DE"`, but
-start with the user's primary dictionary unless they ask for more.
-
-Flyspell legacy pattern, for reference only:
-
-```elisp
-;; init.el
-(spell +flyspell)
-
-;; config.el
-(add-hook! '(org-mode-hook markdown-mode-hook text-mode-hook) #'flyspell-mode)
-(add-hook! '(prog-mode-hook conf-mode-hook yaml-mode-hook) #'flyspell-prog-mode)
-```
-
-Do not reintroduce Flyspell hooks while this repo is on Jinx.
-
-### J. Enabling Org-Tempo (`<s` Tab Expansion in Org)
-
-Org-tempo provides `<s` + Tab -> `#+begin_src` style template expansion in
-Org buffers. The templates are built-in but Doom loads them lazily.
-
-**Required:** `(require 'org-tempo)` inside `(after! org ...)`. Without this
-explicit require, `<s` will not expand even though `org-tempo-remember-template`
-is available.
-
-```elisp
-(after! org
-  (require 'org-tempo)
-  (add-hook 'org-mode-hook #'+org-pretty-mode)
-  ;; ... rest of org config
-```
-
-Also note: the org module needs the `+pretty` flag for full template expansion
-to work. If `<s` still doesn't expand after adding the require, verify the org
-module declaration in `init.el` includes `+pretty` (e.g., `(org +roam +dragndrop +pretty)`) — or check with `M-x org-tempo-remember-template`.
-
-The yasnippet path is separate: `SPC h i` to insert a snippet, type `src`, and
-Tab. Org-tempo and yasnippet coexist — they are independent completion systems.
-
-## Keeping the Config Repo Self-Contained
-
-This skill lives at `.agents/skills/doom-emacs/SKILL.md` — the repo itself
-is the canonical source. Anyone who clones this repo gets the full skill and
-API reference.
-
-For a first-time clone, the repo skill is already usable from this path. If the
-user wants Hermes to auto-load it from the normal runtime skill location, run:
-
-```sh
-scripts/sync-doom-skill-mirror.sh
-scripts/check-doom-skill-mirror.sh
-```
-
-The Hermes runtime mirror at `~/.hermes/skills/emacs/doom-emacs-config/` exists
-only for auto-loading. When you update this skill, sync repo to mirror with an
-exact generated-copy workflow. Do not hand-edit the mirror line by line.
-
-Recommended invariant:
-
-```text
-~/.hermes/skills/emacs/doom-emacs-config/ == ~/.config/doom/.agents/skills/doom-emacs/
-```
-
-Use destructive replacement of the mirror so stale mirror-only files cannot
-survive:
-
-```sh
-SRC="$HOME/.config/doom/.agents/skills/doom-emacs"
-DST="$HOME/.hermes/skills/emacs/doom-emacs-config"
-
-test -f "$SRC/SKILL.md"
-rm -rf "$DST"
-mkdir -p "$(dirname "$DST")"
-cp -a "$SRC" "$DST"
-diff -qr "$SRC" "$DST"
-```
-
-If the repo provides `scripts/sync-doom-skill-mirror.sh` and
-`scripts/check-doom-skill-mirror.sh`, use those instead of retyping the command.
-See `references/doom-skill-mirror-sync.md` for the full rationale and workflow.
-
-If the mirror contains a file that the repo source does not contain, treat that
-as drift. Either copy the valuable file into `.agents/skills/doom-emacs/` first,
-or let the exact sync remove it from the generated mirror.
-
-### AGENTS.md / README.md Sync Protocol
-
-AGENTS.md is the authoritative source for user-specific policies (completion
-preference, window rules, Markdown style, verification steps). Whenever
-you add a new policy or safety step to AGENTS.md in the same session:
-
-1. Add a condensed version to README.md (same key information, less detail)
-2. If the change introduces a new verification command (e.g. `doom doctor`),
-   add it to both the AGENTS.md table and README.md's bullet list
-3. Lint both files before declaring done
-
-README.md is not a full mirror — it skips the detailed tables and commentary
-that AGENTS.md carries. But every actionable policy in AGENTS.md should have
-a corresponding line in README.md so agents and humans alike find the rule
-from either entry point.
-
-### README Module Inventory Protocol
-
-When README.md lists notable modules or feature categories, `init.el` is the
-source of truth. Do not infer enabled modules from README, memory, or old
-conversation state.
-
-1. Read the active `(doom! ...)` form in `init.el`.
-2. Treat uncommented module lines as enabled and commented lines as disabled
-   documentation.
-3. Compare README claims module by module before saying docs are current.
-4. When changing `init.el`, update README module/feature lists in the same
-   concern-sized commit.
-5. If `doom doctor` warns about missing executables for enabled modules, either
-   document them as optional system dependencies or disable/comment the module
-   when the feature is not actually used.
-
-Also document substantial repo content that affects the user experience, such
-as `snippets/<major-mode>/`, instead of leaving it invisible in README.
-
-### Runtime Artifact Hygiene
-
-Do not assume every tracked file in `~/.config/doom/` is intentional config.
-Check for local runtime state before committing or recommending repo cleanup.
-SQLite databases and their WAL/SHM files under tool-specific directories (for
-example `.open-mem/*.db`, `.open-mem/*.db-wal`, `.open-mem/*.db-shm`) are often
-noisy and may contain personal/session data. Prefer ignoring runtime artifacts;
-if the data should be durable and reviewable, export it to Markdown or another
-human-readable format.
-
-When removing already-tracked runtime artifacts while preserving local files:
-
-1. Add ignore patterns first (for example `.open-mem/*.db*`).
-2. Run `git rm --cached <paths>` to stage deletion from the index only.
-3. Do not try to `git add` the ignored runtime paths afterward; Git will refuse
-   because the ignore rule is working. Stage the `.gitignore` and other edited
-   docs/config files instead.
-4. Verify with `git ls-files <runtime-dir>` that artifacts are no longer
-   tracked, and with an existence check if you need to confirm local files were
-   preserved.
+- Check `doom info` for the "Startup time" section.
+- Look for packages that don't use `:defer t` in their `use-package!` form.
+- `M-x profiler-start` then `M-x profiler-report` after startup identifies
+  expensive operations.
+- Verify `lexical-binding: t` is present in all `.el` files — dynamic binding
+  slows the byte-compiler.
 
 ## Restoring Official Template Content
 
@@ -585,36 +429,27 @@ Doom ships canonical example files at `~/.config/emacs/static/`:
 - `packages.example.el`
 
 These contain the original template comments and example settings. If a file
-has been trimmed of template boilerplate, fetch the relevant `.example.el` and
-restore the missing comments. The examples are also available in the Doom repo
-under `static/` on the master branch.
-
-When restoring template comments, preserve the user's actual values — re-add
-only the comment blocks, not the example code.
+has been trimmed of template boilerplate, restore the comment blocks from the
+example — preserving the user's actual values, overwriting only comments.
 
 ## Safety Checks — Always Run After Changes
 
 | After this              | Run this                                                                           |
 | :---------------------- | :--------------------------------------------------------------------------------- |
-| Any requested Doom edit | `check-parens` for changed `.el` files, then `doom sync` unless user says not to   |
+| Any requested Doom edit | `check-parens` for changed `.el` files, then `doom sync` unless told not to        |
 | `init.el` change        | `doom sync` (required after any module change)                                     |
 | `packages.el` change    | `doom sync` (required after any package change)                                    |
-| `config.el` change      | `M-x eval-buffer` or restart Emacs; `doom sync` is still acceptable/preferred here |
+| `config.el` change      | `M-x eval-buffer` or restart; `doom sync` works but check parens first             |
 | Any `.el` file change   | `check-parens` to verify balanced parens                                           |
 | After `doom sync`       | `doom doctor` — catches missing deps, wrong flags, broken recipes                  |
-| Emacs won't start (CLI) | `emacs --batch --eval "(let ((check-parens t)) (check-parens))"` for paren check   |
+| Emacs won't start (CLI) | `emacs --debug-init` for stack trace; `emacs --batch` for paren check              |
 
 **Paren balancing is critical** — a missing paren in `config.el` can prevent
 Emacs from starting. Always verify before declaring done.
 
-**Run `doom doctor` after every `doom sync`** — `doom sync` compiles but doesn't
-validate config. `doom doctor` catches module flag mismatches, missing system
-dependencies, and package recipe errors that would otherwise fail silently.
-
-**For this user's Doom repo, run `doom sync` after edits even when only
-`config.el` changed unless explicitly told not to.** It is cheap, safe, and
-matches the expected workflow; still run the paren check first so syntax errors
-are caught locally before Doom rebuilds the profile.
+**Run `doom doctor` after every `doom sync`** — it catches module flag
+mismatches, missing system dependencies, and package recipe errors that would
+otherwise fail silently.
 
 ## Pitfalls
 
@@ -629,45 +464,45 @@ are caught locally before Doom rebuilds the profile.
   in `packages.el` followed by `doom sync`.
 - **Never delete lines from `init.el`** — comment them out instead. Users rely
   on seeing the full module list to know what's available.
-- **On‑save formatting** — `config.el` has `(format +onsave)` in init.el, so
-  Emacs auto-formats on save. Running `doom sync` then saving `config.el` may
-  break indentation. Warn the user and have them run `M-x doom/reload` after
-  `doom sync` to avoid this.
-- **Stale template comments can mislead agents** — if restored upstream Doom
-  comments recommend `with-eval-after-load`, standard `use-package`, or other
-  non-Doom patterns that conflict with this repo, replace or annotate the
-  comment so the active guidance remains `after!`, `use-package!`, `map!`, and
-  `load!`.
+- **On‑save formatting** — if `format +onsave` is enabled, saving after
+  `doom sync` can break indentation. Run `M-x doom/reload` after `doom sync`.
+- **Stale template comments can mislead** — if restored upstream comments
+  recommend `with-eval-after-load` or standard `use-package`, replace or
+  annotate them to match your config's conventions.
+- **Bind launcher keys outside `after!`** — putting a keybinding inside
+  `(after! <pkg> ...)` delays the binding until the package loads. For
+  commands meant to be run immediately, bind them directly and defer only
+  the package configuration.
 
-## Session Reference Notes
+## Keeping the Config Repo Self-Contained
 
-- `references/2026-05-16-doom-config-evolution.md` captures the session where
-  this repo was named `doom-emacs-config`, Flyspell was replaced with Jinx,
-  `SPC d d` was made an immediate Dirvish launcher binding, and the user
-  clarified that `doom sync` should be run after requested Doom edits.
-- `references/2026-05-16-doom-repo-audit-hygiene.md` captures the repo audit
-  lessons around README/init.el drift, tracked runtime SQLite artifacts,
-  `doom doctor` warning classification, stale upstream template comments, and
-  documenting snippets.
-- `references/jinx-incf-timer.md` captures the durable Jinx timer failure pattern
-  where bytecode containing legacy `incf`/`decf` causes `(void-function incf)` or
-  `(void-function decf)`, plus the straight `:pre-build` patch and verification
-  commands.
+This skill lives at `.agents/skills/doom-emacs/SKILL.md`. Anyone who clones
+this repo gets the full skill with it. After editing the skill, sync the Hermes
+runtime mirror:
+
+```sh
+scripts/sync-doom-skill-mirror.sh
+scripts/check-doom-skill-mirror.sh
+```
+
+See `AGENTS.md` for the two-clone protocol, source-destruction invariant, and
+drift-detection steps.
 
 ## Reference Sources
 
 When you need to understand how a package or Doom module works, the source
-code is at your fingertips — reading it is far more reliable than guessing at
-API surfaces.
+code is at your fingertips:
 
-- **Doom framework source:** `~/.config/emacs/` — This is a clone of the
+- **Doom framework source:** `~/.config/emacs/` — clone of the
   [official Doom Emacs repo](https://github.com/doomemacs/doomemacs). Browse
-  `modules/` for built-in module definitions, `lisp/` for core libraries
-  (including macro definitions), and `core/` for the module system. You can
-  also browse the repo on GitHub to check issues, PRs, and docs online.
+  `modules/` for built-in module definitions, `lisp/` for core libraries,
+  and `core/` for the module system.
 - **Installed package source:** `~/.config/emacs/.local/straight/repos/` —
-  each package (company, corfu, consult, etc.) has its own directory. Read the
-  source to understand available functions, variables, hooks, and faces.
-
-Use `M-x find-library` from within Emacs to jump to any loaded library's
-source directly.
+  each package has its own directory with full source.
+- **Doom Emacs Issues & Docs:** upstream GitHub repository for recent changes,
+  open issues, and pull requests.
+- **This repo's references:**
+  - `references/INDEX.md` — external resource catalogue (community configs, keybinding reference, performance tips)
+  - `references/package-management.md` — package lifecycle, pinning, straight internals, recovery
+  - `.agents/skills/doom-emacs/references/` — session notes and config-specific troubleshooting
+  - `AGENTS.md` — user-specific policies, workflow, drift prevention

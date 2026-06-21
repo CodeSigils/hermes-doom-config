@@ -7,8 +7,22 @@
 | `DOOM-API.md`                        | Idiomatic Doom patterns — which macros to use when and why           |
 | `PROFILE.md`                         | Config profile — modules, packages, custom functions, environment    |
 | `references/INDEX.md`                | Reference catalogue — Doom resources, community configs, exploration |
-| `.agents/skills/doom-emacs/SKILL.md` | Full Doom skill with procedures, pitfalls, extended API reference    |
+| `.agents/skills/doom-emacs/SKILL.md` | General Doom Emacs guide with procedures, troubleshooting, API primer |
 | `README.md`                          | Human quick-start (verify module lists against `init.el`)            |
+
+## Read First — Agent Entry Order
+
+When opening this repo cold, read files in this order:
+
+| Step | File | What it tells you | Why this order |
+| :--- | :--- | :---------------- | :------------- |
+| 1 | `PROFILE.md` | What this config is — modules, packages, environment | Understand the setup before suggesting changes |
+| 2 | `DOOM-API.md` | Idiomatic Doom patterns — which macros to use when | Learn the dialect before editing `.el` files |
+| 3 | This file (`AGENTS.md`) | Agent behavior policies and workflow for this repo | Know the rules before making changes |
+| 4 | `references/INDEX.md` | External Doom resources and community configs | Find what's possible outside this config |
+| 5 | `.agents/skills/doom-emacs/SKILL.md` | General Doom Emacs guide with procedures, troubleshooting, API primer | Deep reference on demand |
+
+`README.md` is human-facing; read it when you need quick-start or dependency info.
 
 ## Source-First Reference Policy
 
@@ -20,12 +34,6 @@ and configuration options. When the user asks about a package, flag, or
 feature, answer from the module source (README.org for flags, config.el for
 implementation patterns, lisp/ for core macros). External references
 supplement, never replace, the installed source.
-
-`PROFILE.md` is the first file an agent should read when entering this repo
-for the first time — it describes what this config is. `DOOM-API.md` teaches
-the idiomatic Doom patterns. `references/INDEX.md` is the file to browse when
-exploring what is possible. The Doom skill at
-`.agents/skills/doom-emacs/SKILL.md` provides deeper API details and procedures.
 
 If `emacs-lisp-expert` is available, load it for general Emacs Lisp guidance;
 if missing, suggest it once as an optional companion, then continue without
@@ -44,7 +52,12 @@ blocking.
 - If the repo skill changes, run `scripts/sync-doom-skill-mirror.sh`, then
   `scripts/check-doom-skill-mirror.sh`. The Hermes runtime mirror at
   `~/.hermes/skills/emacs/doom-emacs-config/` is generated state; do not
-  hand-edit it.
+  hand-edit it. The sync script uses destructive replacement
+  (`rm -rf` then `cp -a`) so stale mirror-only files cannot survive. The
+  invariant to preserve:
+  ```
+  ~/.hermes/skills/emacs/doom-emacs-config/ == ~/.config/doom/.agents/skills/doom-emacs/
+  ```
 - When consulting `DOOM-API.md`, verify its patterns against official Doom
   sources (`~/.config/emacs/core/`, `~/.config/emacs/modules/`, `K` and `gd`
   lookups in `init.el`). If the file is wrong or outdated, propose a fix — it

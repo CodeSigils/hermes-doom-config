@@ -25,8 +25,6 @@ This is a summary. The source of truth is `init.el`, `config.el`, and
 | Tab/workspace    | workspaces module (tabspaces)                                     |
 | Formatting       | `format +onsave` — Ruff for Python, Prettier for Markdown         |
 | Custom prefix    | `sand/`                                                           |
-| Window mgmt      | Custom frame sizing for dual monitors (`sand/initial-frame-size`) |
-| Version control  | `~/.config/doom/` is git, NOT managed by chezmoi                  |
 | Module style     | Comment out unused modules, never delete lines                    |
 | Keybinding style | `map!` with `:leader`; `:localleader` for major-mode maps         |
 | Package installs | via `(package! ...)` in `packages.el` + `doom sync`               |
@@ -73,8 +71,6 @@ Beyond Doom built-ins:
 
 | Function                                     | Purpose                                    |
 | -------------------------------------------- | ------------------------------------------ |
-| `sand/initial-frame-size`                    | Dual-monitor-aware initial frame sizing    |
-| `sand/split-window-sensibly`                 | Split direction based on frame proportions |
 | `sand/org-display-inline-images-only-in-org` | Only display inline images in org-mode     |
 
 ## Config Policies Summary
@@ -82,7 +78,6 @@ Beyond Doom built-ins:
 For full policy text see `AGENTS.md`:
 
 - **Completion Policy** — Company preferred, Corfu disabled as commented module
-- **Window Management Policy** — No low-level `window-split` advice; prefer `display-buffer-alist` and `set-popup-rule!`
 - **Defensive Config Policy** — `fboundp` guards for optional packages; global defaults stay global
 
 ## Environment
@@ -95,6 +90,138 @@ For full policy text see `AGENTS.md`:
 - **Python CLI tooling:** `uv tool install`
 - **Global formatters:** pnpm for prettier, pip/uv for ruff
 
+## Config Details
+
+### Spell Checking with Jinx
+
+This config uses Jinx for spelling instead of Doom's built-in Flyspell module.
+Jinx is async (avoids one subprocess per check), supports multiple languages
+simultaneously, and uses Enchant as a backend.
+
+Keep Doom's `(spell +flyspell)` line commented in `init.el`:
+
+```elisp
+;; (spell +flyspell)  ; left commented for future reference
+```
+
+**packages.el:**
+```elisp
+(unpin! compat)    ; Jinx needs compat 31+
+(package! jinx
+  :recipe (:host github :repo "minad/jinx"))
+```
+
+**config.el:**
+```elisp
+;; Jinx 2.7 calls legacy bare incf/decf at runtime. Emacs 30 only has the
+;; cl-lib names, so install aliases before autoloaded commands run.
+;; Prefer aliases over a straight :pre-build source patch: the source patch
+;; dirties the checkout and makes `doom sync -u` stop for an interactive
+;; dirty-tree prompt.
+(require 'cl-lib)
+(unless (fboundp 'incf)
+  (defalias 'incf #'cl-incf))
+(unless (fboundp 'decf)
+  (defalias 'decf #'cl-decf))
+
+(use-package! jinx
+  :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
+  :config
+  (setq jinx-languages "en_US")
+  (map! "M-$" #'jinx-correct
+        "C-M-$" #'jinx-languages
+        :leader
+        (:prefix ("s" . "spelling")
+         :desc "Correct word" "c" #'jinx-correct
+         :desc "Next misspelling" "n" #'jinx-next
+         :desc "Previous misspelling" "p" #'jinx-previous)))
+```
+
+**System dependencies** (Debian/PikaOS):
+- Runtime: `enchant-2`, `hunspell` or `nuspell`, `hunspell-en-us`
+- Build: `libenchant-2-dev` + `pkg-config` (provides `enchant-2.pc`)
+
+Probe commands:
+```sh
+command -v enchant-2 || command -v enchant
+command -v pkg-config
+command -v hunspell || command -v nuspell
+pkg-config --exists enchant-2
+```
+
+**Verification after `doom sync`:**
+```sh
+emacs --batch -L ~/.config/emacs/.local/straight/build-30.2/compat \
+  -L ~/.config/emacs/.local/straight/build-30.2/jinx \
+  --eval "(progn (require 'cl-lib) (unless (fboundp 'incf) (defalias 'incf #'cl-incf)) (unless (fboundp 'decf) (defalias 'decf #'cl-decf)) (require 'compat) (require 'jinx) (message \"jinx loads OK: %s, completion metadata: %s\" (featurep 'jinx) (fboundp 'completion-table-with-metadata)))"
+git -C ~/.config/emacs/.local/straight/repos/jinx status --short
+```
+
+Expected result: Jinx loads, `completion-table-with-metadata` is defined, and
+the Jinx straight checkout is clean.
+
+**`void-function incf` / `void-function decf`:** If `M-$`, `SPC s c`, or
+unrelated Org commands report `Error running timer 'nil': (void-function incf)`,
+the idle Jinx timer is loading bytecode that still calls legacy `incf`/`decf`.
+Confirm the aliases are present before `(use-package! jinx ...)`, run
+`doom sync`, restart Emacs, and retest.
+
+**Multilingual setup:** Extend `jinx-languages`, e.g. `"en_US de_DE"`. Start
+with the primary dictionary unless the user asks for more.
+
+**Flyspell legacy pattern** (for reference only — do not reintroduce):
+```elisp
+;; init.el
+(spell +flyspell)
+
+;; config.el
+(add-hook! '(org-mode-hook markdown-mode-hook text-mode-hook) #'flyspell-mode)
+(add-hook! '(prog-mode-hook conf-mode-hook yaml-mode-hook) #'flyspell-prog-mode)
+```
+
+### Dirvish File Manager
+
+Dirvish replaces Dired as the primary file manager via the `+dirvish` flag.
+The launcher keybinding stays outside the `after!` block so it's available
+immediately and can autoload the command:
+
+```elisp
+;; Launcher binding — keep outside after! for immediate availability
+(map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)
+
+(after! dirvish
+  (setq dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
+  (setq dirvish-subtree-state-style 'nerd)
+  (setq dirvish-path-separators
+        (list (format " %s " (nerd-icons-codicon "nf-cod-home"))
+              (format " %s " (nerd-icons-codicon "nf-cod-root_folder"))
+              (format " %s " (nerd-icons-faicon "nf-fa-angle_right")))))
+```
+
+Pitfall: putting `SPC d d` inside `(after! dirvish ...)` delays the binding
+until dirvish loads. For launcher commands, bind first; customize after load.
+
+### Org-Tempo (`<s` Tab Expansion)
+
+Org-tempo provides `<s` + Tab → `#+begin_src` template expansion in Org
+buffers. The templates are built-in but Doom loads them lazily, so an explicit
+`require` is needed:
+
+```elisp
+(after! org
+  (require 'org-tempo)   ; without this, `<s` won't expand
+  ;; ... rest of org config
+)
+```
+
+The org module also needs the `+pretty` flag. If `<s` still doesn't expand
+after adding the require, verify the `init.el` module declaration includes
+`+pretty`, e.g. `(org +roam +dragndrop +pretty)`.
+
+The yasnippet path is separate: `SPC h i` to insert a snippet, type `src`,
+and Tab. Org-tempo and yasnippet are independent completion systems and
+coexist.
+
 ## Related Files
 
 | File                                 | Purpose                                                    |
@@ -103,5 +230,5 @@ For full policy text see `AGENTS.md`:
 | `AGENTS.md`                          | Agent behavior policies and workflow                       |
 | `references/INDEX.md`                | External Doom Emacs reference catalogue                    |
 | `references/package-management.md`   | Doom package lifecycle: declaration, sync, update, pinning |
-| `.agents/skills/doom-emacs/SKILL.md` | Doom API reference and procedures                          |
+| `.agents/skills/doom-emacs/SKILL.md` | General Doom Emacs guide with procedures and troubleshooting|
 | `README.md`                          | Human-facing quick start                                   |
