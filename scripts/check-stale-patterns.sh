@@ -135,21 +135,16 @@ for script in scripts/*.sh; do
   name=$(basename "$script")
   [[ "$name" == "config.sh" ]] && continue
 
-  in_agents=$(grep -cF "$name" AGENTS.md || true)
   in_skill=$(grep -cF "$name" .agents/skills/doom-emacs/SKILL.md || true)
 
-  if [[ "$in_agents" -eq 0 ]]; then
-    printf 'MISSING: %s not referenced in AGENTS.md\n' "$name"
-    inv_errors=1
-  fi
   if [[ "$in_skill" -eq 0 ]]; then
-    printf 'MISSING: %s not referenced in SKILL.md\n' "$name"
+    printf 'MISSING: %s not referenced in SKILL.md Scripts table\n' "$name"
     inv_errors=1
   fi
 done
 
 if [[ "$inv_errors" -eq 0 ]]; then
-  printf 'All scripts referenced in AGENTS.md and SKILL.md.\n'
+  printf 'All scripts referenced in SKILL.md Scripts table.\n'
 fi
 printf '\n'
 

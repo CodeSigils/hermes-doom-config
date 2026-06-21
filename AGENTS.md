@@ -58,13 +58,8 @@ companion, then continue without blocking.
 
 ## Scripts
 
-| Script                               | Purpose                                                                                                                                           | When to run                                      |
-| :----------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------- |
-| `scripts/config.sh`                  | Shared variables, grep wrappers, validation helpers                                                                                               | Sourced by other scripts; never invoked directly |
-| `scripts/sync-doom-skill-mirror.sh`  | Copy skill tree to Hermes runtime mirror (`~/.hermes/skills/emacs/doom-emacs-config/`)                                                            | After editing `.agents/skills/doom-emacs/` files |
-| `scripts/check-doom-skill-mirror.sh` | Verify mirror matches source (enforces `src == dst` invariant)                                                                                    | After sync                                       |
-| `scripts/check-stale-patterns.sh`    | Pass 1: scan for dead Doom 3 flags. Pass 2: verify cross-references resolve. Pass 3: confirm every script is referenced in AGENTS.md and SKILL.md | Before every commit                              |
-| `scripts/ai-context.sh [file]`       | Generate AI prompt context block (version, git status, file content, recent commits)                                                              | On demand when enlisting an external model       |
+The canonical reference for all repo scripts — purpose, invocation, and when to run — is
+`.agents/skills/doom-emacs/SKILL.md` (Scripts section).
 
 The Hermes runtime mirror at `~/.hermes/skills/emacs/doom-emacs-config/` is generated state — do not hand-edit it.
 `sync-doom-skill-mirror.sh` uses destructive replacement (`rm -rf` then `cp -a`); stale mirror-only files cannot
@@ -73,9 +68,6 @@ survive. The invariant is:
 ```text
 ~/.hermes/skills/emacs/doom-emacs-config/ == ~/.config/doom/.agents/skills/doom-emacs/
 ```
-
-All scripts require bash and `set -euo pipefail`. They resolve their own repo root from `scripts/config.sh`; you may
-invoke them from any working directory.
 
 ## Decision Thresholds
 
