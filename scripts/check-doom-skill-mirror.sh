@@ -1,18 +1,11 @@
 #!/usr/bin/env bash
+# check-doom-skill-mirror.sh — Verify skill mirror matches repo source
+# Usage: ./scripts/check-doom-skill-mirror.sh
 set -euo pipefail
+. "$(dirname "$0")/config.sh"
 
-SRC="${DOOM_SKILL_SRC:-$HOME/.config/doom/.agents/skills/doom-emacs}"
-DST="${DOOM_SKILL_DST:-$HOME/.hermes/skills/emacs/doom-emacs-config}"
+confirm_skill_src
+confirm_skill_dst
 
-if [[ ! -f "$SRC/SKILL.md" ]]; then
-  printf 'Source skill missing SKILL.md: %s\n' "$SRC" >&2
-  exit 1
-fi
-
-if [[ ! -f "$DST/SKILL.md" ]]; then
-  printf 'Mirror skill missing SKILL.md: %s\n' "$DST" >&2
-  exit 1
-fi
-
-diff -qr -- "$SRC" "$DST"
-printf 'Doom skill mirror is in sync: %s == %s\n' "$SRC" "$DST"
+diff -qr -- "$SKILL_SRC" "$SKILL_DST"
+printf 'Doom skill mirror is in sync: %s == %s\n' "$SKILL_SRC" "$SKILL_DST"

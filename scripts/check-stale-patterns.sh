@@ -9,24 +9,25 @@
 #
 # Usage: ./scripts/check-stale-patterns.sh
 # Exit 0 = clean, 1 = stale content or broken refs found
-
 set -euo pipefail
+. "$(dirname "$0")/config.sh"
+ensure_in_repo
 
 errors=0
-REPO_ROOT=$(cd "$(dirname "$0")/.." && pwd)
-cd "$REPO_ROOT"
 
 ##################################################
 # PASS 1: Stale pattern scan
 ##################################################
 
+# Patterns use ERE syntax (compatible with grep -E).
+# Fixed strings use -F for speed and safety.
 stale_patterns=(
   "doom rollback:Removed in Doom 3 (stub only, does nothing)"
   "doom clean:Removed in Doom 3 (use doom gc)"
-  "pinfile\\.el:No longer exists -- pins are declared via :pin in packages.el"
+  "pinfile[.]el:No longer exists -- pins are declared via :pin in packages.el"
   "straight/versions/:Directory no longer exists in Doom 3"
   "setopt:Dodged migration -- Doom 3 kept setq! as the standard"
-  "\\+babel:Not a valid :lang org flag in Doom 3"
+  "[+]babel:Not a valid :lang org flag in Doom 3"
 )
 
 echo "=== Stale Pattern Scan ==="
@@ -35,11 +36,10 @@ echo ""
 for entry in "${stale_patterns[@]}"; do
   pattern="${entry%%:*}"
   explanation="${entry#*:}"
-  matches=$(grep -rn "$pattern" --include='*.md' . | grep -v '.git/' || true)
+  matches=$(grep_md "$pattern")
   if [ -n "$matches" ]; then
     echo "STALE: $explanation"
     echo "$matches" | head -10
-    # If more than 10 matches, show count
     match_count=$(echo "$matches" | wc -l)
     if [ "$match_count" -gt 10 ]; then
       echo "  ... and $((match_count - 10)) more matches"
@@ -107,11 +107,7 @@ check_path() {
 
 while IFS=: read -r file line _rest; do
   content=$(sed -n "${line}p" "$file" 2>/dev/null || true)
-  # Match backtick-quoted paths: references/... or scripts/... or ./.agents/...
-  # Not URLs (http://), not email-like paths, not version strings
-  paths=$(echo "$content" \
-    | grep -oP '`(?:\./)?(?:references/|scripts/|\.agents/)[^`]+`' \
-    | tr -d '`' || true)
+  paths=$(echo "$content" | extract_paths)
   if [ -z "$paths" ]; then
     continue
   fi
@@ -122,7 +118,7 @@ while IFS=: read -r file line _rest; do
     fi
     check_path "$path" "$file" "$line"
   done
-done < <(grep -rn '`\(\./\)\?\(references/\|scripts/\|\.agents/\)' --include='*.md' . | grep -v '.git/' || true)
+done < <(find_path_refs)
 
 if [ $ref_errors -eq 0 ]; then
   echo "All cross-references resolve."

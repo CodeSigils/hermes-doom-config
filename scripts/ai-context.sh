@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 # ai-context.sh — Gather context for asking AI about Doom Emacs config
 # Usage: ./scripts/ai-context.sh [optional: path to file being edited]
-
 set -euo pipefail
+. "$(dirname "$0")/config.sh"
 
-DOOMDIR="${DOOMDIR:-$HOME/.config/doom}"
 cd "$DOOMDIR"
-
 FILE="${1:-}"
 
 echo "=== Doom Emacs Config Context ==="
