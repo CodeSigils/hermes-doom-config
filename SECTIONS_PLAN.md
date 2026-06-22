@@ -226,7 +226,35 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
       Python edits are formatted
     - `validate-docs.py` itself — run it to confirm the new section inventory
       pass reports no findings
-18. **Commit** with a message documenting each file change
+18. **Commit with decision-aware messages** — `git log` is the historical
+    record for agents. Each commit message should capture *why* a decision
+    was made, not just *what* changed:
+
+    ```
+    <action>: <brief summary>
+
+    <context — what problem or principle drove this change>
+
+    <decisions — trade-offs considered, alternatives rejected, rationale>
+    ```
+
+    Example:
+
+    ```
+    move incf/decf into spellcheck.el per co-location principle
+
+    config.el is now a pure loader (pnpm path fix + load! calls only).
+    incf/decf Jinx legacy aliases go in sections/spellcheck.el alongside
+    the Jinx config they support.
+
+    Aliases are defined at load time via (load! ...), well before any
+    :hook can fire at runtime — no silent void-function risk. Separating
+    the workaround from the config it supports would violate the rule
+    "config belongs with the module it modifies."
+    ```
+
+    Avoid one-liners like "fix typo" or "update plan" — they tell an agent
+    nothing on their own.
 
 ### Why shellcheck isn't needed here
 
