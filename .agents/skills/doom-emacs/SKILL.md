@@ -56,6 +56,7 @@ domain files for specific needs. Read only what your task needs:
 | Setting a keybinding                  | `domains/PROCEDURES.md` (E), Doom API Essentials   |
 | Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                       |
 | Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |
+| Checking style or reviewing patterns  | `references/best-practices.md`                     |
 | Upgrading Doom framework              | `domains/PROCEDURES.md` (G), Safety Checks         |
 | Maintaining config repo scripts       | Skill Script Conventions                           |
 
@@ -242,6 +243,6 @@ When you need to understand how a package or Doom module works, the source code 
 - **This repo's references:**
   - `references/INDEX.md` — external resource catalogue (community configs, keybinding reference, performance tips)
   - `references/package-management.md` — package lifecycle, pinning, straight internals, recovery
-  - `.agents/skills/doom-emacs/references/` — session notes and config-specific troubleshooting
+  - `references/best-practices.md` — consolidated Doom config best practices
   - `AGENTS.md` — user-specific policies, workflow, drift prevention
   - `domains/` — depth guides (architecture, procedures, elisp, troubleshooting)

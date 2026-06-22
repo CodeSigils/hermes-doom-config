@@ -229,5 +229,6 @@ independent completion systems and coexist.
 | `AGENTS.md`                          | Agent behavior policies and workflow                         |
 | `references/INDEX.md`                | External Doom Emacs reference catalogue                      |
 | `references/package-management.md`   | Doom package lifecycle: declaration, sync, update, pinning   |
+| `references/best-practices.md`       | Consolidated Doom config best practices                      |
 | `.agents/skills/doom-emacs/SKILL.md` | General Doom Emacs guide with procedures and troubleshooting |
 | `README.md`                          | Human-facing quick start                                     |

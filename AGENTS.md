@@ -7,6 +7,8 @@
 | `DOOM-API.md`                        | Idiomatic Doom patterns — which macros to use when and why                    |
 | `PROFILE.md`                         | Config profile — modules, packages, custom functions, environment             |
 | `references/INDEX.md`                | Reference catalogue — Doom resources, community configs, exploration          |
+| `references/package-management.md`   | Doom package lifecycle — pinning, straight, recovery                          |
+| `references/best-practices.md`       | Consolidated best practices for writing Doom config                           |
 | `.agents/skills/doom-emacs/SKILL.md` | Compact core: file roles, API essentials, pitfalls; plus `domains/` for depth |
 | `README.md`                          | Human quick-start (verify module lists against `init.el`)                     |
 
@@ -24,6 +26,11 @@ When opening this repo cold, read files in this order:
 
 `README.md` is human-facing; read it when you need quick-start or dependency info.
 
+**Beyond these 5, another 6 reference files exist** in depth layers
+(`references/` and `.agents/skills/doom-emacs/domains/`). The
+Reference Map below lists all 11 files with paths and purposes —
+read it at step 3 to see the full landscape before you need depth.
+
 ## Source-First Reference Policy
 
 The installed Doom source at `~/.config/emacs/` is the authoritative reference for this config — not upstream docs, not
@@ -34,6 +41,30 @@ lisp/ for core macros). External references supplement, never replace, the insta
 
 If `emacs-lisp-expert` is available, load it for general Emacs Lisp guidance; if missing, suggest it once as an optional
 companion, then continue without blocking.
+
+## Reference Map
+
+Guide to every reference file in this repo, organized by depth tier.
+Read this at step 3 to see the full landscape before you need depth.
+
+| Tier | File | Purpose | Discovers / Entry path |
+| :--- | :--- | :------ | :--------------------- |
+| 1 — Root (entry files) | `PROFILE.md` | Config profile — modules, packages, environment | Entry step 1 |
+| 1 — Root (entry files) | `DOOM-API.md` | Idiomatic Doom patterns — which macros to use when | Entry step 2 |
+| 1 — Root (entry files) | `AGENTS.md` | Agent behavior policies, workflow, drift prevention | Entry step 3 |
+| 1 — Root (entry files) | `README.md` | Human quick-start | AGENTS.md Cross-References |
+| 2 — references/ | `references/INDEX.md` | External Doom resources, community configs, exploration | Entry step 4 |
+| 2 — references/ | `references/package-management.md` | Package lifecycle — pinning, straight, recovery | INDEX.md SS9, SKILL.md Reference Sources |
+| 2 — references/ | `references/best-practices.md` | Consolidated Doom config best practices | AGENTS.md Reference Map (this table) |
+| 3 — Skill entry | `.agents/skills/doom-emacs/SKILL.md` | Compact core: file roles, API essentials, pitfalls; plus domains/ index | Entry step 5 |
+| 4 — domains/ | `.agents/skills/doom-emacs/domains/ARCHITECTURE.md` | Doom framework, module system, reload semantics | SKILL.md Quick Index |
+| 4 — domains/ | `.agents/skills/doom-emacs/domains/ELISP.md` | Emacs Lisp for Doom config | SKILL.md Quick Index |
+| 4 — domains/ | `.agents/skills/doom-emacs/domains/PROCEDURES.md` | Task-specific procedures (add module, install package) | SKILL.md Quick Index |
+| 4 — domains/ | `.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md` | Diagnostic guide for Emacs failures | SKILL.md Quick Index |
+
+An agent reading the 5-step entry order encounters 5 files at tier 1 and
+tier 3. The 2 files at tier 2 and 4 files at tier 4 are invisible from the
+entry path alone — this table bridges that gap.
 
 ## Agent Workflow
 
@@ -129,6 +160,7 @@ When you change a source of truth, update its dependent files in the same change
 | `.github/workflows/ci.yml`            | `README.md` maintenance guidance, script contracts                    | Keep path routing aligned with invoked checks            |
 | `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                            | Update diagram, path descriptions                        |
 | `domains/` files                      | `SKILL.md` Quick Index table                                          | Add/remove/rename rows to match domain files             |
+| `references/best-practices.md` | `AGENTS.md` Reference Map, `AGENTS.md` Cross-References, `SKILL.md` Quick Index, `SKILL.md` Reference Sources, `PROFILE.md` Related Files | Add/remove rows, update paths, register in Reference Map |
 | Doom module source (README.org)       | `references/INDEX.md` flags/features tables                           | Flag changes, new module features                        |
 | Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                    | Command changes, new subcommands                         |
 

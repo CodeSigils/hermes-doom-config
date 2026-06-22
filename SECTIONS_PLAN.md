@@ -253,3 +253,51 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
 - **Section file headers**: each mode-line comment names the file's own path;
   self-consistent, no cross-file drift.
 - No per-file listings outside config.el — no duplication to drift.
+
+---
+
+## Companion: Reference Improvements
+
+Alongside the sections split, the reference documentation was improved to
+flatten the discoverability gradient for agents. This was done before the
+section split (it affects reference files, not config files) but is
+documented here as a companion initiative so the reasoning is not lost.
+
+### Problem
+
+The repo had 11 reference `.md` files across 4 depth tiers. The agent entry
+order in `AGENTS.md` listed only 5 of them (`PROFILE.md`, `DOOM-API.md`,
+`AGENTS.md`, `references/INDEX.md`, `SKILL.md`). The other 6 files
+(`references/package-management.md`, `references/best-practices.md`, and
+4 files under `.agents/skills/doom-emacs/domains/`) were invisible from the
+entry path — an agent had to read through all 5 entry files before
+discovering they existed.
+
+### Changes Made
+
+| Change                          | File affected                             | Why                                               |
+| ------------------------------- | ----------------------------------------- | ------------------------------------------------- |
+| Create best-practices.md        | `references/best-practices.md` (new)      | Consolidate scattered guidance into one file      |
+| Add Reference Map table         | `AGENTS.md` (Reference Map section)       | Show all 11 files with paths at step 3            |
+| Update entry order              | `AGENTS.md` (Read First)                  | Note depth layers exist beyond the 5-step path    |
+| Broaden Cross-References        | `AGENTS.md` (table)                       | Include package-management.md and best-practices.md|
+| Drift table update              | `AGENTS.md` (Drift Prevention)            | Add best-practices.md as tracked source of truth  |
+| Update Quick Index              | `SKILL.md`                                | Add best-practices.md row                         |
+| Update Reference Sources        | `SKILL.md`                                | Add best-practices.md to local refs list          |
+| Update Related Files            | `PROFILE.md`                              | Add best-practices.md                             |
+
+### What the Reference Map Gives an Agent
+
+When an agent opens this repo cold and reads `AGENTS.md` at step 3, it now
+sees a tiered table listing every `.md` file in the repo, its purpose, and
+how to discover it. The 6 hidden files are visible immediately — no need to
+find them through cross-references.
+
+### Future Reference Work
+
+- If the `domains/` directory grows beyond 6 files, consider a top-level
+  index or splitting the Reference Map into sub-tables per tier.
+- If upstream Doom module structure changes significantly, audit
+  `references/INDEX.md` for stale flag/feature entries.
+- After the sections split, audit `references/best-practices.md` §3 (File
+  Organization) for accuracy against the new `sections/` structure.
