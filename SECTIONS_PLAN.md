@@ -267,11 +267,12 @@ documented here as a companion initiative so the reasoning is not lost.
 
 The repo had 11 reference `.md` files across 4 depth tiers. The agent entry
 order in `AGENTS.md` listed only 5 of them (`PROFILE.md`, `DOOM-API.md`,
-`AGENTS.md`, `references/INDEX.md`, `SKILL.md`). The other 6 files
-(`references/package-management.md`, `references/best-practices.md`, and
-4 files under `.agents/skills/doom-emacs/domains/`) were invisible from the
-entry path — an agent had to read through all 5 entry files before
-discovering they existed.
+`AGENTS.md`, `references/INDEX.md`, `SKILL.md`). The other 5 files
+(`references/package-management.md` and 4 files under
+`.agents/skills/doom-emacs/domains/`) were invisible from the entry path — an
+agent had to read through all 5 entry files before discovering they existed.
+`references/best-practices.md` was created during this initiative to
+consolidate scattered guidance.
 
 ### Changes Made
 
