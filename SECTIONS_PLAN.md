@@ -121,7 +121,7 @@ are existing `;;; HEADER` blocks, and some are unheadered top-level blocks.
 | pnpm path, exec-path setup                            | Jinx config, incf/decf aliases                      |
 | `delete-by-moving-to-trash`, `confirm-kill-emacs`     | Org files, Org-Roam, Org-Roam-UI                    |
 | `global-prettify-symbols-mode`, `global-subword-mode` | Company backends, dabbrev                           |
-| `display-time-mode`                                   | Browser, window/popup management, frame size        |
+| `display-time-24hr-format`, `display-time-mode`       | Browser, window/popup management, frame size        |
 |                                                       | Dirvish, which-key, smartparens, rainbow-delimiters |
 |                                                       | Ruff, Prettier, markdown-open                       |
 |                                                       | All keybindings (`sections/keys.el`)                |
@@ -260,8 +260,9 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
 0. **Verify clean working tree** — `git status --short` must be empty.
    Commit or stash any pending changes before proceeding.
 1. **Create `sections/` directory**
-2. **Write each section file** by copying from the corresponding `;;; HEADER`
-   block in current config.el (see Section Files table above); verify the
+2. **Write each section file** from the routing table above, using current
+   `config.el` as the source. Some sources are existing `;;; HEADER` blocks;
+   others are unheadered top-level blocks routed by responsibility. Verify each
    mode-line header matches `;;; $DOOMDIR/sections/<name>.el`. Do NOT create
    `defaults.el` — the universal settings at the top of config.el (pnpm path,
    Emacs-wide defaults, display-time) stay in config.el. DO create
