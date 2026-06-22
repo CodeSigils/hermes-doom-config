@@ -1,7 +1,11 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-;; Place your private configuration here. This repo intentionally runs `doom
-;; sync' after requested config changes; see AGENTS.md for the local workflow.
+;; Place your private configuration here. Section files under sections/
+;; are loaded in order below.
+
+;;; UNIVERSAL DEFAULTS — settings that affect Emacs globally, not a specific
+;;; package or mode. Every config surveyed (hlissner, ztlevi, tecosaur) keeps
+;;; these in the loader rather than moving them to a section file.
 
 ;; Ensure pnpm global binaries are on exec-path for formatters (prettier, etc.)
 ;; pnpm stores globals at ~/.local/share/pnpm/bin/ -- independent of fnm.
@@ -9,227 +13,33 @@
   (when (file-directory-p pnpm-global)
     (add-to-list 'exec-path pnpm-global)))
 
-(setq! doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 22);  ; Why: larger font for readability on high-resolution display
-      doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font" :size 20))
-
-(setq! doom-theme 'doom-tokyo-night);  ; Why: dark theme with blue accents, easy on the eyes.
-(setq! display-line-numbers-type t);  ; Why: helps with code navigation and understanding structure.
-
-;;; EMACS DEFAULTS
 (setq! delete-by-moving-to-trash t
       window-combination-resize t
       confirm-kill-emacs nil
       confirm-kill-processes nil
       evil-want-fine-undo t
-      truncate-string-ellipsis "...");  ; Why: cleaner visual indicator for truncated text.
+      truncate-string-ellipsis "...")
 
-(global-prettify-symbols-mode 1);  ; Why: shows pretty symbols like λ for lambda in code.
-(global-subword-mode 1);  ; Why: enables subword navigation (camelCase, snake_case) for movement and editing.
-
-;; Fast async spell checking via Enchant/Hunspell.
-;; Jinx 2.7 still calls legacy bare `incf`/`decf` at runtime. Emacs 30 only
-;; provides the cl-lib names, so install tiny compatibility aliases before Jinx
-;; autoloaded commands can run. Keep this out of straight's repo checkout so
-;; `doom sync -u` can update Jinx without a dirty worktree prompt.
-(require 'cl-lib)
-(unless (fboundp 'incf)
-  (defalias 'incf #'cl-incf))
-(unless (fboundp 'decf)
-  (defalias 'decf #'cl-decf))
-
-(use-package! jinx
-  :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
-  :config
-  (setq! jinx-languages "en_US")
-  (map! "M-$" #'jinx-correct
-        "C-M-$" #'jinx-languages
-        :leader
-        (:prefix ("s" . "spelling")
-         :desc "Correct word" "c" #'jinx-correct
-         :desc "Next misspelling" "n" #'jinx-next
-         :desc "Previous misspelling" "p" #'jinx-previous)))
-
-(after! smartparens
-  (show-smartparens-global-mode 1))
-
-;;; ORG
-(setq! org-directory "~/notes/org/");  ; Why: central location for all Org files.
-
-(defun sand/org-display-inline-images-only-in-org (fn &rest args)
-  "Only run Org inline-image display in Org buffers."
-  (when (derived-mode-p 'org-mode)
-    (apply fn args)))
-
-(after! org
-  (require 'org-tempo)
-  (add-hook! 'org-mode-hook #'+org-pretty-mode)
-
-  ;; Inline images
-  (setq! org-startup-with-inline-images t
-        org-display-remote-inline-images 'cache
-        org-image-actual-width 600)
-
-  ;; Defensive guard: some image/advice integrations can call Org's inline image
-  ;; display from non-Org buffers, which makes `org-element' try to parse
-  ;; Markdown buffers like AGENTS.md.
-  (advice-add #'org-display-inline-images
-              :around #'sand/org-display-inline-images-only-in-org)
-  (when (fboundp 'org-display-user-inline-images)
-    (advice-remove #'org-display-inline-images
-                   #'org-display-user-inline-images)))
-
-;;; ORG ROAM
-(setq! org-roam-directory "~/notes/org/roam");  ; Why: separate directory for Org Roam notes to keep them organized.
-
-(after! org-roam
-  (when (fboundp 'org-roam-db-autosync-mode)
-    (org-roam-db-autosync-mode 1)))  ;; Enables automatic sync
-
-(use-package! org-roam-ui
-  :after org-roam
-  :commands org-roam-ui-mode
-  :config
-  (setq! org-roam-ui-sync-theme t
-        org-roam-ui-follow t
-        org-roam-ui-update-on-save t))
-
-;;; DABBREV
-(setq! abbrev-file-name (expand-file-name "abbrev.el" doom-user-dir))
-(setq! save-abbrevs nil)
-
-;;; COMPANY
-(after! company
-  ;; Doom's Company module is enabled, but its default backend lists do not put
-  ;; `company-files' in the common mode backends. Add it explicitly so paths are
-  ;; suggested after prefixes like ./, ../, ~/, /, and Org file: links.
-  (setq! company-idle-delay 0.2
-        company-minimum-prefix-length 1
-        company-tooltip-limit 12
-        company-tooltip-align-annotations t
-        company-require-match 'never
-        company-selection-wrap-around t
-        company-show-numbers t
-        ;; Search same-mode buffers for dabbrev without scanning every buffer.
-        company-dabbrev-other-buffers t
-        company-dabbrev-code-other-buffers t)
-
-  (set-company-backend! 'prog-mode
-    'company-files
-    '(company-capf :with company-yasnippet)
-    'company-dabbrev-code)
-
-  (set-company-backend! 'conf-mode
-    'company-files
-    '(company-capf :with company-yasnippet)
-    'company-dabbrev-code)
-
-  (set-company-backend! 'text-mode
-    'company-files
-    '(:separate company-dabbrev company-yasnippet company-ispell))
-
-  (set-company-backend! '(org-mode markdown-mode)
-    'company-files
-    '(company-capf :with company-yasnippet)
-    '(:separate company-dabbrev company-ispell)))
-
-;;; BROWSER
-(when-let ((browser (getenv "BROWSER")))
-  (setq! browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program browser))
-
-;;; WINDOW
-;; Use Doom/window display rules rather than advising low-level window
-;; primitives like `window-split'.
-(setq! switch-to-buffer-obey-display-actions t)
-
-(winner-mode 1)
-
-(defun sand/split-window-sensibly (&optional window)
-  "Prefer side-by-side splits, then fall back to below splits."
-  (let ((window (or window (selected-window))))
-    (or (and (window-splittable-p window t)
-             (with-selected-window window
-               (split-window-right)))
-        (and (window-splittable-p window)
-             (with-selected-window window
-               (split-window-below))))))
-
-(setq! split-window-preferred-function #'sand/split-window-sensibly)
-
-;; Keep common transient/help buffers out of the main editing layout without
-;; capturing every star buffer.
-(when (featurep! :ui popup)
-  (set-popup-rule! "^\\*\\(?:Help\\|Apropos\\|Warnings\\|Backtrace\\|Messages\\|Completions\\)\\*"
-    :size 0.35 :ttl 0 :quit t :select nil)
-  (set-popup-rule! "^\\*\\(?:Compile-Log\\|compilation\\|Shell Command Output\\|Async Shell Command\\)\\*"
-    :size 0.3 :ttl 0 :quit t :select nil)
-  (set-popup-rule! "^\\*doom:[^*]+\\*"
-    :size 0.35 :ttl 0 :quit t :select nil))
-
-(defun sand/initial-frame-size ()
-  "Return a monitor-aware initial frame size."
-  (cond
-   ((>= (display-pixel-width) 2560) '((width . 140) (height . 60)))
-   ((>= (display-pixel-width) 1920) '((width . 124) (height . 55)))
-   (t '((width . 100) (height . 45)))))
-
-(setq! initial-frame-alist
-      (append '((top . 1) (left . 1))
-              (sand/initial-frame-size)))
-
-;;; DIRVISH
-;; Keep the launcher binding available immediately; the command is autoloaded.
-(map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)
-
-(after! dirvish
-  (setq! dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
-  (setq! dirvish-subtree-state-style 'nerd)
-  (setq! dirvish-path-separators
-        (list (format " %s " (nerd-icons-codicon "nf-cod-home"))
-              (format " %s " (nerd-icons-codicon "nf-cod-root_folder"))
-              (format " %s " (nerd-icons-faicon "nf-fa-angle_right")))))
-
-;;; TIME
+(global-prettify-symbols-mode 1)
+(global-subword-mode 1)
 (setq! display-time-24hr-format t)
 (display-time-mode 1)
 
-;;; WHICH KEY
-(after! which-key
-  (setq! which-key-min-display-lines 12
-        which-key-idle-delay 0.3))
-
-;;; RAINBOW DELIMITERS
-(use-package! rainbow-delimiters
-  :hook ((org-mode prog-mode) . rainbow-delimiters-mode))
-
-;;; PYTHON FORMATTING (ruff)
-;; Ruff is on PATH at ~/.local/bin/ruff, installed via pnpm global.
-;; Doom's (format +onsave) + apheleia autodetects it, but be explicit.
-(after! python
-  (set-formatter! 'ruff "ruff format --stdin-filename=%b -"
-    :modes '(python-mode));  ; Why: use ruff for fast, consistent Python formatting over LSP.
-  (setq! +format-with-lsp nil))  ;; prefer ruff over lsp formatting
-
-;;; MARKDOWN FORMATTING (prettier)
-;; Prettier handles markdown structure: tables, list indentation, fences.
-;; Installed globally via pnpm at ~/.local/share/pnpm/bin/prettier.
-;; Directly set apheleia alists instead of using set-formatter!, because
-;; Doom's markdown module may register its own formatter entry that
-;; overrides set-formatter! when markdown-mode is loaded lazily.
-(use-package! apheleia
-  :config
-  (setf (alist-get 'prettier-markdown apheleia-formatters)
-        '("prettier" "--parser" "markdown"))
-  (setf (alist-get 'markdown-mode apheleia-mode-alist) 'prettier-markdown)
-  (setf (alist-get 'gfm-mode apheleia-mode-alist) 'prettier-markdown))
-
-;; Use marked for compilation so markdown-open renders HTML in BrowserOS
-;; via browse-url-of-buffer (text/html now routed to browseros.desktop).
-;; markdown-open-command can be a function; markdown-mode now rejects nil.
-(after! markdown-mode
-  (setq! markdown-open-command
-        (lambda ()
-          (interactive)
-          (let ((browse-url-browser-function 'browse-url-xdg-open))
-            (browse-url-of-buffer
-             (markdown-standalone (generate-new-buffer-name "*marked*")))))))
+;;; SECTIONS — loaded in reviewed order; keys loaded last.
+;;
+;;   sections/appearance.el    Font, theme, line-numbers
+;;   sections/spellcheck.el    Jinx spell-checking
+;;   sections/org.el           Org, Org-Roam, Org-Roam-UI
+;;   sections/completion.el    Company backends, dabbrev
+;;   sections/navigation.el    Browser, window management, popups, frame
+;;   sections/ui.el            Dirvish, which-key, smartparens, rainbow-delimiters
+;;   sections/formatting.el    Ruff (Python), Prettier (Markdown)
+;;   sections/keys.el          All keybindings, loaded last
+(load! "sections/appearance")
+(load! "sections/spellcheck")
+(load! "sections/org")
+(load! "sections/completion")
+(load! "sections/navigation")
+(load! "sections/ui")
+(load! "sections/formatting")
+(load! "sections/keys")

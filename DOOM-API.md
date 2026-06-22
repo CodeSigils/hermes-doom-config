@@ -261,8 +261,9 @@ See `packages.el` for this config's unpinned packages and their reasons.
 | `sections/keys.el` | Centralized `map!` keybinding inventory, loaded last  | This config prefers yes |
 | `packages.el`      | Package declarations                                  | Yes                     |
 
-As `config.el` grows beyond ~50 lines per topic area, split into topic files
-and load them from config.el:
+This config uses topic files under `sections/`, loaded from the thin
+`config.el` loader. Add new per-feature settings/hooks/advice to the matching
+section file and register new sections with `(load! ...)`:
 
 ```elisp
 (load! "sections/org")
@@ -368,11 +369,12 @@ it shouldn't run at startup.**
   it was considered and turned off."
 - **One concern per edit.** Don't fix two unrelated things in the same commit.
   If you're adding a package and fixing a keybinding, split them.
-- **Split at ~50 lines.** When a topic block in `config.el` exceeds ~50 lines,
-  split it into a file under `modules/<topic>.el` and load it:
+- **Use the existing `sections/` split.** Add per-feature settings, hooks, and
+  advice to `sections/<topic>.el`; register new sections from `config.el` with
+  `load!`:
 
   ```elisp
-  (load! "modules/org")
+  (load! "sections/org")
   ```
 
 - **Prefer named functions over lambdas.** Lambdas in hooks make the hook

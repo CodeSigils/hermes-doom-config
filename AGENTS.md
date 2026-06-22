@@ -34,7 +34,7 @@ you need depth.
 ## Source-First Reference Policy
 
 The installed Doom source at `~/.config/emacs/` is the authoritative reference for this config — not upstream docs, not
-community configs. Before editing `config.el`, `init.el`, or `packages.el`, consult the corresponding module source at
+community configs. Before editing `config.el`, `sections/*.el`, `init.el`, or `packages.el`, consult the corresponding module source at
 `~/.config/emacs/modules/<cat>/<mod>/` to verify flags, patterns, and configuration options. When the user asks about a
 package, flag, or feature, answer from the module source (README.org for flags, config.el for implementation patterns,
 lisp/ for core macros). External references supplement, never replace, the installed source.
@@ -71,6 +71,8 @@ path alone — this table bridges that gap.
 - Work sequentially. One concern per edit, one concern per commit.
 - Check `git status --short` before changing files.
 - Inspect the relevant file before patching; do not guess from memory.
+- When adding new settings/hooks/advice, place them in the appropriate `sections/*.el` file and register new sections
+  with a `(load! ...)` line in `config.el`. Place all keybindings in `sections/keys.el`.
 - Verify `README.md` module inventory against `init.el`.
 - For changed `.el` files, run `check-parens` before `doom sync`.
 - Run `doom sync` after config edits unless told not to.
@@ -114,10 +116,10 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 
 - The preferred completion backend is Doom's `:completion company` module for the fuller Company experience: snippets,
   code completion, file-path completion, and mature completion backends.
-- Company path completion is intentionally expanded in `config.el` with `company-files` via `set-company-backend!`;
+- Company path completion is intentionally expanded in `sections/completion.el` with `company-files` via `set-company-backend!`;
   preserve that when editing completion behavior.
 - Keep Corfu present as a commented `init.el` module line, but do not switch the completion system to Corfu/Cape (the
-  `company-capf` backends in `config.el` are Company backends, not Corfu configuration -- leave them untouched).
+  `company-capf` backends in `sections/completion.el` are Company backends, not Corfu configuration -- leave them untouched).
 - Do not remove lines from `init.el`; comment disabled modules/settings instead so the original Doom module list stays
   visible and recoverable.
 - After changing `init.el` completion modules, `packages.el`, or requested config-only behavior, run `doom sync` unless
@@ -126,7 +128,8 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 ## Defensive Config Policy
 
 - Use `fboundp` guards for optional package entrypoints when practical, such as `org-roam-db-autosync-mode`.
-- Keep global defaults global. For example, `delete-by-moving-to-trash` belongs in the main defaults section and should
+- Keep global defaults global. For example, `delete-by-moving-to-trash` belongs in the main defaults section of the
+  `config.el` loader and should
   not be duplicated inside package blocks unless a package needs a different value.
 
 ## Markdown Policy
@@ -142,27 +145,27 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 
 - Ruff is the Python formatter and linter (not prettier -- prettier is for markdown only). Installed globally via
   `pnpm add -g ruff` at `~/.local/bin/ruff`.
-- Format on save is configured in `config.el` via `(format +onsave)` with explicit `set-formatter! 'ruff` for Python
-  buffers.
+- Format on save is configured via `(format +onsave)` with explicit `set-formatter! 'ruff` for Python buffers in
+  `sections/formatting.el`.
 - Type checking is done via `mypy` (run in CI/terminal), not via LSP in the editor.
 
 ## Drift Prevention
 
 When you change a source of truth, update its dependent files in the same change:
 
-| Source of truth                       | Dependent files                                                                                                                           | What to update                                           |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                                                                                    | Add/remove modules, adjust flags                         |
-| `packages.el`                         | `PROFILE.md` packages table                                                                                                               | Add/remove packages with purpose notes                   |
-| `config.el`                           | `PROFILE.md` custom functions table, `DOOM-API.md` patterns                                                                               | Update function signatures, add new patterns             |
-| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary, `README.md` agent entry section                                                                     | Update reading order, companion skill mentions           |
-| `scripts/` files                      | `SKILL.md` Scripts table, `AGENTS.md` workflow, CI routing                                                                                | Register scripts, update generic workflow and path gates |
-| `.github/workflows/ci.yml`            | `README.md` maintenance guidance, script contracts                                                                                        | Keep path routing aligned with invoked checks            |
-| `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                                                                                                | Update diagram, path descriptions                        |
-| `domains/` files                      | `SKILL.md` Quick Index table                                                                                                              | Add/remove/rename rows to match domain files             |
-| `references/best-practices.md`        | `AGENTS.md` Reference Map, `AGENTS.md` Cross-References, `SKILL.md` Quick Index, `SKILL.md` Reference Sources, `PROFILE.md` Related Files | Add/remove rows, update paths, register in Reference Map |
-| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                                                                                               | Flag changes, new module features                        |
-| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                                                                                        | Command changes, new subcommands                         |
+| Source of truth                       | Dependent files                                                                                                                           | What to update                                                                         |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                                                                                    | Add/remove modules, adjust flags                                                       |
+| `packages.el`                         | `PROFILE.md` packages table                                                                                                               | Add/remove packages with purpose notes                                                 |
+| `config.el`                           | `sections/*.el`, `PROFILE.md` custom functions table, `DOOM-API.md` patterns                                                              | Add/remove `(load! ...)` lines, update header comment, update moved function locations |
+| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary, `README.md` agent entry section                                                                     | Update reading order, companion skill mentions                                         |
+| `scripts/` files                      | `SKILL.md` Scripts table, `AGENTS.md` workflow, CI routing                                                                                | Register scripts, update generic workflow and path gates                               |
+| `.github/workflows/ci.yml`            | `README.md` maintenance guidance, script contracts                                                                                        | Keep path routing aligned with invoked checks                                          |
+| `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                                                                                                | Update diagram, path descriptions                                                      |
+| `domains/` files                      | `SKILL.md` Quick Index table                                                                                                              | Add/remove/rename rows to match domain files                                           |
+| `references/best-practices.md`        | `AGENTS.md` Reference Map, `AGENTS.md` Cross-References, `SKILL.md` Quick Index, `SKILL.md` Reference Sources, `PROFILE.md` Related Files | Add/remove rows, update paths, register in Reference Map                               |
+| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                                                                                               | Flag changes, new module features                                                      |
+| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                                                                                        | Command changes, new subcommands                                                       |
 
 Run `git diff --check` before committing. Stale documentation is worse than missing documentation because the agent
 cannot distinguish it from truth.
@@ -180,7 +183,7 @@ When asking an AI (or another agent) about this Doom config, provide context to 
 **Minimum context to include:**
 
 - Doom version: `doom version` output
-- File being edited: `config.el`, `init.el`, or `packages.el`
+- File being edited: `config.el`, `sections/*.el`, `init.el`, or `packages.el`
 - What you're trying to achieve
 - What you've already tried
 - Any error messages (exact text)

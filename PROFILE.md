@@ -3,8 +3,9 @@
 Purpose: compact reference for what this Doom Emacs configuration is. An agent reads this to understand the user's setup
 before making suggestions or modifications.
 
-This is a summary. The source of truth is `init.el`, `config.el`, and `packages.el`; policy and reference guides
-live in `AGENTS.md` and `references/` (see AGENTS.md Reference Map for the full inventory).
+This is a summary. The source of truth is `init.el`, `config.el` (loader with universal defaults), `sections/*.el`
+(per-feature config), `sections/keys.el` (keybindings), and `packages.el`; policy and reference guides live in
+`AGENTS.md` and `references/` (see AGENTS.md Reference Map for the full inventory).
 
 ---
 
@@ -68,9 +69,9 @@ Beyond Doom built-ins:
 
 ## Custom Functions (sand/ prefix)
 
-| Function                                     | Purpose                                |
-| -------------------------------------------- | -------------------------------------- |
-| `sand/org-display-inline-images-only-in-org` | Only display inline images in org-mode |
+| Function                                     | Purpose                                | Location          |
+| -------------------------------------------- | -------------------------------------- | ----------------- |
+| `sand/org-display-inline-images-only-in-org` | Only display inline images in org-mode | `sections/org.el` |
 
 ## Config Policies Summary
 
@@ -112,7 +113,7 @@ Keep Doom's `(spell +flyspell)` line commented in `init.el`:
   :recipe (:host github :repo "minad/jinx"))
 ```
 
-**config.el:**
+**sections/spellcheck.el and sections/keys.el:**
 
 ```elisp
 ;; Jinx 2.7 calls legacy bare incf/decf at runtime. Emacs 30 only has the
@@ -129,14 +130,16 @@ Keep Doom's `(spell +flyspell)` line commented in `init.el`:
 (use-package! jinx
   :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
   :config
-  (setq jinx-languages "en_US")
-  (map! "M-$" #'jinx-correct
-        "C-M-$" #'jinx-languages
-        :leader
-        (:prefix ("s" . "spelling")
-         :desc "Correct word" "c" #'jinx-correct
-         :desc "Next misspelling" "n" #'jinx-next
-         :desc "Previous misspelling" "p" #'jinx-previous)))
+  (setq! jinx-languages "en_US"))
+
+;; sections/keys.el
+(map! "M-$" #'jinx-correct
+      "C-M-$" #'jinx-languages
+      :leader
+      (:prefix ("s" . "spelling")
+       :desc "Correct word" "c" #'jinx-correct
+       :desc "Next misspelling" "n" #'jinx-next
+       :desc "Previous misspelling" "p" #'jinx-previous))
 ```
 
 **System dependencies** (Debian/PikaOS):
@@ -178,7 +181,7 @@ asks for more.
 ;; init.el
 (spell +flyspell)
 
-;; config.el
+;; sections/spellcheck.el
 (add-hook! '(org-mode-hook markdown-mode-hook text-mode-hook) #'flyspell-mode)
 (add-hook! '(prog-mode-hook conf-mode-hook yaml-mode-hook) #'flyspell-prog-mode)
 ```
@@ -189,13 +192,15 @@ Dirvish replaces Dired as the primary file manager via the `+dirvish` flag. The 
 `after!` block so it's available immediately and can autoload the command:
 
 ```elisp
+;; sections/keys.el
 ;; Launcher binding — keep outside after! for immediate availability
 (map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)
 
+;; sections/ui.el
 (after! dirvish
-  (setq dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
-  (setq dirvish-subtree-state-style 'nerd)
-  (setq dirvish-path-separators
+  (setq! dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
+  (setq! dirvish-subtree-state-style 'nerd)
+  (setq! dirvish-path-separators
         (list (format " %s " (nerd-icons-codicon "nf-cod-home"))
               (format " %s " (nerd-icons-codicon "nf-cod-root_folder"))
               (format " %s " (nerd-icons-faicon "nf-fa-angle_right")))))
@@ -210,6 +215,7 @@ Org-tempo provides `<s` + Tab → `#+begin_src` template expansion in Org buffer
 loads them lazily, so an explicit `require` is needed:
 
 ```elisp
+;; sections/org.el
 (after! org
   (require 'org-tempo)   ; without this, `<s` won't expand
   ;; ... rest of org config

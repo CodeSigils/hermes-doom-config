@@ -29,6 +29,7 @@ BACKTICK_PATH = re.compile(
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*]\(([^)]+)\)")
 SCRIPT_ROW = re.compile(r"^\|\s*`([^`]+[.](?:sh|py))`\s*\|")
 DOMAIN_ROW = re.compile(r"`(domains/[^`]+)`")
+SECTION_LOAD = re.compile(r'^\(load! "sections/([^"]+)"\)')
 
 
 def markdown_files() -> list[Path]:
@@ -160,6 +161,33 @@ def domain_inventory_findings() -> list[str]:
     return findings
 
 
+def section_inventory_findings() -> list[str]:
+    """Check every loaded section file exists, and every section file is loaded."""
+    config_file = ROOT / "config.el"
+    sections_dir = ROOT / "sections"
+
+    loaded = {
+        f"sections/{match.group(1)}.el"
+        for line in config_file.read_text().splitlines()
+        if (match := SECTION_LOAD.match(line.strip()))
+    }
+    actual = {
+        str(path.relative_to(ROOT))
+        for path in sections_dir.glob("*.el")
+        if path.is_file()
+    }
+
+    findings = [
+        f"BROKEN: config.el loads missing {path}" for path in sorted(loaded - actual)
+    ]
+    findings.extend(
+        f"ORPHAN: {path} exists on disk but is not loaded from config.el"
+        for path in sorted(actual - loaded)
+    )
+    # TODO: check header comment alignment against (load! ...) lines.
+    return findings
+
+
 def report(title: str, findings: list[str], clean_message: str) -> bool:
     print(f"=== {title} ===\n")
     if findings:
@@ -191,6 +219,11 @@ def main() -> int:
         "Domain File Inventory Coverage",
         domain_inventory_findings(),
         "All .agents/ domain files are registered in SKILL.md Quick Index.",
+    )
+    ok &= report(
+        "Section Inventory Coverage",
+        section_inventory_findings(),
+        "All sections/*.el files are loaded from config.el.",
     )
     return 0 if ok else 1
 

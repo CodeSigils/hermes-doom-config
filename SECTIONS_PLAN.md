@@ -96,7 +96,7 @@ are existing `;;; HEADER` blocks, and some are unheadered top-level blocks.
 
 ;;; SECTIONS — loaded in reviewed order; keys loaded last.
 ;;
-;;   sections/appearance.el    Font, theme, line-numbers, symbols
+;;   sections/appearance.el    Font, theme, line-numbers
 ;;   sections/spellcheck.el    Jinx spell-checking
 ;;   sections/org.el           Org, Org-Roam, Org-Roam-UI
 ;;   sections/completion.el    Company backends, dabbrev

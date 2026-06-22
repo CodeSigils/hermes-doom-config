@@ -74,9 +74,10 @@ value.
 | `sections/`        | Split config (see SECTIONS_PLAN.md) — loaded via `load!` | No                  |
 | `sections/keys.el` | Centralized keybinding inventory, loaded last            | No                  |
 
-**Splitting rule:** When a topic block in `config.el` exceeds ~50 lines,
-split settings/hooks/advice into a section file under `sections/<topic>.el`
-and load it from `config.el`. Move every `map!` form to `sections/keys.el`:
+**Splitting rule:** This config already uses a `sections/` split. Put new
+settings/hooks/advice in the matching section file under `sections/<topic>.el`
+and load any new section from `config.el`. Move every `map!` form to
+`sections/keys.el`:
 
 ```elisp
 (load! "sections/org")
@@ -334,7 +335,6 @@ settings that don't belong to any single section:
 - `user-full-name`, `user-mail-address`
 - `doom-scratch-buffer-major-mode`
 - `confirm-kill-emacs`
-- `display-line-numbers-type`
 - Popup rules (`set-popup-rules!`)
 - `custom-set-variables`
 - Environment setup (PATH, exec-path)
@@ -346,6 +346,8 @@ live in config.el as universal defaults.
 **Rule of thumb for our config:**
 
 - If a setting affects a specific package or mode → put it in that section file
+- If a visual setting belongs with font/theme/line-number appearance choices →
+  put it in `sections/appearance.el`
 - If a setting affects Emacs globally (display-time, exec-path, window
   defaults) → keep it in config.el
 - The loader should be thin, not empty — a few universal calls are expected

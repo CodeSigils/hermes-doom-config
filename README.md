@@ -43,14 +43,16 @@ All repo scripts live under `scripts/`. The canonical reference for every script
   SKILL.md > Scripts table      --  single source of truth for all scripts
   ───
   scripts/check-stale-patterns.sh  --  delegates to validate-docs.py, which checks stale
-                                       guidance, local references, and script registration
-                                       in both directions
+                                       guidance, local references, script registration,
+                                       domain inventory, and section inventory
 ```
 
 - `AGENTS.md` workflow bullets reference scripts generically ("run the stale check") without storing concrete paths --
   nothing to drift if a script is renamed.
 - `SKILL.md` is the single source for script metadata. Add or rename a script there, update the table.
 - `check-stale-patterns.sh` enforces script-table coverage in both directions and preserves paths containing spaces.
+- It also checks that every `sections/*.el` file is loaded from `config.el`, and every section loaded from `config.el`
+  exists on disk.
 - `scripts/config.sh` is a support library sourced by other scripts; it is never invoked directly and is excluded from
   the coverage check.
 
@@ -76,6 +78,8 @@ Not currently enabled: Doom's `mu4e`, `irc`, `rss`, `rest`, `web`, `treemacs`, `
 
 - **Company completion** with file path expansion — `company-files` added to `prog-mode`, `org-mode`, and
   `org-capture-mode`
+- **Split config layout** — `config.el` is a thin loader with universal defaults; per-feature config lives under
+  `sections/*.el`, and all keybindings live in `sections/keys.el`
 - **Dirvish** — `SPC d d` launches `dirvish-dwim`
 - **Jinx spell checking** — fast Enchant/Hunspell-backed spell checking for prose and code comments/strings
 - **Org mode** — org-roam, org-roam-ui, org-tempo (`<s` Tab for src blocks), habit tracking, and GTD workflows
@@ -122,3 +126,4 @@ If something breaks, restore `~/.config/doom.backup.*` from the backup.
   source tree. Sync stages and validates a replacement before swapping it into place
 - Markdown files in this repo should not contain emoji, including generated status summaries or agent notes
 - Unused modules are commented out in `init.el`, never deleted
+- Add new settings/hooks/advice to the appropriate `sections/*.el` file; add keybindings to `sections/keys.el`
