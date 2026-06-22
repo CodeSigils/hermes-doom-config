@@ -4,10 +4,16 @@
 > comment block) is the single authoritative section inventory. This plan goes
 > stale once the split is done.
 
-Split `config.el` into a lean loader and section files.
+Split `config.el` into a thin loader with universal defaults and section files.
 Keep `packages.el` and `init.el` as-is.
 
 This is a **refactoring**: all behavior is preserved, only the file layout changes.
+
+Research backing the approach: popular Doom configs use one of two patterns —
+monolithic with headers (hlissner, 205★) or `load!` split with universal
+settings in the loader (ztlevi, 223★). Our plan follows the latter, keeping
+global-only settings directly in `config.el` and moving package/mode-specific
+config to section files.
 
 ## Motivation
 
@@ -37,7 +43,7 @@ extra files. If it grows, the structure repays the overhead.
 
 ## File Contents — What Goes Where
 
-### config.el (post-split) — single source of truth for section inventory
+### config.el (post-split) — thin loader with universal defaults
 
 This is the **only** file whose exact content must be as shown below (it is new
 structure, not derived from the current config.el). All other section files are
@@ -49,15 +55,29 @@ copied from the existing `;;; HEADER` blocks in config.el.
 ;; Place your private configuration here. Section files under sections/
 ;; are loaded in order below.
 
+;;; UNIVERSAL DEFAULTS — settings that affect Emacs globally, not a specific
+;;; package or mode. Every config surveyed (hlissner, ztlevi, tecosaur) keeps
+;;; these in the loader rather than moving them to a section file.
+
 ;; Ensure pnpm global binaries on exec-path for formatters (prettier, etc.)
 ;; pnpm stores globals at ~/.local/share/pnpm/bin/ -- independent of fnm.
 (let ((pnpm-global (expand-file-name "~/.local/share/pnpm/bin")))
   (when (file-directory-p pnpm-global)
     (add-to-list 'exec-path pnpm-global)))
 
-;; Sections — loaded in order (independent of each other).
+(setq! delete-by-moving-to-trash t
+      window-combination-resize t
+      confirm-kill-emacs nil
+      confirm-kill-processes nil
+      evil-want-fine-undo t
+      truncate-string-ellipsis "...")
+
+(global-prettify-symbols-mode 1)
+(global-subword-mode 1)
+(display-time-mode 1)
+
+;;; SECTIONS — loaded in order (independent of each other).
 ;;
-;;   sections/defaults.el      Core Emacs behaviour, display-time
 ;;   sections/appearance.el    Font, theme, line-numbers, symbols
 ;;   sections/spellcheck.el    Jinx spell-checking
 ;;   sections/org.el           Org, Org-Roam, Org-Roam-UI
@@ -65,7 +85,6 @@ copied from the existing `;;; HEADER` blocks in config.el.
 ;;   sections/navigation.el    Browser, window management, popups, frame
 ;;   sections/ui.el            Dirvish, which-key, smartparens, rainbow-delimiters
 ;;   sections/formatting.el    Ruff (Python), Prettier (Markdown)
-(load! "sections/defaults")
 (load! "sections/appearance")
 (load! "sections/spellcheck")
 (load! "sections/org")
@@ -75,22 +94,30 @@ copied from the existing `;;; HEADER` blocks in config.el.
 (load! "sections/formatting")
 ```
 
-**Why config.el can be a pure loader:** The Jinx legacy `incf`/`decf` aliases
-now live in `sections/spellcheck.el`, alongside the Jinx config they support.
-This follows the co-location principle (config belongs with the module it
-modifies) and keeps config.el clean. The aliases are defined at load time
-when `(load! "sections/spellcheck")` runs, which is before any `:hook` can
-fire at runtime — no silent void-function risk.
+**Why some settings stay in config.el and others don't:**
 
-### Section Files — Copied from Current `config.el` Headers
+| Belongs in config.el (universal)                | Belongs in section file (package/mode-specific)               |
+| ----------------------------------------------- | ------------------------------------------------------------- |
+| pnpm path, exec-path setup                      | Jinx config, incf/decf aliases                                |
+| `delete-by-moving-to-trash`, `confirm-kill-emacs` | Org files, Org-Roam, Org-Roam-UI                            |
+| `global-prettify-symbols-mode`, `global-subword-mode` | Company backends, dabbrev                                |
+| `display-time-mode`                             | Browser, window/popup management, frame size                 |
+|                                                  | Dirvish, which-key, smartparens, rainbow-delimiters           |
+|                                                  | Ruff, Prettier, markdown-open                                 |
 
-For each `;;; SECTION` header in the current `config.el`, create a section file:
+The key question: *"Does this setting affect a specific package or mode?"*
+If yes → section file. If it's an Emacs-wide default → config.el.
+
+### Section Files — One Per `;;; HEADER` (No defaults.el)
+
+For each `;;; SECTION` header in the current `config.el`, create a section file.
+Settings **before** the first `;;;` header (pnpm path, Emacs-wide defaults,
+display-time) stay in `config.el` — they are universal, not package-specific.
 
 | config.el header                    | New file                 | Notes                                                  |
 | ----------------------------------- | ------------------------ | ------------------------------------------------------ |
-| _(top of file — before any header)_ | `sections/defaults.el`   | Core Emacs behaviour, pnpm path. display-time (currently at line 192) relocated here during the split. |
 | `;;; APPEARANCE`                    | `sections/appearance.el` | Font, theme, line-numbers                              |
-| `;;; SPELLCHECK`                    | `sections/spellcheck.el` | Jinx use-package! plus incf/decf aliases for Jinx legacy compat; config.el has the pnpm path fix only |
+| `;;; SPELLCHECK`                    | `sections/spellcheck.el` | Jinx use-package! plus incf/decf aliases for Jinx legacy compat; config.el has the universal defaults only |
 | `;;; ORG`                           | `sections/org.el`        | Org, Org-Roam, Org-Roam-UI                             |
 | `;;; DABBREV`                      | `sections/completion.el` | Abbrev file setup (two short `setq!` calls). Merged into completion.el for proximity — sits between ORG and COMPANY in current config. |
 | `;;; COMPANY`                       | `sections/completion.el` | Company backends                                       |
@@ -104,13 +131,15 @@ Each section file must:
 - **With a `;;; HEADER`** — copy from that header through the next header
   (or EOF).
 - **Without a header** (smartparens after SPELLCHECK, frame size after
-  WINDOW, display-time between DIRVISH and WHICH-KEY) — route by content
-  to the section listed in the table above. Verify with the Notes column.
+  WINDOW) — route by content to the section listed in the table above.
+  Verify with the Notes column.
 - (spellcheck.el only) The incf/decf aliases for Jinx 2.7 compat go here
   too, alongside the Jinx config they support.
 
 **Verification:** For each section file, diff against the corresponding header
-block in the current config.el to confirm content is identical.
+block in the current config.el to confirm content is identical. The universal
+defaults at the top (pnpm path, Emacs-wide settings, display-time) are NOT
+copied to section files — they stay in config.el.
 
 ## Documentation Updates
 
@@ -152,7 +181,7 @@ No Quick Index entry (sections are user config, not agent reference docs).
 ### PROFILE.md
 
 - **Quick Reference** line 6 — change `"init.el", "config.el", and "packages.el"`
-  to `"init.el", "config.el" (loader), "sections/*.el" (per-feature config), and "packages.el"`.
+  to `"init.el", "config.el" (loader with universal defaults), "sections/*.el" (per-feature config), and "packages.el"`.
 - **Custom Functions** table — `sand/org-display-inline-images-only-in-org` moves
   from `config.el` to `sections/org.el`. Update the Location column.
 - **Config Details code blocks** — update each section's file-path header to point
@@ -178,7 +207,7 @@ Follow the `domain_inventory_findings()` pattern (inventory dict, findings list,
 sorted reporting). Wire into `main()` as a new report call alongside the domain
 inventory pass.
 
-**Deferred: header-load alignment check.** The comment block (`;; sections/defaults.el ...`)
+**Deferred: header-load alignment check.** The comment block (`;; sections/appearance.el ...`)
 should list every loaded section in order. A future validator pass could parse
 `;; section/file.el` lines from that block and diff against `(load! ...)` lines.
 For now, add a `# TODO: check header comment alignment against (load! ...) lines`
@@ -193,13 +222,17 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
    Commit or stash any pending changes before proceeding.
 1. **Create `sections/` directory**
 2. **Write each section file** by copying from the corresponding `;;; HEADER`
-   block in current config.el (see File Contents table above); verify the
-   mode-line header matches `;;; $DOOMDIR/sections/<name>.el`
+   block in current config.el (see Section Files table above); verify the
+   mode-line header matches `;;; $DOOMDIR/sections/<name>.el`. Do NOT create
+   `defaults.el` — the universal settings at the top of config.el (pnpm path,
+   Emacs-wide defaults, display-time) stay in config.el.
 3. **Verify source completeness** — diff every line of old config.el against
-   the new files. Every line must appear in either config.el (pnpm, load!
-   block) or a section file (incf/decf aliases are part of spellcheck.el).
-   Run `wc -l config.el` on old config.el to get the expected total.
-4. **Replace `config.el`** with the lean loader shown above
+   the new files. Every line must appear in either:
+   - config.el (universal defaults + `load!` block)
+   - a section file (incf/decf aliases are part of spellcheck.el)
+   There are 7 section files + config.el. Run `wc -l config.el` on old
+   config.el to get the expected total.
+4. **Replace `config.el`** with the thin loader with universal defaults shown above
 5. **Load `python-best-practices` skill**, then extend `validate-docs.py` with
    the section inventory pass (see Validator section). After editing, run
    `ruff format --check scripts/validate-docs.py` (the skill's review checklist
@@ -248,7 +281,8 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
     ```
     move incf/decf into spellcheck.el per co-location principle
 
-    config.el is now a pure loader (pnpm path fix + load! calls only).
+    config.el is now a thin loader — universal Emacs-wide defaults sit
+    at the top, then a block of (load! ...) calls for section files.
     incf/decf Jinx legacy aliases go in sections/spellcheck.el alongside
     the Jinx config they support.
 
@@ -272,13 +306,12 @@ add it and run `shellcheck -x scripts/*.sh` before committing — the CI's
 
 | Risk                                           | Mitigation                                                                                                                                                                                |
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Spellcheck section includes incf/decf aliases for Jinx 2.7 compat | Solved — aliases live in spellcheck.el alongside the Jinx config they support, keeping config.el a pure loader. incf/decf are defined at load time, before any `:hook` can fire at runtime. |
+| Spellcheck section includes incf/decf aliases for Jinx 2.7 compat | Solved — aliases live in spellcheck.el alongside the Jinx config they support. Universal defaults in config.el load first, then section files, so incf/decf are defined before any `:hook` fires. |
 | Load order regression                          | Sections are independent — no functional coupling. Reorder if needed; any order works.                                                                                                    |
 | `(featurep! ...)` guard in navigation.el       | Already wrapped — stays in the section file.                                                                                                                                              |
 | Emacs won't start                              | Step 9 catches this. Rollback: `git checkout config.el && rm -rf sections/`.                                                                                                              |
 | Header comment drifts from load! lines         | Validator tracks load! vs filesystem but NOT load! vs header comment. The TODO in validate-docs.py flags this gap.                                                                        |
 | Section file mode-line path wrong after rename | The header `;;; $DOOMDIR/sections/<name>.el` hardcodes the path. Renaming a file without updating the header creates a stale comment. Naming is stable — the risk is low.                 |
-| Root file name collision with section file     | If someone creates `~/.config/doom/defaults.el` and config.el has `(load! "sections/defaults")`, the load is unambiguous. Safer never to have root files named the same as section stems. |
 | Stale PROFILE.md function locations            | Step 10 catches this.                                                                                                                                                                     |
 
 ## Anti-Drift
