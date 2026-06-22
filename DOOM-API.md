@@ -253,19 +253,21 @@ See `packages.el` for this config's unpinned packages and their reasons.
 
 ## 5. File Organization
 
-| File          | What Goes Here                                      | `doom sync`?            |
-| ------------- | --------------------------------------------------- | ----------------------- |
-| `init.el`     | Module declarations only                            | Yes                     |
-| `config.el`   | Settings, keybinds, hooks, advice, custom functions | This config prefers yes |
-| `packages.el` | Package declarations                                | Yes                     |
+| File               | What Goes Here                                        | `doom sync`?            |
+| ------------------ | ----------------------------------------------------- | ----------------------- |
+| `init.el`          | Module declarations only                              | Yes                     |
+| `config.el`        | Thin loader with universal defaults and `load!` calls | This config prefers yes |
+| `sections/*.el`    | Per-feature settings, hooks, advice, custom functions | This config prefers yes |
+| `sections/keys.el` | Centralized `map!` keybinding inventory, loaded last  | This config prefers yes |
+| `packages.el`      | Package declarations                                  | Yes                     |
 
 As `config.el` grows beyond ~50 lines per topic area, split into topic files
 and load them from config.el:
 
 ```elisp
-(load! "modules/org")
-(load! "modules/lsp")
-(load! "modules/keybindings")
+(load! "sections/org")
+(load! "sections/completion")
+(load! "sections/keys")
 ```
 
 ---

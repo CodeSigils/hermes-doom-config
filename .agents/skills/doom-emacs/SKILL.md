@@ -86,11 +86,13 @@ consultation, skill mirror sync).
 
 Doom splits config across three files. Putting the wrong thing in the wrong file is the most common mistake.
 
-| File          | Purpose                                                  | `doom sync` needed? |
-| :------------ | :------------------------------------------------------- | :------------------ |
-| `init.el`     | Declare which Doom modules are enabled, with their flags | Yes                 |
-| `packages.el` | Install external packages (MELPA, git repos)             | Yes                 |
-| `config.el`   | Settings, keybinds, hooks, advice, custom functions      | Depends on config   |
+| File               | Purpose                                                  | `doom sync` needed? |
+| :----------------- | :------------------------------------------------------- | :------------------ |
+| `init.el`          | Declare which Doom modules are enabled, with their flags | Yes                 |
+| `packages.el`      | Install external packages (MELPA, git repos)             | Yes                 |
+| `config.el`        | Thin loader with universal defaults and `load!` calls    | Depends on config   |
+| `sections/`        | Split config loaded via `(load! ...)` from `config.el`   | No                  |
+| `sections/keys.el` | Centralized keybinding inventory loaded last             | No                  |
 
 ## Writing Conventions
 
@@ -100,6 +102,10 @@ Patterns that apply to any Doom config:
 - Use `after!` for deferred config — never `with-eval-after-load`
 - Use `use-package!` for package configuration — never standard `use-package`
 - Use `map!` for keybindings; `:leader` prefix for global bindings
+- In this repo, keep all `map!` forms in `sections/keys.el`, grouped by
+  package or prefix. Use `(:map override ...)` for global chords that must beat
+  minor-mode maps, and `(:after <pkg> :map <map> ...)` inside `map!` for
+  package-specific maps.
 - Use `fboundp` guards for optional package entrypoints (e.g. `(when (fboundp 'some-command) (some-command 1))`)
 - Comment out unused modules in `init.el` — never delete lines
 - Snippets live under `<doom-user-dir>/snippets/<major-mode>/`
@@ -162,6 +168,10 @@ package recipe errors that would otherwise fail silently.
 - **Bind launcher keys outside `after!`** — putting a keybinding inside `(after! <pkg> ...)` delays the binding until
   the package loads. For commands meant to be run immediately, bind them directly and defer only the package
   configuration.
+- **Scattering keybindings across feature sections** — this repo intentionally
+  uses a centralized `sections/keys.el`, following the ztlevi-style all-keys
+  inventory. Keep every `map!` form there; review a feature by checking both its
+  section file and `sections/keys.el`.
 
 ## Domain Drift Governance
 

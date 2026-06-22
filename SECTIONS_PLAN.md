@@ -11,9 +11,9 @@ This is a **refactoring**: all behavior is preserved, only the file layout chang
 
 Research backing the approach: popular Doom configs use one of two patterns —
 monolithic with headers (hlissner, 205★) or `load!` split with universal
-settings in the loader (ztlevi, 223★). Our plan follows the latter, keeping
-global-only settings directly in `config.el` and moving package/mode-specific
-config to section files.
+settings in the loader (ztlevi, 223★). Our plan follows the latter, with two
+explicit ztlevi-inspired refinements: global-only settings stay directly in
+`config.el`, and all keybindings move to a centralized `sections/keys.el` file.
 
 ## Motivation
 
@@ -22,18 +22,21 @@ This formalises the existing structure.
 
 **What this gains (ROI):**
 
-| Benefit                                                            | Real at current size?                                   |
-| ------------------------------------------------------------------ | ------------------------------------------------------- |
-| `git blame` per feature (isolated file, not shared config.el)      | Yes — meaningful even at this size                      |
-| Agent-friendly navigation (agents target files, not grep sections) | Yes — agents match `sections/spellcheck.el` by name     |
-| Future-proofing for growth past 500 lines                          | Pre-emptive — lighter to do now than during a migration |
-| Easier to review Org-only changes                                  | Yes — diff shows only sections/org.el                   |
+| Benefit                                                            | Real at current size?                                       |
+| ------------------------------------------------------------------ | ----------------------------------------------------------- |
+| `git blame` per feature (isolated file, not shared config.el)      | Yes — meaningful even at this size                          |
+| Centralized keybinding inventory                                   | Yes — agents and humans inspect one file for key behavior   |
+| Agent-friendly navigation (agents target files, not grep sections) | Yes — agents match `sections/spellcheck.el` by name         |
+| Future-proofing for growth past 500 lines                          | Pre-emptive — lighter to do now than during a migration     |
+| Easier to review Org-only changes                                  | Yes — diff shows config in sections/org.el, keys in keys.el |
 
 **What this costs:**
 
 - 8 new files + directory structure at repo root
 - `(load! ...)` indirection — reading a symbol sometimes requires opening two files
 - One more mental model (load order) for what is mostly independent config
+- Keybindings are intentionally separated from package config; reviewing a feature
+  may require checking both its section file and `sections/keys.el`
 - Plan content (split description + notes) goes stale after execution
 
 **Verdict:** Marginal today, better-than-neutral for the next feature addition.
@@ -85,6 +88,7 @@ copied from the existing `;;; HEADER` blocks in config.el.
 ;;   sections/navigation.el    Browser, window management, popups, frame
 ;;   sections/ui.el            Dirvish, which-key, smartparens, rainbow-delimiters
 ;;   sections/formatting.el    Ruff (Python), Prettier (Markdown)
+;;   sections/keys.el          All keybindings, loaded last
 (load! "sections/appearance")
 (load! "sections/spellcheck")
 (load! "sections/org")
@@ -92,21 +96,28 @@ copied from the existing `;;; HEADER` blocks in config.el.
 (load! "sections/navigation")
 (load! "sections/ui")
 (load! "sections/formatting")
+(load! "sections/keys")
 ```
 
 **Why some settings stay in config.el and others don't:**
 
-| Belongs in config.el (universal)                | Belongs in section file (package/mode-specific)               |
-| ----------------------------------------------- | ------------------------------------------------------------- |
-| pnpm path, exec-path setup                      | Jinx config, incf/decf aliases                                |
-| `delete-by-moving-to-trash`, `confirm-kill-emacs` | Org files, Org-Roam, Org-Roam-UI                            |
-| `global-prettify-symbols-mode`, `global-subword-mode` | Company backends, dabbrev                                |
-| `display-time-mode`                             | Browser, window/popup management, frame size                 |
-|                                                  | Dirvish, which-key, smartparens, rainbow-delimiters           |
-|                                                  | Ruff, Prettier, markdown-open                                 |
+| Belongs in config.el (universal)                      | Belongs in section file (package/mode-specific)     |
+| ----------------------------------------------------- | --------------------------------------------------- |
+| pnpm path, exec-path setup                            | Jinx config, incf/decf aliases                      |
+| `delete-by-moving-to-trash`, `confirm-kill-emacs`     | Org files, Org-Roam, Org-Roam-UI                    |
+| `global-prettify-symbols-mode`, `global-subword-mode` | Company backends, dabbrev                           |
+| `display-time-mode`                                   | Browser, window/popup management, frame size        |
+|                                                       | Dirvish, which-key, smartparens, rainbow-delimiters |
+|                                                       | Ruff, Prettier, markdown-open                       |
+|                                                       | All keybindings (`sections/keys.el`)                |
 
-The key question: *"Does this setting affect a specific package or mode?"*
-If yes → section file. If it's an Emacs-wide default → config.el.
+The key question for settings: _"Does this setting affect a specific package or
+mode?"_ If yes → section file. If it's an Emacs-wide default → config.el.
+
+Keybindings are the deliberate exception to co-location. ztlevi's `+keys.el`
+is a strong real-world example: a single key inventory makes global overrides,
+leader prefixes, `(:map override ...)`, and `(:after <pkg> :map <map> ...)`
+patterns easier to audit than scattered `map!` blocks.
 
 ### Section Files — One Per `;;; HEADER` (No defaults.el)
 
@@ -114,22 +125,27 @@ For each `;;; SECTION` header in the current `config.el`, create a section file.
 Settings **before** the first `;;;` header (pnpm path, Emacs-wide defaults,
 display-time) stay in `config.el` — they are universal, not package-specific.
 
-| config.el header                    | New file                 | Notes                                                  |
-| ----------------------------------- | ------------------------ | ------------------------------------------------------ |
-| `;;; APPEARANCE`                    | `sections/appearance.el` | Font, theme, line-numbers                              |
-| `;;; SPELLCHECK`                    | `sections/spellcheck.el` | Jinx use-package! plus incf/decf aliases for Jinx legacy compat; config.el has the universal defaults only |
-| `;;; ORG`                           | `sections/org.el`        | Org, Org-Roam, Org-Roam-UI                             |
-| `;;; DABBREV`                      | `sections/completion.el` | Abbrev file setup (two short `setq!` calls). Merged into completion.el for proximity — sits between ORG and COMPANY in current config. |
-| `;;; COMPANY`                       | `sections/completion.el` | Company backends                                       |
-| `;;; NAVIGATION`                    | `sections/navigation.el` | Browser, window/popup management, frame size           |
-| `;;; UI`                            | `sections/ui.el`         | Dirvish, which-key, smartparens, rainbow-delimiters    |
-| `;;; FORMATTING`                    | `sections/formatting.el` | Ruff, Prettier, markdown-open                          |
+| config.el header | New file                 | Notes                                                                                                                                  |
+| ---------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `;;; APPEARANCE` | `sections/appearance.el` | Font, theme, line-numbers                                                                                                              |
+| `;;; SPELLCHECK` | `sections/spellcheck.el` | Jinx use-package! plus incf/decf aliases for Jinx legacy compat; config.el has the universal defaults only                             |
+| `;;; ORG`        | `sections/org.el`        | Org, Org-Roam, Org-Roam-UI                                                                                                             |
+| `;;; DABBREV`    | `sections/completion.el` | Abbrev file setup (two short `setq!` calls). Merged into completion.el for proximity — sits between ORG and COMPANY in current config. |
+| `;;; COMPANY`    | `sections/completion.el` | Company backends                                                                                                                       |
+| `;;; NAVIGATION` | `sections/navigation.el` | Browser, window/popup management, frame size                                                                                           |
+| `;;; UI`         | `sections/ui.el`         | Dirvish, which-key, smartparens, rainbow-delimiters                                                                                    |
+| `;;; FORMATTING` | `sections/formatting.el` | Ruff, Prettier, markdown-open                                                                                                          |
+| All `map!` forms | `sections/keys.el`       | Centralized keybinding inventory; loaded last                                                                                          |
 
 Each section file must:
 
 - Start with `;;; $DOOMDIR/sections/<name>.el -*- lexical-binding: t; -*-`
 - **With a `;;; HEADER`** — copy from that header through the next header
-  (or EOF).
+  (or EOF), except for `map!` forms.
+- **All keybindings** — move every `map!` form to `sections/keys.el`, grouped by
+  package or prefix. Use `(:after <pkg> :map <map> ...)` inside `map!` for
+  package maps and `(:map override ...)` for global overrides that must win
+  over minor modes.
 - **Without a header** (smartparens after SPELLCHECK, frame size after
   WINDOW) — route by content to the section listed in the table above.
   Verify with the Notes column.
@@ -137,9 +153,10 @@ Each section file must:
   too, alongside the Jinx config they support.
 
 **Verification:** For each section file, diff against the corresponding header
-block in the current config.el to confirm content is identical. The universal
-defaults at the top (pnpm path, Emacs-wide settings, display-time) are NOT
-copied to section files — they stay in config.el.
+block in the current config.el to confirm content is identical except for
+`map!` forms, which are intentionally moved to `sections/keys.el`. The
+universal defaults at the top (pnpm path, Emacs-wide settings, display-time)
+are NOT copied to section files — they stay in config.el.
 
 ## Documentation Updates
 
@@ -156,8 +173,9 @@ Drift prevention table — one row:
 Agent Workflow — add bullet:
 
 ```
-- When adding new config, place it in the appropriate sections/*.el file
-  and register it with a (load! ...) line in config.el.
+- When adding new settings/hooks/advice, place them in the appropriate
+  sections/*.el file and register new sections with a (load! ...) line in
+  config.el. Place all keybindings in sections/keys.el.
 ```
 
 ### SKILL.md
@@ -166,6 +184,7 @@ File Roles table — one row:
 
 ```
 | sections/        | Split config loaded via (load! ...) from config.el | No       |
+| sections/keys.el | Centralized keybinding inventory loaded last       | No       |
 ```
 
 No Quick Index entry (sections are user config, not agent reference docs).
@@ -173,7 +192,8 @@ No Quick Index entry (sections are user config, not agent reference docs).
 ### README.md
 
 - **Key Features** — add note that per-feature config lives in `sections/*.el`,
-  with `config.el` as the loader.
+  with `config.el` as the loader and `sections/keys.el` as the centralized
+  keybinding inventory.
 - **Notes** — mention `sections/` as the home for split settings.
 - **Agent Script Awareness** — update the config.el reference if the diagram
   mentions config.el file structure.
@@ -181,7 +201,7 @@ No Quick Index entry (sections are user config, not agent reference docs).
 ### PROFILE.md
 
 - **Quick Reference** line 6 — change `"init.el", "config.el", and "packages.el"`
-  to `"init.el", "config.el" (loader with universal defaults), "sections/*.el" (per-feature config), and "packages.el"`.
+  to `"init.el", "config.el" (loader with universal defaults), "sections/*.el" (per-feature config), "sections/keys.el" (keybindings), and "packages.el"`.
 - **Custom Functions** table — `sand/org-display-inline-images-only-in-org` moves
   from `config.el` to `sections/org.el`. Update the Location column.
 - **Config Details code blocks** — update each section's file-path header to point
@@ -189,6 +209,7 @@ No Quick Index entry (sections are user config, not agent reference docs).
   - Jinx spell-checking config -> `sections/spellcheck.el`
   - Dirvish config -> `sections/ui.el`
   - Org-Tempo config -> `sections/org.el`
+  - Jinx and Dirvish keybindings -> `sections/keys.el`
     (The code blocks themselves are documentation; they duplicate the section files.
     Do NOT attempt to make PROFILE.md authoritative — it is a human summary. Just
     update the file paths.)
@@ -225,13 +246,15 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
    block in current config.el (see Section Files table above); verify the
    mode-line header matches `;;; $DOOMDIR/sections/<name>.el`. Do NOT create
    `defaults.el` — the universal settings at the top of config.el (pnpm path,
-   Emacs-wide defaults, display-time) stay in config.el.
+   Emacs-wide defaults, display-time) stay in config.el. DO create
+   `sections/keys.el` and move every `map!` form there.
 3. **Verify source completeness** — diff every line of old config.el against
    the new files. Every line must appear in either:
    - config.el (universal defaults + `load!` block)
    - a section file (incf/decf aliases are part of spellcheck.el)
-   There are 7 section files + config.el. Run `wc -l config.el` on old
-   config.el to get the expected total.
+   - sections/keys.el (all `map!` forms)
+     There are 8 section files + config.el. Run `wc -l config.el` on old
+     config.el to get the expected total.
 4. **Replace `config.el`** with the thin loader with universal defaults shown above
 5. **Load `python-best-practices` skill**, then extend `validate-docs.py` with
    the section inventory pass (see Validator section). After editing, run
@@ -265,8 +288,8 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
     - `validate-docs.py` itself — run it to confirm the new section inventory
       pass reports no findings
 18. **Commit with decision-aware messages** — `git log` is the historical
-    record for agents. Each commit message should capture *why* a decision
-    was made, not just *what* changed:
+    record for agents. Each commit message should capture _why_ a decision
+    was made, not just _what_ changed:
 
     ```
     <action>: <brief summary>
@@ -279,17 +302,18 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
     Example:
 
     ```
-    move incf/decf into spellcheck.el per co-location principle
+    split config into sections with centralized keys
 
     config.el is now a thin loader — universal Emacs-wide defaults sit
     at the top, then a block of (load! ...) calls for section files.
     incf/decf Jinx legacy aliases go in sections/spellcheck.el alongside
-    the Jinx config they support.
+    the Jinx config they support. Keybindings move to sections/keys.el
+    as a single searchable inventory, loaded last.
 
     Aliases are defined at load time via (load! ...), well before any
-    :hook can fire at runtime — no silent void-function risk. Separating
-    the workaround from the config it supports would violate the rule
-    "config belongs with the module it modifies."
+    :hook can fire at runtime — no silent void-function risk. Centralized
+    keys intentionally trade strict co-location for easier audit of global
+    overrides, leader prefixes, and package-map bindings.
     ```
 
     Avoid one-liners like "fix typo" or "update plan" — they tell an agent
@@ -304,19 +328,21 @@ add it and run `shellcheck -x scripts/*.sh` before committing — the CI's
 
 ## Risks
 
-| Risk                                           | Mitigation                                                                                                                                                                                |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Risk                                                              | Mitigation                                                                                                                                                                                        |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Spellcheck section includes incf/decf aliases for Jinx 2.7 compat | Solved — aliases live in spellcheck.el alongside the Jinx config they support. Universal defaults in config.el load first, then section files, so incf/decf are defined before any `:hook` fires. |
-| Load order regression                          | Sections are independent — no functional coupling. Reorder if needed; any order works.                                                                                                    |
-| `(featurep! ...)` guard in navigation.el       | Already wrapped — stays in the section file.                                                                                                                                              |
-| Emacs won't start                              | Step 9 catches this. Rollback: `git checkout config.el && rm -rf sections/`.                                                                                                              |
-| Header comment drifts from load! lines         | Validator tracks load! vs filesystem but NOT load! vs header comment. The TODO in validate-docs.py flags this gap.                                                                        |
-| Section file mode-line path wrong after rename | The header `;;; $DOOMDIR/sections/<name>.el` hardcodes the path. Renaming a file without updating the header creates a stale comment. Naming is stable — the risk is low.                 |
-| Stale PROFILE.md function locations            | Step 10 catches this.                                                                                                                                                                     |
+| Centralized keys drift from package config                        | `sections/keys.el` is loaded last and grouped by package/prefix. Feature review should check both the section file and keys file.                                                                 |
+| Load order regression                                             | Sections are independent — no functional coupling. Reorder if needed; any order works.                                                                                                            |
+| `(featurep! ...)` guard in navigation.el                          | Already wrapped — stays in the section file.                                                                                                                                                      |
+| Emacs won't start                                                 | Step 9 catches this. Rollback: `git checkout config.el && rm -rf sections/`.                                                                                                                      |
+| Header comment drifts from load! lines                            | Validator tracks load! vs filesystem but NOT load! vs header comment. The TODO in validate-docs.py flags this gap.                                                                                |
+| Section file mode-line path wrong after rename                    | The header `;;; $DOOMDIR/sections/<name>.el` hardcodes the path. Renaming a file without updating the header creates a stale comment. Naming is stable — the risk is low.                         |
+| Stale PROFILE.md function locations                               | Step 10 catches this.                                                                                                                                                                             |
 
 ## Anti-Drift
 
 - **config.el header block** is the single authoritative listing of all sections.
+- **sections/keys.el** is the single authoritative listing of all keybindings.
 - **validate-docs.py section inventory pass** checks every `(load! ...)` resolves
   to a file, and flags orphaned section files.
 - **validate-docs.py TODO** notes the header-comment alignment gap (deferred).
@@ -324,8 +350,9 @@ add it and run `shellcheck -x scripts/*.sh` before committing — the CI's
 - **README.md Key Features**: references sections/ directory structure.
 - **PROFILE.md**: queries reference `sections/*.el`, not `config.el` directly.
 - **SKILL.md File Roles**: one generic `sections/` row.
-- **Agent workflow**: explicit instruction to add new config to a section file
-  and register with a `(load! ...)` line in config.el.
+- **Agent workflow**: explicit instruction to add new settings/hooks/advice to a
+  section file, add new keybindings to `sections/keys.el`, and register new
+  section files with a `(load! ...)` line in config.el.
 - **Section file headers**: each mode-line comment names the file's own path;
   self-consistent, no cross-file drift.
 - No per-file listings outside config.el — no duplication to drift.
@@ -352,20 +379,20 @@ consolidate scattered guidance.
 
 ### Changes Made
 
-| Change                          | File affected                             | Why                                               |
-| ------------------------------- | ----------------------------------------- | ------------------------------------------------- |
-| Create best-practices.md        | `references/best-practices.md` (new)      | Consolidate scattered guidance into one file      |
-| Add Reference Map table         | `AGENTS.md` (Reference Map section)       | Show all 11 files with paths at step 3            |
-| Update entry order              | `AGENTS.md` (Read First)                  | Note depth layers exist beyond the 5-step path    |
-| Broaden Cross-References        | `AGENTS.md` (table)                       | Include package-management.md and best-practices.md|
-| Drift table update              | `AGENTS.md` (Drift Prevention)            | Add best-practices.md as tracked source of truth  |
-| Update Quick Index              | `SKILL.md`                                | Add best-practices.md row                         |
-| Update Reference Sources        | `SKILL.md`                                | Add best-practices.md to local refs list          |
-| Update Related Files            | `PROFILE.md`                              | Add best-practices.md                             |
-| Swap entry steps 4 and 5       | `AGENTS.md` (Read First)                  | SKILL.md (local) before INDEX.md (external)      |
-| Link SS7 to best-practices.md  | `DOOM-API.md` (SS7)                       | Agents reading DOOM-API.md find the consolidated ref |
-| Add sibling cross-links        | all 4 `domains/` files                    | Any domain file links to the other three          |
-| Broaden source-of-truth        | `PROFILE.md` line 6                       | Mention AGENTS.md and references/ alongside config files |
+| Change                        | File affected                        | Why                                                      |
+| ----------------------------- | ------------------------------------ | -------------------------------------------------------- |
+| Create best-practices.md      | `references/best-practices.md` (new) | Consolidate scattered guidance into one file             |
+| Add Reference Map table       | `AGENTS.md` (Reference Map section)  | Show all 11 files with paths at step 3                   |
+| Update entry order            | `AGENTS.md` (Read First)             | Note depth layers exist beyond the 5-step path           |
+| Broaden Cross-References      | `AGENTS.md` (table)                  | Include package-management.md and best-practices.md      |
+| Drift table update            | `AGENTS.md` (Drift Prevention)       | Add best-practices.md as tracked source of truth         |
+| Update Quick Index            | `SKILL.md`                           | Add best-practices.md row                                |
+| Update Reference Sources      | `SKILL.md`                           | Add best-practices.md to local refs list                 |
+| Update Related Files          | `PROFILE.md`                         | Add best-practices.md                                    |
+| Swap entry steps 4 and 5      | `AGENTS.md` (Read First)             | SKILL.md (local) before INDEX.md (external)              |
+| Link SS7 to best-practices.md | `DOOM-API.md` (SS7)                  | Agents reading DOOM-API.md find the consolidated ref     |
+| Add sibling cross-links       | all 4 `domains/` files               | Any domain file links to the other three                 |
+| Broaden source-of-truth       | `PROFILE.md` line 6                  | Mention AGENTS.md and references/ alongside config files |
 
 ### What the Reference Map Gives an Agent
 
