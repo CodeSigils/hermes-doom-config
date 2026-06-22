@@ -1,10 +1,10 @@
 # Sections Split Plan
 
-> **One-shot construction guide.** The section file contents below document what
-> to write — they go stale once the split executes. After execution, `config.el`
-> (with its header comment block) is the single authoritative section inventory.
+> **One-shot construction guide.** After execution, `config.el` (with its header
+> comment block) is the single authoritative section inventory. This plan goes
+> stale once the split is done.
 
-Split `config.el` (235 lines) into a lean loader and section files.
+Split `config.el` into a lean loader and section files.
 Keep `packages.el` and `init.el` as-is.
 
 ## Motivation
@@ -14,30 +14,34 @@ This formalises the existing structure.
 
 **What this gains (ROI):**
 
-| Benefit                                                            | Real for 235 lines?                                       |
-| ------------------------------------------------------------------ | --------------------------------------------------------- |
-| `git blame` per feature (isolated file, not shared config.el)      | Yes — meaningful even at 235 lines                        |
-| Agent-friendly navigation (agents target files, not grep sections) | Yes — agents match `sections/spellcheck.el` by name       |
-| Future-proofing for growth past 500 lines                          | Pre-emptive — plan is lighter now than during a migration |
-| Easier to review Org-only changes                                  | Yes — diff shows only sections/org.el                     |
+| Benefit                                                            | Real at current size?                                   |
+| ------------------------------------------------------------------ | ------------------------------------------------------- |
+| `git blame` per feature (isolated file, not shared config.el)      | Yes — meaningful even at this size                      |
+| Agent-friendly navigation (agents target files, not grep sections) | Yes — agents match `sections/spellcheck.el` by name     |
+| Future-proofing for growth past 500 lines                          | Pre-emptive — lighter to do now than during a migration |
+| Easier to review Org-only changes                                  | Yes — diff shows only sections/org.el                   |
 
 **What this costs:**
 
 - 8 new files + directory structure at repo root
 - `(load! ...)` indirection — reading a symbol sometimes requires opening two files
 - One more mental model (load order) for what is mostly independent config
-- Plan content (lines 51-311) will go stale immediately after execution
+- Plan content (split description + notes) goes stale after execution
 
 **Verdict:** Marginal today, better-than-neutral for the next feature addition.
 The split is mechanical (copy-paste + `load!`), low risk with `check-parens` and
-`doom sync` gates. If the config stays at 235 lines forever, the cost is a few
+`doom sync` gates. If the config stays at this size forever, the cost is a few
 extra files. If it grows, the structure repays the overhead.
 
-## File Contents
+## File Contents — What Goes Where
 
 ### config.el (post-split) — single source of truth for section inventory
 
-```
+This is the **only** file whose exact content must be as shown below (it is new
+structure, not derived from the current config.el). All other section files are
+copied from the existing `;;; HEADER` blocks in config.el.
+
+```elisp
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here. Section files under sections/
@@ -81,271 +85,37 @@ extra files. If it grows, the structure repays the overhead.
 (load! "sections/formatting")
 ```
 
-**Note on incf/decf placement:** These aliases are the _only reason_ config.el
+**incf/decf placement rationale:** These aliases are the _only reason_ config.el
 is not a pure loader. They must execute before any Jinx autoload fires. Putting
 them in config.el (rather than a section file) makes the load guarantee
 unambiguous: they run before the first `(load! ...)`, which is before any
-`:hook` can trigger. If they were in `sections/spellcheck.el`, a future edit
-that reorders or splits that file could break Jinx silently.
+`:hook` can trigger. If they were in a section file, a future reorder or
+rename could break Jinx silently.
 
-### sections/defaults.el
+### Section Files — Copied from Current `config.el` Headers
 
-```
-;;; $DOOMDIR/sections/defaults.el -*- lexical-binding: t; -*-
+For each `;;; SECTION` header in the current `config.el`, create a section file:
 
-(setq! delete-by-moving-to-trash t
-      window-combination-resize t
-      confirm-kill-emacs nil
-      confirm-kill-processes nil
-      evil-want-fine-undo t
-      truncate-string-ellipsis "...")
+| config.el header                    | New file                 | Notes                                                  |
+| ----------------------------------- | ------------------------ | ------------------------------------------------------ |
+| _(top of file — before any header)_ | `sections/defaults.el`   | Core Emacs behaviour, display-time                     |
+| `;;; APPEARANCE`                    | `sections/appearance.el` | Font, theme, line-numbers                              |
+| `;;; SPELLCHECK`                    | `sections/spellcheck.el` | Jinx config only — incf/decf aliases stay in config.el |
+| `;;; ORG`                           | `sections/org.el`        | Org, Org-Roam, Org-Roam-UI                             |
+| `;;; COMPANY`                       | `sections/completion.el` | Company backends, dabbrev                              |
+| `;;; NAVIGATION`                    | `sections/navigation.el` | Browser, window/popup management, frame size           |
+| `;;; UI`                            | `sections/ui.el`         | Dirvish, which-key, smartparens, rainbow-delimiters    |
+| `;;; FORMATTING`                    | `sections/formatting.el` | Ruff, Prettier, markdown-open                          |
 
-;; Time
-(setq! display-time-24hr-format t)
-(display-time-mode 1)
-```
+Each section file must:
 
-### sections/appearance.el
+- Start with `;;; $DOOMDIR/sections/<name>.el -*- lexical-binding: t; -*-`
+- Contain exactly the code from under that header in the _current_ config.el
+- (spellcheck.el only) Exclude the incf/decf aliases — they stay in config.el.
+  Add a comment at the top referencing config.el for those aliases.
 
-```
-;;; $DOOMDIR/sections/appearance.el -*- lexical-binding: t; -*-
-
-(setq! doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 22)
-      doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font" :size 20))
-(setq! doom-theme 'doom-tokyo-night)
-(setq! display-line-numbers-type t)
-
-(global-prettify-symbols-mode 1)
-(global-subword-mode 1)
-```
-
-### sections/spellcheck.el
-
-```
-;;; $DOOMDIR/sections/spellcheck.el -*- lexical-binding: t; -*-
-
-;; Fast async spell checking via Enchant/Hunspell.
-;; incf/decf compatibility aliases are in config.el (loaded before any
-;; use-package! :hook can fire). Do not move them into this file — see
-;; config.el for rationale.
-
-(use-package! jinx
-  :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
-  :config
-  (setq! jinx-languages "en_US")
-  (map! "M-$" #'jinx-correct
-        "C-M-$" #'jinx-languages
-        :leader
-        (:prefix ("s" . "spelling")
-         :desc "Correct word" "c" #'jinx-correct
-         :desc "Next misspelling" "n" #'jinx-next
-         :desc "Previous misspelling" "p" #'jinx-previous)))
-```
-
-### sections/org.el
-
-```
-;;; $DOOMDIR/sections/org.el -*- lexical-binding: t; -*-
-
-(setq! org-directory "~/notes/org/")
-
-(defun sand/org-display-inline-images-only-in-org (fn &rest args)
-  "Only run Org inline-image display in Org buffers."
-  (when (derived-mode-p 'org-mode)
-    (apply fn args)))
-
-(after! org
-  (require 'org-tempo)
-  (add-hook! 'org-mode-hook #'+org-pretty-mode)
-
-  ;; Inline images
-  (setq! org-startup-with-inline-images t
-        org-display-remote-inline-images 'cache
-        org-image-actual-width 600)
-
-  ;; Defensive guard: some image/advice integrations can call Org's inline
-  ;; image display from non-Org buffers, which makes `org-element' try to
-  ;; parse Markdown buffers like AGENTS.md.
-  (advice-add #'org-display-inline-images
-              :around #'sand/org-display-inline-images-only-in-org)
-  (when (fboundp 'org-display-user-inline-images)
-    (advice-remove #'org-display-inline-images
-                   #'org-display-user-inline-images)))
-
-;; Org Roam
-(setq! org-roam-directory "~/notes/org/roam")
-
-(after! org-roam
-  (when (fboundp 'org-roam-db-autosync-mode)
-    (org-roam-db-autosync-mode 1)))
-
-(use-package! org-roam-ui
-  :after org-roam
-  :commands org-roam-ui-mode
-  :config
-  (setq! org-roam-ui-sync-theme t
-        org-roam-ui-follow t
-        org-roam-ui-update-on-save t))
-```
-
-### sections/completion.el
-
-```
-;;; $DOOMDIR/sections/completion.el -*- lexical-binding: t; -*-
-
-;; Dabbrev
-(setq! abbrev-file-name (expand-file-name "abbrev.el" doom-user-dir))
-(setq! save-abbrevs nil)
-
-;; Company
-(after! company
-  ;; Doom's Company module is enabled, but its default backend lists do not
-  ;; put `company-files' in the common mode backends. Add it explicitly so
-  ;; paths are suggested after prefixes like ./, ../, ~/, /, and Org file:
-  ;; links.
-  (setq! company-idle-delay 0.2
-        company-minimum-prefix-length 1
-        company-tooltip-limit 12
-        company-tooltip-align-annotations t
-        company-require-match 'never
-        company-selection-wrap-around t
-        company-show-numbers t
-        ;; Search same-mode buffers for dabbrev without scanning every buffer.
-        company-dabbrev-other-buffers t
-        company-dabbrev-code-other-buffers t)
-
-  (set-company-backend! 'prog-mode
-    'company-files
-    '(company-capf :with company-yasnippet)
-    'company-dabbrev-code)
-
-  (set-company-backend! 'conf-mode
-    'company-files
-    '(company-capf :with company-yasnippet)
-    'company-dabbrev-code)
-
-  (set-company-backend! 'text-mode
-    'company-files
-    '(:separate company-dabbrev company-yasnippet company-ispell))
-
-  (set-company-backend! '(org-mode markdown-mode)
-    'company-files
-    '(company-capf :with company-yasnippet)
-    '(:separate company-dabbrev company-ispell)))
-```
-
-### sections/navigation.el
-
-```
-;;; $DOOMDIR/sections/navigation.el -*- lexical-binding: t; -*-
-
-;; Browser
-(when-let ((browser (getenv "BROWSER")))
-  (setq! browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program browser))
-
-;; Window management
-(setq! switch-to-buffer-obey-display-actions t)
-(winner-mode 1)
-
-(defun sand/split-window-sensibly (&optional window)
-  "Prefer side-by-side splits, then fall back to below splits."
-  (let ((window (or window (selected-window))))
-    (or (and (window-splittable-p window t)
-             (with-selected-window window
-               (split-window-right)))
-        (and (window-splittable-p window)
-             (with-selected-window window
-               (split-window-below))))))
-
-(setq! split-window-preferred-function #'sand/split-window-sensibly)
-
-;; Popups — keep common transient/help buffers out of the main editing layout
-;; (boundary note: these use :ui popup features, placed here for window
-;;  management grouping — could also live in ui.el)
-(when (featurep! :ui popup)
-  (set-popup-rule! "^\\*\\(?:Help\\|Apropos\\|Warnings\\|Backtrace\\|Messages\\|Completions\\)\\*"
-    :size 0.35 :ttl 0 :quit t :select nil)
-  (set-popup-rule! "^\\*\\(?:Compile-Log\\|compilation\\|Shell Command Output\\|Async Shell Command\\)\\*"
-    :size 0.3 :ttl 0 :quit t :select nil)
-  (set-popup-rule! "^\\*doom:[^*]+\\*"
-    :size 0.35 :ttl 0 :quit t :select nil))
-
-;; Initial frame size
-(defun sand/initial-frame-size ()
-  "Return a monitor-aware initial frame size."
-  (cond
-   ((>= (display-pixel-width) 2560) '((width . 140) (height . 60)))
-   ((>= (display-pixel-width) 1920) '((width . 124) (height . 55)))
-   (t '((width . 100) (height . 45)))))
-
-(setq! initial-frame-alist
-      (append '((top . 1) (left . 1))
-              (sand/initial-frame-size)))
-```
-
-### sections/ui.el
-
-```
-;;; $DOOMDIR/sections/ui.el -*- lexical-binding: t; -*-
-
-;; Smartparens
-(after! smartparens
-  (show-smartparens-global-mode 1))
-
-;; Dirvish
-(map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)
-
-(after! dirvish
-  (setq! dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
-  (setq! dirvish-subtree-state-style 'nerd)
-  (setq! dirvish-path-separators
-        (list (format " %s " (nerd-icons-codicon "nf-cod-home"))
-              (format " %s " (nerd-icons-codicon "nf-cod-root_folder"))
-              (format " %s " (nerd-icons-faicon "nf-fa-angle_right")))))
-
-;; Which-key
-(after! which-key
-  (setq! which-key-min-display-lines 12
-        which-key-idle-delay 0.3))
-
-;; Rainbow delimiters
-(use-package! rainbow-delimiters
-  :hook ((org-mode prog-mode) . rainbow-delimiters-mode))
-```
-
-### sections/formatting.el
-
-```
-;;; $DOOMDIR/sections/formatting.el -*- lexical-binding: t; -*-
-
-;; Python formatting (ruff)
-;; Ruff is on PATH at ~/.local/bin/ruff, installed via pnpm global.
-;; Doom's (format +onsave) + apheleia autodetects it, but be explicit.
-(after! python
-  (set-formatter! 'ruff "ruff format --stdin-filename=%b -"
-    :modes '(python-mode))
-  (setq! +format-with-lsp nil))
-
-;; Markdown formatting (prettier)
-;; Prettier handles markdown structure: tables, list indentation, fences.
-;; Installed globally via pnpm at ~/.local/share/pnpm/bin/prettier.
-(use-package! apheleia
-  :config
-  (setf (alist-get 'prettier-markdown apheleia-formatters)
-        '("prettier" "--parser" "markdown"))
-  (setf (alist-get 'markdown-mode apheleia-mode-alist) 'prettier-markdown)
-  (setf (alist-get 'gfm-mode apheleia-mode-alist) 'prettier-markdown))
-
-;; Use marked for compilation so markdown-open renders HTML in BrowserOS
-(after! markdown-mode
-  (setq! markdown-open-command
-        (lambda ()
-          (interactive)
-          (let ((browse-url-browser-function 'browse-url-xdg-open))
-            (browse-url-of-buffer
-             (markdown-standalone (generate-new-buffer-name "*marked*")))))))
-```
+**Verification:** For each section file, diff against the corresponding header
+block in the current config.el to confirm content is identical.
 
 ## Documentation Updates
 
@@ -392,72 +162,74 @@ No Quick Index entry (sections are user config, not agent reference docs).
   from `config.el` to `sections/org.el`. Update the Location column.
 - **Config Details code blocks** — update each section's file-path header to point
   to the new section file instead of config.el:
-  - Jinx spell-checking config → `sections/spellcheck.el`
-  - Dirvish config → `sections/ui.el`
-  - Org-Tempo config → `sections/org.el`
-    (The code blocks themselves are documentation; they duplicate what's in the
-    section files. Do NOT attempt to make PROFILE.md authoritative — it is a
-    human summary, not a drift-free source of truth. Just update the file paths.)
+  - Jinx spell-checking config -> `sections/spellcheck.el`
+  - Dirvish config -> `sections/ui.el`
+  - Org-Tempo config -> `sections/org.el`
+    (The code blocks themselves are documentation; they duplicate the section files.
+    Do NOT attempt to make PROFILE.md authoritative — it is a human summary. Just
+    update the file paths.)
 
 ## Validator
 
-Extend `validate-docs.py` with two new passes:
+Extend `validate-docs.py` with a section inventory pass:
 
-**1. Section inventory (`section_inventory_findings()`).**
-Read `(load! "sections/([^"]+)")` lines from config.el,
-compare against `sections/*.el` on disk:
+**`section_inventory_findings()`.** Read `(load! "sections/([^"]+)")` lines
+from config.el, compare against `sections/*.el` on disk:
 
 - `BROKEN` — load! target file does not exist
 - `ORPHAN` — section file exists but is not loaded
 
-Follow the `domain_inventory_findings()` pattern in the existing code
-(inventory dict, findings list, sorted reporting). Wire into `main()` as a
-new report call alongside the domain inventory pass.
+Follow the `domain_inventory_findings()` pattern (inventory dict, findings list,
+sorted reporting). Wire into `main()` as a new report call alongside the domain
+inventory pass.
 
-**2. Header-load alignment (future — add as comment only for now).**
-The header comment block (`;; sections/defaults.el ...`) should list every
-section that has a `(load! ...)` line, in the same order. This is not yet
-automated — add a `# TODO:` in validate-docs.py noting the gap. Implementing
-it requires parsing `;; section/file.el` lines from the comment block, which
-is more complex than the regex for `(load! ...)` lines.
+**Deferred: header-load alignment check.** The comment block (`;; sections/defaults.el ...`)
+should list every loaded section in order. A future validator pass could parse
+`;; section/file.el` lines from that block and diff against `(load! ...)` lines.
+For now, add a `# TODO: check header comment alignment against (load! ...) lines`
+in validate-docs.py and revisit if load! reordering becomes routine.
 
 Before editing `validate-docs.py`, load the `python-best-practices` skill
 to apply the review checklist (ruff check, py_compile, ruff format --check).
 
 ## Execution Steps
 
+0. **Verify clean working tree** — `git status --short` must be empty.
+   Commit or stash any pending changes before proceeding.
 1. **Create `sections/` directory**
-2. **Write each section file** with the exact content shown above; verify each
-   mode-line header matches the file's path (`;;; $DOOMDIR/sections/<name>.el`)
-3. **Verify source completeness** — diff the old config.el line by line against
-   the new section files. All 235 lines must be accounted for. <!--- stale-check: allow -->
-4. **Replace `config.el`** with the lean loader shown above (incf/decf aliases,
-   pnpm setup, load! block, no section body content)
+2. **Write each section file** by copying from the corresponding `;;; HEADER`
+   block in current config.el (see File Contents table above); verify the
+   mode-line header matches `;;; $DOOMDIR/sections/<name>.el`
+3. **Verify source completeness** — diff every line of old config.el against
+   the new files. Every line must appear in either config.el (pnpm, incf/decf,
+   load! block) or a section file. Run `wc -l config.el` on old config.el to
+   get the expected total.
+4. **Replace `config.el`** with the lean loader shown above
 5. **Load `python-best-practices` skill**, then extend `validate-docs.py` with
    the section inventory pass (see Validator section)
 6. **Run `check-parens`** on all `.el` files (`config.el`, `sections/*.el`)
 7. **Run `doom sync`** and verify exit code
 8. **Run `doom doctor`** and verify output
-   - If doom sync or doctor fails: fix the reported errors in the affected
-     section file, re-run check-parens, re-run sync/doctor. Do not proceed
-     past a failed step.
-9. **Test config load** — `emacs --batch -l ~/.config/doom/config.el \
---eval='(message "config loaded OK")'`. This catches syntax errors and
-   missing dependencies that doom sync's byte-compilation might miss.
+   - If sync or doctor fails: fix errors in the affected section file, re-run
+     check-parens, re-run sync/doctor. Do not proceed past failure.
+9. **Test config load** — `emacs --batch -l ~/.config/doom/config.el --eval='(message "config loaded OK")'`.
+   Catches syntax errors and missing dependencies that doom sync's
+   byte-compilation might miss.
 10. **Update PROFILE.md** — source-of-truth line, Config Details file references,
     Custom Functions table location
 11. **Update README.md** — Key Features, Notes, Agent Script Awareness sections
 12. **Update AGENTS.md** — drift prevention row + agent workflow bullet
 13. **Update SKILL.md** — File Roles row
 14. **Run `git diff --check`** to catch whitespace errors
-15. **Sync mirror** and run validator
+15. **Sync mirror** and run validator (validate-docs.py section inventory pass
+    must report zero findings)
 16. **Commit** with a message documenting each file change
 
 ## Risks
 
 | Risk                                           | Mitigation                                                                                                                                                                                |
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| incf/decf aliases separated from Jinx config   | Solved by design — aliases stay in config.el (immovable), spellcheck.el only has use-package! jinx. A cross-reference comment in spellcheck.el points back to config.el.                  |
+| incf/decf aliases separated from Jinx config   | Solved by design — aliases stay in config.el (immovable), spellcheck.el only has Jinx use-package!. A cross-reference comment in spellcheck.el points back to config.el.                  |
 | Load order regression                          | Sections are independent — no functional coupling. Reorder if needed; any order works.                                                                                                    |
 | `(featurep! ...)` guard in navigation.el       | Already wrapped — stays in the section file.                                                                                                                                              |
 | Emacs won't start                              | Step 9 catches this. Rollback: `git checkout config.el && rm -rf sections/`.                                                                                                              |
@@ -471,7 +243,7 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
 - **config.el header block** is the single authoritative listing of all sections.
 - **validate-docs.py section inventory pass** checks every `(load! ...)` resolves
   to a file, and flags orphaned section files.
-- **validate-docs.py TODO** notes the header-comment alignment gap.
+- **validate-docs.py TODO** notes the header-comment alignment gap (deferred).
 - **AGENTS.md drift table**: `config.el` -> `sections/*.el`.
 - **README.md Key Features**: references sections/ directory structure.
 - **PROFILE.md**: queries reference `sections/*.el`, not `config.el` directly.
