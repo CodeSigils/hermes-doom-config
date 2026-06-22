@@ -7,6 +7,8 @@
 Split `config.el` into a lean loader and section files.
 Keep `packages.el` and `init.el` as-is.
 
+This is a **refactoring**: all behavior is preserved, only the file layout changes.
+
 ## Motivation
 
 The section headers already exist in `config.el` (`;;; ORG`, `;;; COMPANY`, etc.).
@@ -194,7 +196,9 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
    Run `wc -l config.el` on old config.el to get the expected total.
 4. **Replace `config.el`** with the lean loader shown above
 5. **Load `python-best-practices` skill**, then extend `validate-docs.py` with
-   the section inventory pass (see Validator section)
+   the section inventory pass (see Validator section). After editing, run
+   `ruff format --check scripts/validate-docs.py` (the skill's review checklist
+   covers this, but the explicit gate prevents accidental commits).
 6. **Run `check-parens`** on all `.el` files (`config.el`, `sections/*.el`)
 7. **Run `doom sync`** and verify exit code
 8. **Run `doom doctor`** and verify output
@@ -209,9 +213,23 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
 12. **Update AGENTS.md** — drift prevention row + agent workflow bullet
 13. **Update SKILL.md** — File Roles row
 14. **Run `git diff --check`** to catch whitespace errors
-15. **Sync mirror** and run validator (validate-docs.py section inventory pass
-    must report zero findings)
-16. **Commit** with a message documenting each file change
+15. **Sync mirror** — `scripts/sync-doom-skill-mirror.sh`;
+    verify with `scripts/check-doom-skill-mirror.sh`
+16. **Full stale-patterns and Python audit:**
+    - `scripts/check-stale-patterns.sh` — cross-reference integrity, script
+      inventory, domain file coverage (must report zero findings)
+    - `ruff format --check scripts/validate-docs.py` — verifies step 5's
+      Python edits are formatted
+    - `validate-docs.py` itself — run it to confirm the new section inventory
+      pass reports no findings
+17. **Commit** with a message documenting each file change
+
+### Why shellcheck isn't needed here
+
+The sections split only touches `.el`, `.py`, and `.md` files. No shell
+scripts are created or modified. If the split ever requires a new script,
+add it and run `shellcheck -x scripts/*.sh` before committing — the CI's
+`shellcheck` job enforces this on push for `scripts/*.sh` changes.
 
 ## Risks
 
