@@ -15,6 +15,12 @@ settings in the loader (ztlevi, 223★). Our plan follows the latter, with two
 explicit ztlevi-inspired refinements: global-only settings stay directly in
 `config.el`, and all keybindings move to a centralized `sections/keys.el` file.
 
+Adopt only what improves this config. From ztlevi, that means centralized keys,
+`(:map override ...)`, `(:after <pkg> :map <map> ...)`, and `(executable-find
+...)` fallback chains. Do not import larger-config overhead (`autoload/`
+directories, broad module-conditional architecture, platform binding layers, or
+literate config) until this repo has real pressure for it.
+
 ## Motivation
 
 The section headers already exist in `config.el` (`;;; ORG`, `;;; COMPANY`, etc.).

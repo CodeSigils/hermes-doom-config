@@ -276,6 +276,13 @@ practice:
 
 Research across popular Doom configs reveals two dominant approaches:
 
+Adopt external patterns by fit, not by imitation. From ztlevi, this config uses
+only the pieces that reduce local complexity: centralized keys,
+`(:map override ...)`, `(:after <pkg> :map <map> ...)`, and `(executable-find
+...)` fallback chains. Defer larger-config machinery (`autoload/` directories,
+broad module-conditional architecture, platform binding layers, literate config)
+until the repo has concrete pressure for it.
+
 ### Pattern A: Monolithic with Headers
 
 Doom's creator (hlissner) and most popular configs keep everything in a single
