@@ -53,18 +53,6 @@ copied from the existing `;;; HEADER` blocks in config.el.
   (when (file-directory-p pnpm-global)
     (add-to-list 'exec-path pnpm-global)))
 
-;; Jinx 2.7 calls legacy bare incf/decf at runtime. Emacs 30 only provides
-;; the cl-lib names, so install compatibility aliases here (config.el) so
-;; they are loaded before any use-package! :hook can fire. Keeping them
-;; out of the section files guarantees load order — moving them into a
-;; section file would create a silent void-function risk if the section
-;; were reordered past a Jinx-triggering hook.
-(require 'cl-lib)
-(unless (fboundp 'incf)
-  (defalias 'incf #'cl-incf))
-(unless (fboundp 'decf)
-  (defalias 'decf #'cl-decf))
-
 ;; Sections — loaded in order (independent of each other).
 ;;
 ;;   sections/defaults.el      Core Emacs behaviour, display-time
@@ -85,12 +73,12 @@ copied from the existing `;;; HEADER` blocks in config.el.
 (load! "sections/formatting")
 ```
 
-**incf/decf placement rationale:** These aliases are the _only reason_ config.el
-is not a pure loader. They must execute before any Jinx autoload fires. Putting
-them in config.el (rather than a section file) makes the load guarantee
-unambiguous: they run before the first `(load! ...)`, which is before any
-`:hook` can trigger. If they were in a section file, a future reorder or
-rename could break Jinx silently.
+**Why config.el can be a pure loader:** The Jinx legacy `incf`/`decf` aliases
+now live in `sections/spellcheck.el`, alongside the Jinx config they support.
+This follows the co-location principle (config belongs with the module it
+modifies) and keeps config.el clean. The aliases are defined at load time
+when `(load! "sections/spellcheck")` runs, which is before any `:hook` can
+fire at runtime — no silent void-function risk.
 
 ### Section Files — Copied from Current `config.el` Headers
 
@@ -100,7 +88,7 @@ For each `;;; SECTION` header in the current `config.el`, create a section file:
 | ----------------------------------- | ------------------------ | ------------------------------------------------------ |
 | _(top of file — before any header)_ | `sections/defaults.el`   | Core Emacs behaviour, display-time                     |
 | `;;; APPEARANCE`                    | `sections/appearance.el` | Font, theme, line-numbers                              |
-| `;;; SPELLCHECK`                    | `sections/spellcheck.el` | Jinx config only — incf/decf aliases stay in config.el |
+| `;;; SPELLCHECK`                    | `sections/spellcheck.el` | Jinx use-package! plus incf/decf aliases for Jinx legacy compat; config.el has the pnpm path fix only |
 | `;;; ORG`                           | `sections/org.el`        | Org, Org-Roam, Org-Roam-UI                             |
 | `;;; COMPANY`                       | `sections/completion.el` | Company backends, dabbrev                              |
 | `;;; NAVIGATION`                    | `sections/navigation.el` | Browser, window/popup management, frame size           |
@@ -111,8 +99,8 @@ Each section file must:
 
 - Start with `;;; $DOOMDIR/sections/<name>.el -*- lexical-binding: t; -*-`
 - Contain exactly the code from under that header in the _current_ config.el
-- (spellcheck.el only) Exclude the incf/decf aliases — they stay in config.el.
-  Add a comment at the top referencing config.el for those aliases.
+- (spellcheck.el only) The incf/decf aliases for Jinx 2.7 compat go here
+  too, alongside the Jinx config they support.
 
 **Verification:** For each section file, diff against the corresponding header
 block in the current config.el to confirm content is identical.
@@ -201,9 +189,9 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
    block in current config.el (see File Contents table above); verify the
    mode-line header matches `;;; $DOOMDIR/sections/<name>.el`
 3. **Verify source completeness** — diff every line of old config.el against
-   the new files. Every line must appear in either config.el (pnpm, incf/decf,
-   load! block) or a section file. Run `wc -l config.el` on old config.el to
-   get the expected total.
+   the new files. Every line must appear in either config.el (pnpm, load!
+   block) or a section file (incf/decf aliases are part of spellcheck.el).
+   Run `wc -l config.el` on old config.el to get the expected total.
 4. **Replace `config.el`** with the lean loader shown above
 5. **Load `python-best-practices` skill**, then extend `validate-docs.py` with
    the section inventory pass (see Validator section)
@@ -229,7 +217,7 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
 
 | Risk                                           | Mitigation                                                                                                                                                                                |
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| incf/decf aliases separated from Jinx config   | Solved by design — aliases stay in config.el (immovable), spellcheck.el only has Jinx use-package!. A cross-reference comment in spellcheck.el points back to config.el.                  |
+| Spellcheck section includes incf/decf aliases for Jinx 2.7 compat | Solved — aliases live in spellcheck.el alongside the Jinx config they support, keeping config.el a pure loader. incf/decf are defined at load time, before any `:hook` can fire at runtime. |
 | Load order regression                          | Sections are independent — no functional coupling. Reorder if needed; any order works.                                                                                                    |
 | `(featurep! ...)` guard in navigation.el       | Already wrapped — stays in the section file.                                                                                                                                              |
 | Emacs won't start                              | Step 9 catches this. Rollback: `git checkout config.el && rm -rf sections/`.                                                                                                              |
