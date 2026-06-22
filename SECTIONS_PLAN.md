@@ -285,6 +285,10 @@ discovering they existed.
 | Update Quick Index              | `SKILL.md`                                | Add best-practices.md row                         |
 | Update Reference Sources        | `SKILL.md`                                | Add best-practices.md to local refs list          |
 | Update Related Files            | `PROFILE.md`                              | Add best-practices.md                             |
+| Swap entry steps 4 and 5       | `AGENTS.md` (Read First)                  | SKILL.md (local) before INDEX.md (external)      |
+| Link SS7 to best-practices.md  | `DOOM-API.md` (SS7)                       | Agents reading DOOM-API.md find the consolidated ref |
+| Add sibling cross-links        | all 4 `domains/` files                    | Any domain file links to the other three          |
+| Broaden source-of-truth        | `PROFILE.md` line 6                       | Mention AGENTS.md and references/ alongside config files |
 
 ### What the Reference Map Gives an Agent
 
