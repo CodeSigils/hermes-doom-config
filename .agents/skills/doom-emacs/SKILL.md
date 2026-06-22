@@ -72,7 +72,11 @@ The key steps are:
 4. Run `doom sync` after requested edits (including config-only), unless told
    not to.
 5. Run `doom doctor` after `doom sync`.
-6. Finish with `git diff --check`, `git status --short`, concise summary.
+6. Run `scripts/check-stale-patterns.sh` before committing.
+7. If skill or domain files were changed: run both sync scripts
+   (`scripts/sync-doom-skill-mirror.sh`, then
+   `scripts/check-doom-skill-mirror.sh`).
+8. Finish with `git diff --check`, `git status --short`, concise summary.
 
 See AGENTS.md for the full workflow with edge cases (failed commands, reference
 consultation, skill mirror sync).

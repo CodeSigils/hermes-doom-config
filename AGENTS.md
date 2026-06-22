@@ -44,8 +44,9 @@ companion, then continue without blocking.
 - For changed `.el` files, run `check-parens` before `doom sync`.
 - Run `doom sync` after config edits unless told not to.
 - Run `doom doctor` after `doom sync`.
-- When the skill changes, sync the Hermes runtime mirror (see [Scripts](#scripts) table). It is generated state; do not
-  hand-edit it.
+- When the skill or any domain file changes, sync the Hermes runtime mirror before
+  committing (see `scripts/sync-doom-skill-mirror.sh` in [Scripts](#scripts) table).
+  The mirror is generated state; do not hand-edit it.
 - Verify `DOOM-API.md` patterns against Doom source (`~/.config/emacs/`). If wrong, propose a fix.
 - Before every commit, run the stale-patterns check (see [Scripts](#scripts) table).
 - Before committing script changes, run the network-free contracts (see [Scripts](#scripts) table).
@@ -72,7 +73,7 @@ mirror-only files cannot survive, and the previous mirror is restored if replace
 
 | Authority level                     | What the agent does                                                     | Examples                                                                                                                                           |
 | ----------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Do automatically                    | Routine maintenance within documented patterns                          | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add custom functions with `sand/` prefix, run `doom sync` + `doom doctor` |
+| Do automatically                    | Routine maintenance within documented patterns                          | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add custom functions with `sand/` prefix, run `doom sync` + `doom doctor`, **sync the runtime mirror after editing skill or domain files** |
 | Propose (ask first)                 | Structural changes that affect behavior or files beyond the edit target | Create new top-level files, introduce new modules, change completion backend, override Doom's core macro usage, modify popup rules broadly         |
 | Never without explicit user request | Destructive or irreversible operations                                  | `doom upgrade`, removing lines from `init.el` instead of commenting, hand-editing the generated runtime mirror under `~/.hermes/skills/`           |
 
