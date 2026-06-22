@@ -213,16 +213,20 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
 12. **Update AGENTS.md** — drift prevention row + agent workflow bullet
 13. **Update SKILL.md** — File Roles row
 14. **Run `git diff --check`** to catch whitespace errors
-15. **Sync mirror** — `scripts/sync-doom-skill-mirror.sh`;
+15. **Verify CI triggers are still accurate** — the current `**/*.el` glob
+    already covers the new `sections/*.el` files. No change needed. Only add
+    or narrow path filters if a future refactoring creates files that shouldn't
+    trigger CI (e.g., static data files).
+16. **Sync mirror** — `scripts/sync-doom-skill-mirror.sh`;
     verify with `scripts/check-doom-skill-mirror.sh`
-16. **Full stale-patterns and Python audit:**
+17. **Full stale-patterns and Python audit:**
     - `scripts/check-stale-patterns.sh` — cross-reference integrity, script
       inventory, domain file coverage (must report zero findings)
     - `ruff format --check scripts/validate-docs.py` — verifies step 5's
       Python edits are formatted
     - `validate-docs.py` itself — run it to confirm the new section inventory
       pass reports no findings
-17. **Commit** with a message documenting each file change
+18. **Commit** with a message documenting each file change
 
 ### Why shellcheck isn't needed here
 
