@@ -158,6 +158,15 @@ files; every `map!` form moves to `sections/keys.el`.
 Each section file must:
 
 - Start with `;;; $DOOMDIR/sections/<name>.el -*- lexical-binding: t; -*-`
+- Include exactly one short purpose comment after the header, matching the
+  `config.el` section inventory wording. This gives local orientation without
+  creating another drift-prone manifest. Example:
+
+  ```elisp
+  ;;; $DOOMDIR/sections/org.el -*- lexical-binding: t; -*-
+  ;; Org, Org-Roam, and Org-Roam-UI configuration.
+  ```
+
 - **With a `;;; HEADER`** — copy from that header through the next routed block
   boundary, except for `map!` forms.
 - **All keybindings** — move every `map!` form to `sections/keys.el`, grouped by
