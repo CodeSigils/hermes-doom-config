@@ -28,6 +28,7 @@ BACKTICK_PATH = re.compile(
 )
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*]\(([^)]+)\)")
 SCRIPT_ROW = re.compile(r"^\|\s*`([^`]+[.](?:sh|py))`\s*\|")
+DOMAIN_ROW = re.compile(r"`(domains/[^`]+)`")
 
 
 def markdown_files() -> list[Path]:
@@ -128,6 +129,37 @@ def inventory_findings() -> list[str]:
     return findings
 
 
+def domain_inventory_findings() -> list[str]:
+    """Check every file under .agents/ has a row in SKILL.md Quick Index, and vice versa."""
+    actual: set[str] = set()
+    for path in SKILL_ROOT.rglob("*"):
+        if not path.is_file():
+            continue
+        rel = str(path.relative_to(SKILL_ROOT))
+        if rel == "SKILL.md":
+            continue
+        actual.add(rel)
+
+    text = SKILL_FILE.read_text()
+    try:
+        qi_section = text.split("## Quick Index", 1)[1].split("\n## ", 1)[0]
+    except IndexError:
+        return ["MISSING: SKILL.md has no Quick Index section"]
+
+    referenced = set(DOMAIN_ROW.findall(qi_section))
+
+    findings: list[str] = []
+    for path in sorted(actual - referenced):
+        findings.append(
+            f"MISSING: {path} exists on disk but has no row in SKILL.md Quick Index"
+        )
+    for path in sorted(referenced - actual):
+        findings.append(
+            f"STALE: SKILL.md Quick Index references {path} but file does not exist"
+        )
+    return findings
+
+
 def report(title: str, findings: list[str], clean_message: str) -> bool:
     print(f"=== {title} ===\n")
     if findings:
@@ -154,6 +186,11 @@ def main() -> int:
         "Script Inventory Coverage",
         inventory_findings(),
         "SKILL.md Scripts table and scripts directory agree.",
+    )
+    ok &= report(
+        "Domain File Inventory Coverage",
+        domain_inventory_findings(),
+        "All .agents/ domain files are registered in SKILL.md Quick Index.",
     )
     return 0 if ok else 1
 
