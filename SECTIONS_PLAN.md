@@ -88,11 +88,12 @@ For each `;;; SECTION` header in the current `config.el`, create a section file:
 
 | config.el header                    | New file                 | Notes                                                  |
 | ----------------------------------- | ------------------------ | ------------------------------------------------------ |
-| _(top of file — before any header)_ | `sections/defaults.el`   | Core Emacs behaviour, display-time                     |
+| _(top of file — before any header)_ | `sections/defaults.el`   | Core Emacs behaviour, pnpm path. display-time (currently at line 192) relocated here during the split. |
 | `;;; APPEARANCE`                    | `sections/appearance.el` | Font, theme, line-numbers                              |
 | `;;; SPELLCHECK`                    | `sections/spellcheck.el` | Jinx use-package! plus incf/decf aliases for Jinx legacy compat; config.el has the pnpm path fix only |
 | `;;; ORG`                           | `sections/org.el`        | Org, Org-Roam, Org-Roam-UI                             |
-| `;;; COMPANY`                       | `sections/completion.el` | Company backends, dabbrev                              |
+| `;;; DABBREV`                      | `sections/completion.el` | Abbrev file setup (two short `setq!` calls). Merged into completion.el for proximity — sits between ORG and COMPANY in current config. |
+| `;;; COMPANY`                       | `sections/completion.el` | Company backends                                       |
 | `;;; NAVIGATION`                    | `sections/navigation.el` | Browser, window/popup management, frame size           |
 | `;;; UI`                            | `sections/ui.el`         | Dirvish, which-key, smartparens, rainbow-delimiters    |
 | `;;; FORMATTING`                    | `sections/formatting.el` | Ruff, Prettier, markdown-open                          |
@@ -100,7 +101,11 @@ For each `;;; SECTION` header in the current `config.el`, create a section file:
 Each section file must:
 
 - Start with `;;; $DOOMDIR/sections/<name>.el -*- lexical-binding: t; -*-`
-- Contain exactly the code from under that header in the _current_ config.el
+- **With a `;;; HEADER`** — copy from that header through the next header
+  (or EOF).
+- **Without a header** (smartparens after SPELLCHECK, frame size after
+  WINDOW, display-time between DIRVISH and WHICH-KEY) — route by content
+  to the section listed in the table above. Verify with the Notes column.
 - (spellcheck.el only) The incf/decf aliases for Jinx 2.7 compat go here
   too, alongside the Jinx config they support.
 
