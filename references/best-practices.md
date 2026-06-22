@@ -206,6 +206,82 @@ practice:
 
 ---
 
+## 10. Config Splitting Patterns
+
+Research across popular Doom configs reveals two dominant approaches:
+
+### Pattern A: Monolithic with Headers
+
+Doom's creator (hlissner) and most popular configs keep everything in a single
+`config.el` with `;;; HEADER` section comments. Works well up to ~300 lines.
+
+**Example:** https://github.com/hlissner/.doom.d (205★, 296-line config.el)
+
+### Pattern B: `load!` File Split
+
+Section files loaded via `(load! ...)` from a lean config.el. Two naming
+conventions exist:
+
+| Convention | Example | Subdirectory? | Pros | Cons |
+| ---------- | ------- | ------------- | ---- | ---- |
+| `+prefix`  | `"+ui"` | No (flat)     | Shorter names, no mkdir | Visual noise from `+` |
+| `sections/`| `"sections/ui"` | Yes (`sections/`) | Cleaner `ls`, explicit grouping | Extra mental indirection |
+
+**Real-world example (flat +prefix):**
+https://github.com/ztlevi/doom-config (223★)
+
+```elisp
+;; From ztlevi's config.el — 7 load! calls + global settings
+(load! "+os")
+(load! "+git")
+(load! "+misc")
+(load! "+text")
+(load! "+prog")
+(load! "+ui")
+(load! "+keys")
+;; Conditional section — only loads if the module is enabled
+(cond
+ ((modulep! :tools lsp +eglot) (load! "+eglot"))
+ ((modulep! :tools lsp) (load! "+lsp")))
+```
+
+### Universal Settings Stay in the Loader
+
+A pattern shared by EVERY config surveyed: the loader (`config.el`) keeps
+settings that don't belong to any single section:
+
+- `user-full-name`, `user-mail-address`
+- `doom-scratch-buffer-major-mode`
+- `confirm-kill-emacs`
+- `display-line-numbers-type`
+- Popup rules (`set-popup-rules!`)
+- `custom-set-variables`
+- Environment setup (PATH, exec-path)
+
+In ztlevi's config, these sit below the `load!` block. In hlissner's
+config, they sit at the top of the monolithic file. Either way, they
+live in config.el as universal defaults.
+
+**Rule of thumb for our config:**
+- If a setting affects a specific package or mode → put it in that section file
+- If a setting affects Emacs globally (display-time, exec-path, window
+  defaults) → keep it in config.el (or sections/defaults.el)
+- The loader should be thin, not empty — a few universal calls are expected
+
+**Exceptional: incf/decf aliases.** These are a backward-compat workaround
+for Jinx, so they belong in the spellcheck section, not the loader. This
+was a deliberate decision documented in the plan (SECTIONS_PLAN.md).
+
+### Why Not Literate Config?
+
+Several popular configs (tecosaur 1087★, nmartin84 244★) use org-babel
+literate config (`config.org` tangle). Unnecessary here:
+- Our config is small enough to read without tangling
+- Org-babel hides `git blame` information behind a tangle step
+- Agents can't navigate org-babel source blocks as easily as `.el` files
+
+---
+
 ## Cross-References
 
 | For deeper coverage                         | See                                                     |
