@@ -295,7 +295,7 @@ consolidate scattered guidance.
 
 When an agent opens this repo cold and reads `AGENTS.md` at step 3, it now
 sees a tiered table listing every `.md` file in the repo, its purpose, and
-how to discover it. The 6 hidden files are visible immediately — no need to
+how to discover it. The 5 hidden files are visible immediately — no need to
 find them through cross-references.
 
 ### Future Reference Work
