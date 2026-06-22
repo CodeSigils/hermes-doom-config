@@ -21,8 +21,8 @@ When opening this repo cold, read files in this order:
 | 1    | `PROFILE.md`                         | What this config is — modules, packages, environment                          | Understand the setup before suggesting changes |
 | 2    | `DOOM-API.md`                        | Idiomatic Doom patterns — which macros to use when                            | Learn the dialect before editing `.el` files   |
 | 3    | This file (`AGENTS.md`)              | Agent behavior policies and workflow for this repo                            | Know the rules before making changes           |
-| 4    | `references/INDEX.md`                | External Doom resources and community configs                                 | Find what's possible outside this config       |
-| 5    | `.agents/skills/doom-emacs/SKILL.md` | Compact core: file roles, API essentials, pitfalls; plus `domains/` for depth | Deep reference on demand                       |
+| 4    | `.agents/skills/doom-emacs/SKILL.md` | Compact core: file roles, API essentials, pitfalls; plus `domains/` for depth | Deep reference on demand                       |
+| 5    | `references/INDEX.md`                | External Doom resources and community configs                                 | Find what's possible outside this config       |
 
 `README.md` is human-facing; read it when you need quick-start or dependency info.
 

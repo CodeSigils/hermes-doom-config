@@ -6,6 +6,9 @@ Step-by-step instructions for common config tasks. Read this when you need to ma
 **Parent skill:** `SKILL.md` — compact core with file roles, API essentials, safety checks, pitfalls, and the Quick
 Index for all domain files. Load SKILL.md first for the minimal context every Doom edit needs.
 
+**Siblings:** `ARCHITECTURE.md`, `ELISP.md`, `PROCEDURES.md`, `TROUBLESHOOTING.md` — depth guides for framework,
+elisp, procedures, and troubleshooting.
+
 ## A. Adding a Module to init.el
 
 1. Find the appropriate category section under `(doom! ...)`

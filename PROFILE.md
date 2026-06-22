@@ -3,7 +3,8 @@
 Purpose: compact reference for what this Doom Emacs configuration is. An agent reads this to understand the user's setup
 before making suggestions or modifications.
 
-This is a summary. The source of truth is `init.el`, `config.el`, and `packages.el`.
+This is a summary. The source of truth is `init.el`, `config.el`, and `packages.el`; policy and reference guides
+live in `AGENTS.md` and `references/` (see AGENTS.md Reference Map for the full inventory).
 
 ---
 

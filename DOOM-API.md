@@ -284,6 +284,11 @@ Doom runs an Emacs server by default.
 
 ## 7. Performance and Best Practices
 
+> **Consolidated reference:** `references/best-practices.md` collects the
+> guidance in this section plus conventions from SKILL.md and AGENTS.md into
+> one scannable file. Read that for the summary; this section has the detail
+> with examples.
+
 ### 7.1 Lexical Binding — Why Every .el File Needs It
 
 Every `.el` file in this config must start with a lexical-binding cookie:
@@ -433,5 +438,6 @@ wrong or omits:
 | `PROFILE.md`                         | What this specific config enables and runs                  |
 | `AGENTS.md`                          | Agent behavior policies (must read before any edit)         |
 | `references/INDEX.md`                | External Doom resources, tutorials, inspiring configs       |
+| `references/best-practices.md`       | Consolidated Doom config best practices                     |
 | `.agents/skills/doom-emacs/SKILL.md` | Full Doom skill with procedures and pitfalls                |
 | `~/.config/emacs/core/`              | Doom's own macro source (ultimate truth for macro behavior) |
