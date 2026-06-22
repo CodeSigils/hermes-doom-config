@@ -178,8 +178,9 @@ feature sections; key behavior has one searchable inventory.
   `(:after <pkg> :map <map> ...)`.
 - Use `(:map override ...)` for global chords that must win over minor-mode
   maps.
-- Use `(:when (modulep! ...))` or `(:when IS-LINUX)` inside `map!` for
-  module/platform-specific bindings.
+- Do not add broad module/platform binding layers just because another config
+  has them. Use conditional bindings only when this repo has a concrete module
+  or platform split to support.
 
 **Launcher + package-map example:**
 
@@ -203,18 +204,6 @@ feature sections; key behavior has one searchable inventory.
  (:map override
   "M-q" (if (daemonp) #'delete-frame #'save-buffers-kill-terminal)
   "M-p" #'projectile-find-file))
-```
-
-**Conditional binding example:**
-
-```elisp
-(map!
- (:when (modulep! :completion vertico)
-  "M-f" #'consult-line
-  "C-s" #'consult-line)
- (:when IS-LINUX
-  :leader
-  :desc "Reveal in terminal" "o t" #'+shell/reveal-in-terminal))
 ```
 
 ---
@@ -318,6 +307,10 @@ https://github.com/ztlevi/doom-config (223★)
  ((modulep! :tools lsp) (load! "+lsp")))
 ```
 
+The conditional LSP loading above is context, not a recommendation for this
+repo today. Use module conditionals when maintaining alternate module stacks;
+do not add them proactively.
+
 ### Centralized Keys Stay in One File
 
 ztlevi's `+keys.el` is large (431 lines) but valuable: it answers keybinding
@@ -326,8 +319,7 @@ questions in one place. This repo adopts the same concept with
 
 - All `map!` forms live in `sections/keys.el`
 - Load `sections/keys.el` last
-- Group by global overrides, leader prefixes, package maps, and conditional
-  module/platform bindings
+- Group by global overrides, leader prefixes, and package maps
 - Use `(:after <pkg> :map <map> ...)` inside `map!` for package maps
 - Use `(:map override ...)` for high-priority global overrides
 
