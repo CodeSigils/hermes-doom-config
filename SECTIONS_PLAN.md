@@ -21,10 +21,17 @@ Adopt only what improves this config. From ztlevi, that means centralized keys,
 directories, broad module-conditional architecture, platform binding layers, or
 literate config) until this repo has real pressure for it.
 
+**Implementation recommendation:** Start this as one deliberate mechanical
+migration once the working tree is clean. Keep behavior unchanged, add the
+section-inventory validator in the same change, and treat `config.el`'s final
+loader block as the post-split source of truth. Do not begin a partial split
+unless you are prepared to finish the verification gates before stopping.
+
 ## Motivation
 
-The section headers already exist in `config.el` (`;;; ORG`, `;;; COMPANY`, etc.).
-This formalises the existing structure.
+Most section headers already exist in `config.el` (`;;; ORG`, `;;; COMPANY`,
+etc.). The split formalises that structure while routing a few unheadered
+top-level blocks by responsibility.
 
 **What this gains (ROI):**
 
@@ -38,7 +45,7 @@ This formalises the existing structure.
 
 **What this costs:**
 
-- 8 new files + directory structure at repo root
+- 8 section files under a new `sections/` directory at repo root
 - `(load! ...)` indirection — reading a symbol sometimes requires opening two files
 - One more mental model (load order) for what is mostly independent config
 - Keybindings are intentionally separated from package config; reviewing a feature
@@ -55,8 +62,9 @@ extra files. If it grows, the structure repays the overhead.
 ### config.el (post-split) — thin loader with universal defaults
 
 This is the **only** file whose exact content must be as shown below (it is new
-structure, not derived from the current config.el). All other section files are
-copied from the existing `;;; HEADER` blocks in config.el.
+structure, not derived from the current config.el). Section files are extracted
+from the current `config.el` according to the routing table below; some sources
+are existing `;;; HEADER` blocks, and some are unheadered top-level blocks.
 
 ```elisp
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
@@ -83,9 +91,10 @@ copied from the existing `;;; HEADER` blocks in config.el.
 
 (global-prettify-symbols-mode 1)
 (global-subword-mode 1)
+(setq! display-time-24hr-format t)
 (display-time-mode 1)
 
-;;; SECTIONS — loaded in order (independent of each other).
+;;; SECTIONS — loaded in reviewed order; keys loaded last.
 ;;
 ;;   sections/appearance.el    Font, theme, line-numbers, symbols
 ;;   sections/spellcheck.el    Jinx spell-checking
@@ -125,36 +134,39 @@ is a strong real-world example: a single key inventory makes global overrides,
 leader prefixes, `(:map override ...)`, and `(:after <pkg> :map <map> ...)`
 patterns easier to audit than scattered `map!` blocks.
 
-### Section Files — One Per `;;; HEADER` (No defaults.el)
+### Section Files — Route Current Blocks by Responsibility (No defaults.el)
 
-For each `;;; SECTION` header in the current `config.el`, create a section file.
-Settings **before** the first `;;;` header (pnpm path, Emacs-wide defaults,
-display-time) stay in `config.el` — they are universal, not package-specific.
+The current `config.el` is mostly organized by `;;; SECTION` headers, but not
+every planned section has a matching header today. Route the live blocks below
+by responsibility rather than assuming one file per existing header. Universal
+settings stay in `config.el`; package/mode-specific blocks move to section
+files; every `map!` form moves to `sections/keys.el`.
 
-| config.el header | New file                 | Notes                                                                                                                                  |
-| ---------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `;;; APPEARANCE` | `sections/appearance.el` | Font, theme, line-numbers                                                                                                              |
-| `;;; SPELLCHECK` | `sections/spellcheck.el` | Jinx use-package! plus incf/decf aliases for Jinx legacy compat; config.el has the universal defaults only                             |
-| `;;; ORG`        | `sections/org.el`        | Org, Org-Roam, Org-Roam-UI                                                                                                             |
-| `;;; DABBREV`    | `sections/completion.el` | Abbrev file setup (two short `setq!` calls). Merged into completion.el for proximity — sits between ORG and COMPANY in current config. |
-| `;;; COMPANY`    | `sections/completion.el` | Company backends                                                                                                                       |
-| `;;; NAVIGATION` | `sections/navigation.el` | Browser, window/popup management, frame size                                                                                           |
-| `;;; UI`         | `sections/ui.el`         | Dirvish, which-key, smartparens, rainbow-delimiters                                                                                    |
-| `;;; FORMATTING` | `sections/formatting.el` | Ruff, Prettier, markdown-open                                                                                                          |
-| All `map!` forms | `sections/keys.el`       | Centralized keybinding inventory; loaded last                                                                                          |
+| Current block/header                                                                      | New file                 | Notes                                                                                                           |
+| ----------------------------------------------------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| Top-level font/theme/line-number settings before defaults                                 | `sections/appearance.el` | No current `;;; APPEARANCE` header exists; extract these appearance settings by content                         |
+| `;;; EMACS DEFAULTS`                                                                      | `config.el`              | Universal defaults stay in the loader                                                                           |
+| Jinx compatibility aliases + `use-package! jinx` block                                    | `sections/spellcheck.el` | No current `;;; SPELLCHECK` header exists; include incf/decf aliases beside the Jinx config they support        |
+| `;;; ORG`, `;;; ORG ROAM`                                                                 | `sections/org.el`        | Org, Org-Roam, Org-Roam-UI                                                                                      |
+| `;;; DABBREV`, `;;; COMPANY`                                                              | `sections/completion.el` | Abbrev file setup plus Company backends                                                                         |
+| `;;; BROWSER`, `;;; WINDOW`                                                               | `sections/navigation.el` | Browser, window/popup management, frame size                                                                    |
+| Unheadered `after! smartparens`, `;;; DIRVISH`, `;;; WHICH KEY`, `;;; RAINBOW DELIMITERS` | `sections/ui.el`         | UI package configuration; Dirvish launcher key moves to `sections/keys.el`                                      |
+| `;;; TIME`                                                                                | `config.el`              | Time display is a universal default; keep both `display-time-24hr-format` and `display-time-mode` in the loader |
+| `;;; PYTHON FORMATTING (ruff)`, `;;; MARKDOWN FORMATTING (prettier)`                      | `sections/formatting.el` | Ruff, Prettier, markdown-open                                                                                   |
+| All `map!` forms                                                                          | `sections/keys.el`       | Centralized keybinding inventory; loaded last                                                                   |
 
 Each section file must:
 
 - Start with `;;; $DOOMDIR/sections/<name>.el -*- lexical-binding: t; -*-`
-- **With a `;;; HEADER`** — copy from that header through the next header
-  (or EOF), except for `map!` forms.
+- **With a `;;; HEADER`** — copy from that header through the next routed block
+  boundary, except for `map!` forms.
 - **All keybindings** — move every `map!` form to `sections/keys.el`, grouped by
   package or prefix. Use `(:after <pkg> :map <map> ...)` inside `map!` for
   package maps and `(:map override ...)` for global overrides that must win
   over minor modes.
-- **Without a header** (smartparens after SPELLCHECK, frame size after
-  WINDOW) — route by content to the section listed in the table above.
-  Verify with the Notes column.
+- **Without a matching header** (appearance settings, spellcheck/Jinx block,
+  smartparens) — route by content to the section listed in the table above.
+  Verify against the live `config.el`, not against assumed header names.
 - (spellcheck.el only) The incf/decf aliases for Jinx 2.7 compat go here
   too, alongside the Jinx config they support.
 
@@ -271,9 +283,13 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
 8. **Run `doom doctor`** and verify output
    - If sync or doctor fails: fix errors in the affected section file, re-run
      check-parens, re-run sync/doctor. Do not proceed past failure.
-9. **Test config load** — `emacs --batch -l ~/.config/doom/config.el --eval='(message "config loaded OK")'`.
-   Catches syntax errors and missing dependencies that doom sync's
-   byte-compilation might miss.
+9. **Test config load in a Doom-aware context**. Do **not** run
+   `emacs --batch -l ~/.config/doom/config.el` directly: `config.el` depends on
+   Doom macros such as `setq!`, `after!`, `use-package!`, and `map!`, so a
+   direct load can fail for the wrong reason. Use `doom sync` + `doom doctor` as
+   the required non-interactive checks; if an additional smoke test is needed,
+   start Emacs through Doom's normal init path and treat only real config errors
+   as failures.
 10. **Update PROFILE.md** — source-of-truth line, Config Details file references,
     Custom Functions table location
 11. **Update README.md** — Key Features, Notes, Agent Script Awareness sections
@@ -338,9 +354,9 @@ add it and run `shellcheck -x scripts/*.sh` before committing — the CI's
 | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Spellcheck section includes incf/decf aliases for Jinx 2.7 compat | Solved — aliases live in spellcheck.el alongside the Jinx config they support. Universal defaults in config.el load first, then section files, so incf/decf are defined before any `:hook` fires. |
 | Centralized keys drift from package config                        | `sections/keys.el` is loaded last and grouped by package/prefix. Feature review should check both the section file and keys file.                                                                 |
-| Load order regression                                             | Sections are independent — no functional coupling. Reorder if needed; any order works.                                                                                                            |
+| Load order regression                                             | Keep the documented loader order and load `sections/keys.el` last. Most sections are independent, but the planned order is the reviewed path; do not reorder casually during the migration.       |
 | `(featurep! ...)` guard in navigation.el                          | Already wrapped — stays in the section file.                                                                                                                                                      |
-| Emacs won't start                                                 | Step 9 catches this. Rollback: `git checkout config.el && rm -rf sections/`.                                                                                                                      |
+| Emacs won't start                                                 | `doom sync`, `doom doctor`, and the Doom-aware smoke test catch this. Rollback: `git checkout config.el && rm -rf sections/`.                                                                     |
 | Header comment drifts from load! lines                            | Validator tracks load! vs filesystem but NOT load! vs header comment. The TODO in validate-docs.py flags this gap.                                                                                |
 | Section file mode-line path wrong after rename                    | The header `;;; $DOOMDIR/sections/<name>.el` hardcodes the path. Renaming a file without updating the header creates a stale comment. Naming is stable — the risk is low.                         |
 | Stale PROFILE.md function locations                               | Step 10 catches this.                                                                                                                                                                             |
@@ -361,7 +377,8 @@ add it and run `shellcheck -x scripts/*.sh` before committing — the CI's
   section files with a `(load! ...)` line in config.el.
 - **Section file headers**: each mode-line comment names the file's own path;
   self-consistent, no cross-file drift.
-- No per-file listings outside config.el — no duplication to drift.
+- After execution, avoid new per-file section inventories outside `config.el` —
+  no duplication to drift.
 
 ---
 
@@ -374,21 +391,21 @@ documented here as a companion initiative so the reasoning is not lost.
 
 ### Problem
 
-The repo had 11 reference `.md` files across 4 depth tiers. The agent entry
-order in `AGENTS.md` listed only 5 of them (`PROFILE.md`, `DOOM-API.md`,
-`AGENTS.md`, `references/INDEX.md`, `SKILL.md`). The other 5 files
-(`references/package-management.md` and 4 files under
-`.agents/skills/doom-emacs/domains/`) were invisible from the entry path — an
-agent had to read through all 5 entry files before discovering they existed.
-`references/best-practices.md` was created during this initiative to
-consolidate scattered guidance.
+The repo's reference material spans root docs, `references/`, the local skill,
+and domain files. The original agent entry order in `AGENTS.md` exposed only the
+main entry path (`PROFILE.md`, `DOOM-API.md`, `AGENTS.md`,
+`references/INDEX.md`, `SKILL.md`). Deeper files such as
+`references/package-management.md`, `references/best-practices.md`, and the
+domain files were easy to miss unless an agent followed several
+cross-references. `references/best-practices.md` was created during this
+initiative to consolidate scattered guidance.
 
 ### Changes Made
 
 | Change                        | File affected                        | Why                                                      |
 | ----------------------------- | ------------------------------------ | -------------------------------------------------------- |
 | Create best-practices.md      | `references/best-practices.md` (new) | Consolidate scattered guidance into one file             |
-| Add Reference Map table       | `AGENTS.md` (Reference Map section)  | Show all 11 files with paths at step 3                   |
+| Add Reference Map table       | `AGENTS.md` (Reference Map section)  | Show all mapped reference files with paths at step 3     |
 | Update entry order            | `AGENTS.md` (Read First)             | Note depth layers exist beyond the 5-step path           |
 | Broaden Cross-References      | `AGENTS.md` (table)                  | Include package-management.md and best-practices.md      |
 | Drift table update            | `AGENTS.md` (Drift Prevention)       | Add best-practices.md as tracked source of truth         |
@@ -403,9 +420,9 @@ consolidate scattered guidance.
 ### What the Reference Map Gives an Agent
 
 When an agent opens this repo cold and reads `AGENTS.md` at step 3, it now
-sees a tiered table listing every `.md` file in the repo, its purpose, and
-how to discover it. The 5 hidden files are visible immediately — no need to
-find them through cross-references.
+sees a tiered table listing the mapped reference files, their purpose, and how
+to discover them. The depth files are visible immediately — no need to find
+them through cross-references.
 
 ### Future Reference Work
 
