@@ -26,10 +26,10 @@ When opening this repo cold, read files in this order:
 
 `README.md` is human-facing; read it when you need quick-start or dependency info.
 
-**Beyond these 5, another 6 reference files exist** in depth layers
-(`references/` and `.agents/skills/doom-emacs/domains/`). The
-Reference Map below lists all 11 files with paths and purposes —
-read it at step 3 to see the full landscape before you need depth.
+Beyond these 5 entry files, additional reference files exist in depth layers
+(`references/` and `.agents/skills/doom-emacs/domains/`). The Reference Map
+below is the source of truth for the full landscape — read it at step 3 before
+you need depth.
 
 ## Source-First Reference Policy
 
@@ -47,24 +47,24 @@ companion, then continue without blocking.
 Guide to every reference file in this repo, organized by depth tier.
 Read this at step 3 to see the full landscape before you need depth.
 
-| Tier | File | Purpose | Discovers / Entry path |
-| :--- | :--- | :------ | :--------------------- |
-| 1 — Root (entry files) | `PROFILE.md` | Config profile — modules, packages, environment | Entry step 1 |
-| 1 — Root (entry files) | `DOOM-API.md` | Idiomatic Doom patterns — which macros to use when | Entry step 2 |
-| 1 — Root (entry files) | `AGENTS.md` | Agent behavior policies, workflow, drift prevention | Entry step 3 |
-| 1 — Root (entry files) | `README.md` | Human quick-start | AGENTS.md Cross-References |
-| 2 — references/ | `references/INDEX.md` | External Doom resources, community configs, exploration | Entry step 4 |
-| 2 — references/ | `references/package-management.md` | Package lifecycle — pinning, straight, recovery | INDEX.md SS9, SKILL.md Reference Sources |
-| 2 — references/ | `references/best-practices.md` | Consolidated Doom config best practices | AGENTS.md Reference Map (this table) |
-| 3 — Skill entry | `.agents/skills/doom-emacs/SKILL.md` | Compact core: file roles, API essentials, pitfalls; plus domains/ index | Entry step 5 |
-| 4 — domains/ | `.agents/skills/doom-emacs/domains/ARCHITECTURE.md` | Doom framework, module system, reload semantics | SKILL.md Quick Index |
-| 4 — domains/ | `.agents/skills/doom-emacs/domains/ELISP.md` | Emacs Lisp for Doom config | SKILL.md Quick Index |
-| 4 — domains/ | `.agents/skills/doom-emacs/domains/PROCEDURES.md` | Task-specific procedures (add module, install package) | SKILL.md Quick Index |
-| 4 — domains/ | `.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md` | Diagnostic guide for Emacs failures | SKILL.md Quick Index |
+| Tier                   | File                                                   | Purpose                                                                 | Discovers / Entry path                   |
+| :--------------------- | :----------------------------------------------------- | :---------------------------------------------------------------------- | :--------------------------------------- |
+| 1 — Root (entry files) | `PROFILE.md`                                           | Config profile — modules, packages, environment                         | Entry step 1                             |
+| 1 — Root (entry files) | `DOOM-API.md`                                          | Idiomatic Doom patterns — which macros to use when                      | Entry step 2                             |
+| 1 — Root (entry files) | `AGENTS.md`                                            | Agent behavior policies, workflow, drift prevention                     | Entry step 3                             |
+| 1 — Root (entry files) | `README.md`                                            | Human quick-start                                                       | AGENTS.md Cross-References               |
+| 2 — references/        | `references/INDEX.md`                                  | External Doom resources, community configs, exploration                 | Entry step 4                             |
+| 2 — references/        | `references/package-management.md`                     | Package lifecycle — pinning, straight, recovery                         | INDEX.md SS9, SKILL.md Reference Sources |
+| 2 — references/        | `references/best-practices.md`                         | Consolidated Doom config best practices                                 | AGENTS.md Reference Map (this table)     |
+| 3 — Skill entry        | `.agents/skills/doom-emacs/SKILL.md`                   | Compact core: file roles, API essentials, pitfalls; plus domains/ index | Entry step 5                             |
+| 4 — domains/           | `.agents/skills/doom-emacs/domains/ARCHITECTURE.md`    | Doom framework, module system, reload semantics                         | SKILL.md Quick Index                     |
+| 4 — domains/           | `.agents/skills/doom-emacs/domains/ELISP.md`           | Emacs Lisp for Doom config                                              | SKILL.md Quick Index                     |
+| 4 — domains/           | `.agents/skills/doom-emacs/domains/PROCEDURES.md`      | Task-specific procedures (add module, install package)                  | SKILL.md Quick Index                     |
+| 4 — domains/           | `.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md` | Diagnostic guide for Emacs failures                                     | SKILL.md Quick Index                     |
 
-An agent reading the 5-step entry order encounters 5 files at tier 1 and
-tier 3. The 2 files at tier 2 and 4 files at tier 4 are invisible from the
-entry path alone — this table bridges that gap.
+An agent reading the 5-step entry order encounters the entry files and the skill
+entry. The `references/` files and domain files are invisible from the entry
+path alone — this table bridges that gap.
 
 ## Agent Workflow
 
@@ -102,11 +102,11 @@ mirror-only files cannot survive, and the previous mirror is restored if replace
 
 ## Decision Thresholds
 
-| Authority level                     | What the agent does                                                     | Examples                                                                                                                                           |
-| ----------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authority level                     | What the agent does                                                     | Examples                                                                                                                                                                                                            |
+| ----------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Do automatically                    | Routine maintenance within documented patterns                          | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add custom functions with `sand/` prefix, run `doom sync` + `doom doctor`, **sync the runtime mirror after editing skill or domain files** |
-| Propose (ask first)                 | Structural changes that affect behavior or files beyond the edit target | Create new top-level files, introduce new modules, change completion backend, override Doom's core macro usage, modify popup rules broadly         |
-| Never without explicit user request | Destructive or irreversible operations                                  | `doom upgrade`, removing lines from `init.el` instead of commenting, hand-editing the generated runtime mirror under `~/.hermes/skills/`           |
+| Propose (ask first)                 | Structural changes that affect behavior or files beyond the edit target | Create new top-level files, introduce new modules, change completion backend, override Doom's core macro usage, modify popup rules broadly                                                                          |
+| Never without explicit user request | Destructive or irreversible operations                                  | `doom upgrade`, removing lines from `init.el` instead of commenting, hand-editing the generated runtime mirror under `~/.hermes/skills/`                                                                            |
 
 When in doubt, propose and wait. The cost of asking is lower than the cost of reverting.
 
@@ -150,19 +150,19 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 
 When you change a source of truth, update its dependent files in the same change:
 
-| Source of truth                       | Dependent files                                                       | What to update                                           |
-| ------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------- |
-| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                | Add/remove modules, adjust flags                         |
-| `packages.el`                         | `PROFILE.md` packages table                                           | Add/remove packages with purpose notes                   |
-| `config.el`                           | `PROFILE.md` custom functions table, `DOOM-API.md` patterns           | Update function signatures, add new patterns             |
-| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary, `README.md` agent entry section | Update reading order, companion skill mentions           |
-| `scripts/` files                      | `SKILL.md` Scripts table, `AGENTS.md` workflow, CI routing            | Register scripts, update generic workflow and path gates |
-| `.github/workflows/ci.yml`            | `README.md` maintenance guidance, script contracts                    | Keep path routing aligned with invoked checks            |
-| `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                            | Update diagram, path descriptions                        |
-| `domains/` files                      | `SKILL.md` Quick Index table                                          | Add/remove/rename rows to match domain files             |
-| `references/best-practices.md` | `AGENTS.md` Reference Map, `AGENTS.md` Cross-References, `SKILL.md` Quick Index, `SKILL.md` Reference Sources, `PROFILE.md` Related Files | Add/remove rows, update paths, register in Reference Map |
-| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                           | Flag changes, new module features                        |
-| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                    | Command changes, new subcommands                         |
+| Source of truth                       | Dependent files                                                                                                                           | What to update                                           |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                                                                                    | Add/remove modules, adjust flags                         |
+| `packages.el`                         | `PROFILE.md` packages table                                                                                                               | Add/remove packages with purpose notes                   |
+| `config.el`                           | `PROFILE.md` custom functions table, `DOOM-API.md` patterns                                                                               | Update function signatures, add new patterns             |
+| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary, `README.md` agent entry section                                                                     | Update reading order, companion skill mentions           |
+| `scripts/` files                      | `SKILL.md` Scripts table, `AGENTS.md` workflow, CI routing                                                                                | Register scripts, update generic workflow and path gates |
+| `.github/workflows/ci.yml`            | `README.md` maintenance guidance, script contracts                                                                                        | Keep path routing aligned with invoked checks            |
+| `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                                                                                                | Update diagram, path descriptions                        |
+| `domains/` files                      | `SKILL.md` Quick Index table                                                                                                              | Add/remove/rename rows to match domain files             |
+| `references/best-practices.md`        | `AGENTS.md` Reference Map, `AGENTS.md` Cross-References, `SKILL.md` Quick Index, `SKILL.md` Reference Sources, `PROFILE.md` Related Files | Add/remove rows, update paths, register in Reference Map |
+| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                                                                                               | Flag changes, new module features                        |
+| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                                                                                        | Command changes, new subcommands                         |
 
 Run `git diff --check` before committing. Stale documentation is worse than missing documentation because the agent
 cannot distinguish it from truth.

@@ -105,8 +105,13 @@ Patterns that apply to any Doom config:
 - In this repo, keep all `map!` forms in `sections/keys.el`, grouped by
   package or prefix. Use `(:map override ...)` for global chords that must beat
   minor-mode maps, and `(:after <pkg> :map <map> ...)` inside `map!` for
-  package-specific maps.
+  package-specific maps. Adopt only the external patterns that reduce local
+  complexity; do not cargo-cult larger-config machinery like broad
+  module/platform binding layers, `autoload/` splits, or literate config before
+  this repo has real pressure for them.
 - Use `fboundp` guards for optional package entrypoints (e.g. `(when (fboundp 'some-command) (some-command 1))`)
+- Use `(executable-find ...)` fallback chains before configuring external
+  binaries such as browsers, terminals, shell helpers, or formatters.
 - Comment out unused modules in `init.el` — never delete lines
 - Snippets live under `<doom-user-dir>/snippets/<major-mode>/`
 
@@ -172,6 +177,9 @@ package recipe errors that would otherwise fail silently.
   uses a centralized `sections/keys.el`, following the ztlevi-style all-keys
   inventory. Keep every `map!` form there; review a feature by checking both its
   section file and `sections/keys.el`.
+- **Hardcoding external binary paths** — use `(executable-find ...)` fallback
+  chains for browser, terminal, shell helper, and formatter commands. Missing
+  optional binaries should degrade gracefully, not break config loading.
 
 ## Domain Drift Governance
 
