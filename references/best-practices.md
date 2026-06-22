@@ -131,15 +131,24 @@ it shouldn't run at startup.
 
 ## 6. Keybinding Conventions
 
-- Always use `map!` — never `define-key` or `global-set-key`
-- Global bindings use `:leader` (SPC prefix)
-- Major-mode bindings use `:localleader` (SPC m prefix)
-- Always provide a `:desc` string for which-key discoverability
-- For commands meant to run immediately, bind outside `after!`:
+- **Place bindings in the config section they modify** — an Org keybinding goes
+  in the Org section of `config.el` (or `sections/org.el` post-split), not in a
+  centralized keybinding file. This keeps related config together and makes
+  `git blame` tell you why a binding exists.
+- **Build on top of Doom's defaults; do not replace them.** Only shadow a
+  binding when you have a deliberate reason, and document why in a comment.
+  Doom ships carefully chosen defaults — overriding them without understanding
+  the trade-off creates a maintenance burden on upgrade.
+- Always use `map!` — never `define-key` or `global-set-key`.
+- Global bindings use `:leader` (SPC prefix).
+- Major-mode bindings use `:localleader` (SPC m prefix).
+- Always provide a `:desc` string for which-key discoverability.
+- For commands meant to run immediately, bind outside `after!` (both belong in
+  the same config section, alongside the package config they modify):
 
 ```elisp
-;; Launcher binding — autoloads the command on first use
-(map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)
+;;; Dirvish section — binding + config live here, not in a separate keybindings file
+(map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)  ; outside after! — autoloads
 (after! dirvish
   (setq dirvish-attributes '(vc-state nerd-icons ...)))
 ```
