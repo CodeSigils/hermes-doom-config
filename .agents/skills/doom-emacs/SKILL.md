@@ -99,6 +99,8 @@ Doom splits config across three files. Putting the wrong thing in the wrong file
 Patterns that apply to any Doom config:
 
 - Every `.el` file starts with `;;; <path> -*- lexical-binding: t; -*-`
+- Section files under `sections/` should include exactly one short purpose comment after the header, matching the
+  `config.el` section inventory wording. This gives local orientation without creating another drift-prone manifest.
 - Use `after!` for deferred config — never `with-eval-after-load`
 - Use `use-package!` for package configuration — never standard `use-package`
 - Use `map!` for keybindings; `:leader` prefix for global bindings
@@ -170,6 +172,10 @@ package recipe errors that would otherwise fail silently.
   `M-x doom/reload` after `doom sync`.
 - **Stale template comments can mislead** — if restored upstream comments recommend `with-eval-after-load` or standard
   `use-package`, replace or annotate them to match your config's conventions.
+- **Do not smoke-test `config.el` by direct batch load** — `emacs --batch -l ~/.config/doom/config.el` can fail for the
+  wrong reason because Doom macros such as `setq!`, `after!`, `use-package!`, and `map!` are not guaranteed to be
+  available outside Doom's normal init path. Prefer `doom sync`, `doom doctor`, `check-parens`, and only Doom-aware
+  batch/load tests when extra smoke coverage is needed.
 - **Bind launcher keys outside `after!`** — putting a keybinding inside `(after! <pkg> ...)` delays the binding until
   the package loads. For commands meant to be run immediately, bind them directly and defer only the package
   configuration.

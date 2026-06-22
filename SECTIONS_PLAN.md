@@ -179,11 +179,12 @@ Each section file must:
 - (spellcheck.el only) The incf/decf aliases for Jinx 2.7 compat go here
   too, alongside the Jinx config they support.
 
-**Verification:** For each section file, diff against the corresponding header
-block in the current config.el to confirm content is identical except for
-`map!` forms, which are intentionally moved to `sections/keys.el`. The
-universal defaults at the top (pnpm path, Emacs-wide settings, display-time)
-are NOT copied to section files — they stay in config.el.
+**Verification:** For each section file, diff against its routed source block or
+top-level source region in the current config.el to confirm content is
+identical except for `map!` forms, which are intentionally moved to
+`sections/keys.el`. The universal defaults at the top (pnpm path, Emacs-wide
+settings, display-time) are NOT copied to section files — they stay in
+config.el.
 
 ## Documentation Updates
 
@@ -227,7 +228,7 @@ No Quick Index entry (sections are user config, not agent reference docs).
 
 ### PROFILE.md
 
-- **Quick Reference** line 6 — change `"init.el", "config.el", and "packages.el"`
+- **Quick Reference** source-of-truth sentence near the top — change `"init.el", "config.el", and "packages.el"`
   to `"init.el", "config.el" (loader with universal defaults), "sections/*.el" (per-feature config), "sections/keys.el" (keybindings), and "packages.el"`.
 - **Custom Functions** table — `sand/org-display-inline-images-only-in-org` moves
   from `config.el` to `sections/org.el`. Update the Location column.
@@ -276,13 +277,15 @@ to apply the review checklist (ruff check, py_compile, ruff format --check).
    `defaults.el` — the universal settings at the top of config.el (pnpm path,
    Emacs-wide defaults, display-time) stay in config.el. DO create
    `sections/keys.el` and move every `map!` form there.
-3. **Verify source completeness** — diff every line of old config.el against
-   the new files. Every line must appear in either:
-   - config.el (universal defaults + `load!` block)
+3. **Verify source completeness** — save the old `config.el` before replacing
+   it, then account for every top-level form and comment block by destination:
+   - `config.el` (universal defaults + `load!` block)
    - a section file (incf/decf aliases are part of spellcheck.el)
-   - sections/keys.el (all `map!` forms)
-     There are 8 section files + config.el. Run `wc -l config.el` on old
-     config.el to get the expected total.
+   - `sections/keys.el` (all `map!` forms)
+     Then review `git diff -- config.el sections/` and confirm every behavior
+     change is explained by relocation only. Do not rely on `wc -l` as a
+     completeness check; the split intentionally adds/removes comments and moves
+     keybindings.
 4. **Replace `config.el`** with the thin loader with universal defaults shown above
 5. **Load `python-best-practices` skill**, then extend `validate-docs.py` with
    the section inventory pass (see Validator section). After editing, run
