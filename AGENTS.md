@@ -1,18 +1,5 @@
 # Doom Emacs Agent Instructions
 
-## Cross-References (Files Agent Must Load)
-
-| File                                 | Purpose                                                                       |
-| ------------------------------------ | ----------------------------------------------------------------------------- |
-| `DOOM-API.md`                        | Idiomatic Doom patterns — which macros to use when and why                    |
-| `PROFILE.md`                         | Config profile — modules, packages, custom functions, environment             |
-| `references/INDEX.md`                | Reference catalogue — Doom resources, community configs, exploration          |
-| `references/package-management.md`   | Doom package lifecycle — pinning, straight, recovery                          |
-| `references/best-practices.md`       | Consolidated best practices for writing Doom config                           |
-| `references/yasnippets.md`           | Snippet inventory, template syntax, best practices                            |
-| `.agents/skills/doom-emacs/SKILL.md` | Compact core: file roles, API essentials, pitfalls; plus `domains/` for depth |
-| `README.md`                          | Human quick-start (verify module lists against `init.el`)                     |
-
 ## Read First — Agent Entry Order
 
 When opening this repo cold, read files in this order:
@@ -52,7 +39,7 @@ before you need depth.
 | 1 — Root (entry files) | `PROFILE.md`                                           | Config profile — modules, packages, environment                         | Entry step 1                             |
 | 1 — Root (entry files) | `DOOM-API.md`                                          | Idiomatic Doom patterns — which macros to use when                      | Entry step 2                             |
 | 1 — Root (entry files) | `AGENTS.md`                                            | Agent behavior policies, workflow, drift prevention                     | Entry step 3                             |
-| 1 — Root (entry files) | `README.md`                                            | Human quick-start                                                       | AGENTS.md Cross-References               |
+| 1 — Root (entry files) | `README.md`                                            | Human quick-start                                                       | Read First (below)                       |
 | 2 — references/        | `references/INDEX.md`                                  | External Doom resources, community configs, exploration                 | Entry step 4                             |
 | 2 — references/        | `references/package-management.md`                     | Package lifecycle — pinning, straight, recovery                         | INDEX.md SS9, SKILL.md Reference Sources |
 | 2 — references/        | `references/best-practices.md`                         | Consolidated Doom config best practices                                 | AGENTS.md Reference Map (this table)     |
@@ -152,21 +139,21 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 
 When you change a source of truth, update its dependent files in the same change:
 
-| Source of truth                       | Dependent files                                                                                                                           | What to update                                                                                                 |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                                                                                    | Add/remove modules, adjust flags                                                                               |
-| `packages.el`                         | `PROFILE.md` packages table                                                                                                               | Add/remove packages with purpose notes                                                                         |
-| `config.el`                           | `sections/*.el`, `PROFILE.md` custom functions table, `DOOM-API.md` patterns, `README.md` File Layout table                               | Add/remove `(load! ...)` lines, update header comment, update moved function locations, update section listing |
-| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary, `README.md` agent entry section                                                                     | Update reading order, companion skill mentions                                                                 |
-| `scripts/` files                      | `SKILL.md` Scripts table, `AGENTS.md` workflow, CI routing                                                                                | Register scripts, update generic workflow and path gates                                                       |
-| `.github/workflows/ci.yml`            | `README.md` maintenance guidance, script contracts                                                                                        | Keep path routing aligned with invoked checks                                                                  |
-| `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                                                                                                | Update diagram, path descriptions                                                                              |
-| `domains/` files                      | `SKILL.md` Quick Index table                                                                                                              | Add/remove/rename rows to match domain files                                                                   |
-| `references/best-practices.md`        | `AGENTS.md` Reference Map, `AGENTS.md` Cross-References, `SKILL.md` Quick Index, `SKILL.md` Reference Sources, `PROFILE.md` Related Files | Add/remove rows, update paths, register in Reference Map                                                       |
-| `references/yasnippets.md`            | `AGENTS.md` Reference Map, `AGENTS.md` Cross-References, `SKILL.md` Quick Index, `SKILL.md` Reference Sources                             | Update snippet inventory, register in Reference Map and Quick Index                                            |
-| `snippets/`                           | `references/yasnippets.md`                                                                                                                | Update snippet inventory when adding or removing snippet files                                                 |
-| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                                                                                               | Flag changes, new module features                                                                              |
-| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                                                                                        | Command changes, new subcommands                                                                               |
+| Source of truth                       | Dependent files                                                                                             | What to update                                                                                                 |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                                                      | Add/remove modules, adjust flags                                                                               |
+| `packages.el`                         | `PROFILE.md` packages table                                                                                 | Add/remove packages with purpose notes                                                                         |
+| `config.el`                           | `sections/*.el`, `PROFILE.md` custom functions table, `DOOM-API.md` patterns, `README.md` File Layout table | Add/remove `(load! ...)` lines, update header comment, update moved function locations, update section listing |
+| `AGENTS.md`                           | `PROFILE.md` Config Policies Summary, `README.md` agent entry section                                       | Update reading order, companion skill mentions                                                                 |
+| `scripts/` files                      | `SKILL.md` Scripts table, `AGENTS.md` workflow, CI routing                                                  | Register scripts, update generic workflow and path gates                                                       |
+| `.github/workflows/ci.yml`            | `README.md` maintenance guidance, script contracts                                                          | Keep path routing aligned with invoked checks                                                                  |
+| `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                                                                  | Update diagram, path descriptions                                                                              |
+| `domains/` files                      | `SKILL.md` Quick Index table                                                                                | Add/remove/rename rows to match domain files                                                                   |
+| `references/best-practices.md`        | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, `SKILL.md` Reference Sources, `PROFILE.md` Related Files | Add/remove rows, update paths, register in Reference Map                                                       |
+| `references/yasnippets.md`            | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, `SKILL.md` Reference Sources                             | Update snippet inventory, register in Reference Map and Quick Index                                            |
+| `snippets/`                           | `references/yasnippets.md`                                                                                  | Update snippet inventory when adding or removing snippet files                                                 |
+| Doom module source (README.org)       | `references/INDEX.md` flags/features tables                                                                 | Flag changes, new module features                                                                              |
+| Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                                                          | Command changes, new subcommands                                                                               |
 
 Run `git diff --check` before committing. Stale documentation is worse than missing documentation because the agent
 cannot distinguish it from truth.

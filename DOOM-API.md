@@ -435,13 +435,4 @@ wrong or omits:
 
 ---
 
-## Cross-References
-
-| File                                 | Content                                                     |
-| ------------------------------------ | ----------------------------------------------------------- |
-| `PROFILE.md`                         | What this specific config enables and runs                  |
-| `AGENTS.md`                          | Agent behavior policies (must read before any edit)         |
-| `references/INDEX.md`                | External Doom resources, tutorials, inspiring configs       |
-| `references/best-practices.md`       | Consolidated Doom config best practices                     |
-| `.agents/skills/doom-emacs/SKILL.md` | Full Doom skill with procedures and pitfalls                |
-| `~/.config/emacs/core/`              | Doom's own macro source (ultimate truth for macro behavior) |
+For the full file inventory, see the Reference Map in `AGENTS.md`.

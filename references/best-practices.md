@@ -367,17 +367,4 @@ literate config (`config.org` tangle). Unnecessary here:
 
 ---
 
-## Cross-References
-
-| For deeper coverage                        | See                                                    |
-| ------------------------------------------ | ------------------------------------------------------ |
-| Doom macro syntax with examples            | `DOOM-API.md`                                          |
-| Package lifecycle (pinning, straight)      | `references/package-management.md`                     |
-| Agent workflow and drift prevention        | `AGENTS.md`                                            |
-| Config profile (enabled modules, packages) | `PROFILE.md`                                           |
-| General Doom guide plus troubleshooting    | `.agents/skills/doom-emacs/SKILL.md`                   |
-| Task-specific procedures                   | `.agents/skills/doom-emacs/domains/PROCEDURES.md`      |
-| Troubleshooting diagnostics                | `.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md` |
-| Emacs Lisp for Doom config                 | `.agents/skills/doom-emacs/domains/ELISP.md`           |
-| Doom framework architecture                | `.agents/skills/doom-emacs/domains/ARCHITECTURE.md`    |
-| External resources and community configs   | `references/INDEX.md`                                  |
+For the full file inventory, see the Reference Map in `AGENTS.md`.
