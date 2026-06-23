@@ -364,7 +364,3 @@ literate config (`config.org` tangle). Unnecessary here:
 - Our config is small enough to read without tangling
 - Org-babel hides `git blame` information behind a tangle step
 - Agents can't navigate org-babel source blocks as easily as `.el` files
-
----
-
-For the full file inventory, see the [Reference Map in AGENTS.md](AGENTS.md#reference-map).

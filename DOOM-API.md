@@ -432,7 +432,3 @@ wrong or omits:
    explanation, link to it rather than copy-pasting. This file is a curated
    guide — the skill at `.agents/skills/doom-emacs/SKILL.md` is the exhaustive
    reference.
-
----
-
-For the full file inventory, see the [Reference Map in AGENTS.md](AGENTS.md#reference-map).

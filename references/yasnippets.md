@@ -5,7 +5,7 @@ by typing a key followed by the expansion key (Tab or SPC by default).
 
 ## Directory Structure
 
-````
+````text
 snippets/
 ├── emacs-lisp-mode/    # 14 snippets (add-hook, cond, defmacro, defun, ...)
 ├── javascript-mode/    # 12 snippets (=>, afn, cl, clg, const, ...)
