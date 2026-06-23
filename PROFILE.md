@@ -75,7 +75,7 @@ Beyond Doom built-ins:
 
 ## Config Policies Summary
 
-For full policy text see `AGENTS.md`:
+For full policy text see [`AGENTS.md`](AGENTS.md):
 
 - **Completion Policy** — Company preferred, Corfu disabled as commented module
 - **Defensive Config Policy** — `fboundp` guards for optional packages; global defaults stay global
@@ -230,12 +230,13 @@ independent completion systems and coexist.
 
 ## Related Files
 
-| File                                 | Purpose                                                      |
-| ------------------------------------ | ------------------------------------------------------------ |
-| `DOOM-API.md`                        | Idiomatic Doom patterns — which macros to use when and why   |
-| `AGENTS.md`                          | Agent behavior policies and workflow                         |
-| `references/INDEX.md`                | External Doom Emacs reference catalogue                      |
-| `references/package-management.md`   | Doom package lifecycle: declaration, sync, update, pinning   |
-| `references/best-practices.md`       | Consolidated Doom config best practices                      |
-| `.agents/skills/doom-emacs/SKILL.md` | General Doom Emacs guide with procedures and troubleshooting |
-| `README.md`                          | Human-facing quick start                                     |
+| File                                                                       | Purpose                                                    |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| [`DOOM-API.md`](DOOM-API.md)                                               | Idiomatic Doom patterns — which macros to use when and why |
+| [`AGENTS.md`](AGENTS.md)                                                   | Agent behavior policies and workflow                       |
+| [`references/INDEX.md`](references/INDEX.md)                               | External Doom Emacs reference catalogue                    |
+| [`references/package-management.md`](references/package-management.md)     | Doom package lifecycle: declaration, sync, update, pinning |
+| [`references/best-practices.md`](references/best-practices.md)             | Consolidated Doom config best practices                    |
+| [`references/yasnippets.md`](references/yasnippets.md)                     | Snippet inventory, template syntax, best practices         |
+| [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md) | General Doom guide with procedures and troubleshooting     |
+| [`README.md`](README.md)                                                   | Human-facing quick start                                   |
