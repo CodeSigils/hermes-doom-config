@@ -194,14 +194,16 @@ its purpose changes, **update the Quick Index in the same change**:
 All repo scripts live under `scripts/`. Sourcing `scripts/config.sh` provides shared paths and safety checks; the
 registered workflow tools are:
 
-| Script                       | Purpose                                                                        | When to run                                |
-| :--------------------------- | :----------------------------------------------------------------------------- | :----------------------------------------- |
-| `sync-doom-skill-mirror.sh`  | Validate, stage, and atomically replace the Hermes runtime mirror              | After editing skill or domain files        |
-| `check-doom-skill-mirror.sh` | Verify source/destination identity and byte-level mirror equality              | After sync                                 |
-| `check-stale-patterns.sh`    | Run documentation, script, domain, and section inventory validation            | Before committing documentation or scripts |
-| `validate-docs.py`           | Check stale guidance, local references, script registry, domains, and sections | Called by `check-stale-patterns.sh`        |
-| `run-offline-contracts.sh`   | Exercise documentation and disposable mirror-safety contracts                  | Before committing script changes           |
-| `ai-context.sh`              | Report config, mirror, tool, and Git context; file content is explicit opt-in  | On demand when enlisting an external model |
+| Script                       | Purpose                                                                        | When to run                                     |
+| :--------------------------- | :----------------------------------------------------------------------------- | :---------------------------------------------- |
+| `sync-doom-skill-mirror.sh`  | Validate, stage, and atomically replace the Hermes runtime mirror              | After editing skill or domain files             |
+| `check-doom-skill-mirror.sh` | Verify source/destination identity and byte-level mirror equality              | After sync                                      |
+| `check-stale-patterns.sh`    | Run documentation, script, domain, and section inventory validation            | Before committing documentation or scripts      |
+| `validate-docs.py`           | Check stale guidance, local references, script registry, domains, and sections | Called by `check-stale-patterns.sh`             |
+| `run-offline-contracts.sh`   | Exercise documentation and disposable mirror-safety contracts                  | Before committing script changes                |
+| `ai-context.sh`              | Report config, mirror, tool, and Git context; file content is explicit opt-in  | On demand when enlisting an external model      |
+| `install-hooks.sh`           | Install the pre-commit hook into `.git/hooks/pre-commit`                       | After cloning fresh or when hook script changes |
+| `pre-commit-hook.sh`         | Canonical pre-commit hook source (installed by install-hooks.sh)               | Automatically on every commit (via git hook)    |
 
 ## Skill Script Conventions
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # pre-commit-hook.sh: Canonical copy of the pre-commit hook.
 # Source of truth; install to .git/hooks/pre-commit via scripts/install-hooks.sh.
+# Usage: git calls this automatically on commit; run it directly for a dry check.
 set -euo pipefail
 
 # Where to report violations -- use stderr so regular commit messages remain
@@ -23,7 +24,7 @@ check() {
     local rc=0 file
     for file in "$@"; do
         # grep -n with no match exits 1 (valid) or >1 (error)
-        if grep -nE "$pattern" "$file" 2>/dev/null; then
+        if grep -nF "$pattern" "$file" 2>/dev/null; then
             printf '  >> %s: %s\n\n' "$file" "$msg"
             rc=1
         fi
@@ -36,7 +37,7 @@ check() {
 check_no_match() {
     local pattern="$1" msg="$2" file="$3"
     local hit
-    hit=$(grep -nE "$pattern" "$file" 2>/dev/null || true)
+    hit=$(grep -nF "$pattern" "$file" 2>/dev/null || true)
     if [ -z "$hit" ]; then
         printf '  >> %s: %s\n' "$file" "$msg"
         return 1
@@ -67,15 +68,15 @@ check "featurep!" \
     'featurep! is deprecated; use (modulep! ...) instead (best-practices.md §1)' \
     "${FILES[@]}" || BLOCKED=1
 
-check '\(setq-default ' \
+check '(setq-default ' \
     'Use setq! instead of setq-default (best-practices.md §1)' \
     "${FILES[@]}" || BLOCKED=1
 
-check '\(define-key ' \
+check '(define-key ' \
     'Use (map! ...) instead of define-key (best-practices.md §1, §6)' \
     "${FILES[@]}" || BLOCKED=1
 
-check '\(advice-add ' \
+check '(advice-add ' \
     'Use (defadvice! ...) instead of defun + advice-add (best-practices.md §1)' \
     "${FILES[@]}" || BLOCKED=1
 
@@ -90,15 +91,15 @@ done
 
 # --- Non-blocking warnings (review items) ---
 
-check '\(setq ' \
+check '(setq ' \
     'WARNING: bare (setq ...) found. Should this be (setq! ...)? (best-practices.md §1)' \
     "${FILES[@]}" || true
 
-check '\(require\b' \
+check '(require' \
     'WARNING: top-level (require ...) found. Should this be inside (after! ...)? (best-practices.md §4)' \
     "${FILES[@]}" || true
 
-check '\(lambda\b' \
+check '(lambda' \
     'WARNING: lambda found. Should this be a named function with sand/ prefix? (best-practices.md §4)' \
     "${FILES[@]}" || true
 

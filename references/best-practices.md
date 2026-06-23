@@ -265,7 +265,7 @@ practice:
 - **Using standard `use-package` instead of `use-package!`** — `use-package!` adds disabled-package awareness and extra keywords; the regular `use-package` misses these.
 - **Editing `early-init.el` or `~/.emacs.d/init.el`** — Doom manages those. All user config goes in `~/.config/doom/`.
 - **Missing lexical-binding cookie on `.el` file** — Add `;;; file.el -*- lexical-binding: t; -*-` as first line.
-- **`(setq-default ...)` when `setq!` suffices** — `setq!` triggers custom setters on customizable variables; more efficient than `setopt`.
+- **`(setq-default ...)` when `setq!` suffices** — `setq!` triggers custom setters on customizable variables; more efficient than `setopt`. <!-- stale-check: allow -->
 - **Deleting `init.el` lines instead of commenting** — Comment them out. The comment documents a considered-and-rejected option.
 - **`package-install` interactively** — Always use `(package! ...)` in `packages.el` + `doom sync`.
 - **Keybinding inside `after!` for launcher commands** — Bind outside `after!` in `sections/keys.el` so the command is available immediately and can autoload.

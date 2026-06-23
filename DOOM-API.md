@@ -107,7 +107,7 @@ position flag. Simpler than writing separate `add-hook` calls.
 ### `setq!` — Safe Variable Setting
 
 Doom's wrapper around `setq` that triggers custom setters on customizable
-variables via `set-default-toplevel-value`. More efficient than `setopt`.
+variables via `set-default-toplevel-value`. More efficient than `setopt`. <!-- stale-check: allow -->
 
 ```elisp
 (setq! delete-by-moving-to-trash t
@@ -340,7 +340,7 @@ it shouldn't run at startup.**
 | ----------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `(use-package foo ...)`                               | `(use-package! foo ...)`                               | Adds disabled-package awareness and extra keywords; the regular `use-package` misses these                                           |
 | `(with-eval-after-load 'foo ...)` or `(require 'foo)` | `(after! foo ...)`                                     | Doom's macro handles ordering through its deferred system. Never `require` in config                                                 |
-| `(setq-default ...)` or bare `setq`                   | `setq!`                                                | Triggers custom setters on customizable variables; more efficient than `setopt`                                                      |
+| `(setq-default ...)` or bare `setq`                   | `setq!`                                                | Triggers custom setters on customizable variables; more efficient than `setopt`. <!-- stale-check: allow -->                         |
 | `(define-key map k f)` or `(global-set-key ...)`      | `(map! ...)` with `:leader`, `:map`, or `:localleader` | Integrates with which-key for discoverability and evil-state awareness                                                               |
 | `(add-hook 'foo-hook ...)` with a lambda              | `(add-hook! ...)` or `use-package!` `:hook`            | Supports multiple hooks, local variables natively (`setq-local` inside the form), and mode-specific behavior without lambda wrappers |
 | `(loop for ... collect ...)`                          | `(cl-loop for ... collect ...)`                        | `cl-lib` is the modern, namespaced version. Bare `loop` pollutes the namespace                                                       |
