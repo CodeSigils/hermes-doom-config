@@ -54,19 +54,21 @@ For the full agent workflow and configuration policies, see `AGENTS.md`.
 Add new settings and hooks to the matching section file. Add new keybindings to
 `sections/keys.el`. Register a new section file with `(load! ...)` in `config.el`.
 
-```
+```text
                     Config Edit Workflow
 
-  ┌─────────┐     ┌───────────┐     ┌──────────────┐
-  │ Edit .el │────>│  check-   │────>│  doom sync   │
-  │  file   │     │  parens   │     │  (if needed)  │
-  └─────────┘     └───────────┘     └──────┬───────┘
-                                           │
-                                           v
-  ┌─────────┐     ┌───────────┐     ┌──────────────┐
-  │ Commit  │<────│ git diff  │<────│ doom doctor  │
-  │         │     │ --check   │     │              │
-  └─────────┘     └───────────┘     └──────────────┘
+  ┌──────────┐   ┌──────────┐   ┌────────────┐   ┌──────────┐
+  │ git stat │   │ check-   │   │ doom sync  │   │ doom     │
+  │ +inspect │──>│ parens   │──>│ (if mods   │──>│ doctor   │
+  │ +edit .el│   │          │   │  or pkgs)  │   │          │
+  └──────────┘   └──────────┘   └────────────┘   └────┬─────┘
+                                                       │
+                                                       v
+  ┌──────────────┐   ┌──────────┐   ┌────────────────┐
+  │ stale        │   │ git diff │   │ commit with    │
+  │ patterns     │──>│ --check  │──>│ decision aware │
+  │ + sync mirror│   │          │   │ message         │
+  └──────────────┘   └──────────┘   └────────────────┘
 ```
 
 ## Agent Script Awareness
