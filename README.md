@@ -54,6 +54,21 @@ For the full agent workflow and configuration policies, see `AGENTS.md`.
 Add new settings and hooks to the matching section file. Add new keybindings to
 `sections/keys.el`. Register a new section file with `(load! ...)` in `config.el`.
 
+```
+                    Config Edit Workflow
+
+  ┌─────────┐     ┌───────────┐     ┌──────────────┐
+  │ Edit .el │────>│  check-   │────>│  doom sync   │
+  │  file   │     │  parens   │     │  (if needed)  │
+  └─────────┘     └───────────┘     └──────┬───────┘
+                                           │
+                                           v
+  ┌─────────┐     ┌───────────┐     ┌──────────────┐
+  │ Commit  │<────│ git diff  │<────│ doom doctor  │
+  │         │     │ --check   │     │              │
+  └─────────┘     └───────────┘     └──────────────┘
+```
+
 ## Agent Script Awareness
 
 All repo scripts live under `scripts/`. The canonical reference for every script -- purpose, invocation, and when to run
