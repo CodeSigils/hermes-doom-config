@@ -62,13 +62,13 @@ Add new settings and hooks to the matching section file. Add new keybindings to
   │ +inspect │──>│ parens   │──>│ (if mods   │──>│ doctor   │
   │ +edit .el│   │          │   │  or pkgs)  │   │          │
   └──────────┘   └──────────┘   └────────────┘   └────┬─────┘
-                                                       │
-                                                       v
-  ┌──────────────┐   ┌──────────┐   ┌────────────────┐
-  │ stale        │   │ git diff │   │ commit with    │
-  │ patterns     │──>│ --check  │──>│ decision aware │
-  │ + sync mirror│   │          │   │ message         │
-  └──────────────┘   └──────────┘   └────────────────┘
+                                                      │
+                                                      v
+  ┌──────────────┐       ┌──────────┐     ┌────────────────┐
+  │ stale        │       │ git diff │     │ commit with    │
+  │ patterns     │──────>│ --check  │────>│ decision aware │
+  │ + sync mirror│       │          │     │ message        │
+  └──────────────┘       └──────────┘     └────────────────┘
 ```
 
 ## Agent Script Awareness
@@ -76,11 +76,11 @@ Add new settings and hooks to the matching section file. Add new keybindings to
 All repo scripts live under `scripts/`. The canonical reference for every script -- purpose, invocation, and when to run
 -- is the Scripts table in `.agents/skills/doom-emacs/SKILL.md`.
 
-```
-  AGENTS.md > workflow bullets  --  generic prose, no paths stored here
-  AGENTS.md > Scripts section   --  points to SKILL.md table
+```text
+  AGENTS.md > workflow bullets     --  generic prose, no paths stored here
+  AGENTS.md > Scripts section      --  points to SKILL.md table
   ───
-  SKILL.md > Scripts table      --  single source of truth for all scripts
+  SKILL.md > Scripts table         --  single source of truth for all scripts
   ───
   scripts/check-stale-patterns.sh  --  delegates to validate-docs.py, which checks stale
                                        guidance, local references, script registration,
