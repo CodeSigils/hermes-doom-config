@@ -31,6 +31,29 @@ scripts/check-doom-skill-mirror.sh
 
 For the full agent workflow and configuration policies, see `AGENTS.md`.
 
+## File Layout
+
+| Path                         | Purpose                                                         |
+| ---------------------------- | --------------------------------------------------------------- |
+| `init.el`                    | Module declarations (single `doom!` form)                       |
+| `packages.el`                | Package declarations (`package!` forms)                         |
+| `config.el`                  | Thin loader with universal defaults and section `load!` calls   |
+| `sections/appearance.el`     | Font, theme, line numbers                                       |
+| `sections/spellcheck.el`     | Jinx spell-checking                                             |
+| `sections/org.el`            | Org, Org-Roam, Org-Roam-UI                                      |
+| `sections/completion.el`     | Company backends, dabbrev                                       |
+| `sections/navigation.el`     | Browser, window management, popups, frame                       |
+| `sections/ui.el`             | Dirvish, which-key, smartparens, rainbow-delimiters             |
+| `sections/formatting.el`     | Ruff (Python), Prettier (Markdown)                              |
+| `sections/keys.el`           | All keybindings (loaded last)                                   |
+| `snippets/`                  | Yasnippet templates per major-mode                              |
+| `scripts/`                   | Repo tooling (validation, mirror sync, CI)                      |
+| `references/`                | Best-practices, package management, external resource catalogue |
+| `.agents/skills/doom-emacs/` | Agent skill with domain files for depth                         |
+
+Add new settings and hooks to the matching section file. Add new keybindings to
+`sections/keys.el`. Register a new section file with `(load! ...)` in `config.el`.
+
 ## Agent Script Awareness
 
 All repo scripts live under `scripts/`. The canonical reference for every script -- purpose, invocation, and when to run
