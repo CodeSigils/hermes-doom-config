@@ -352,3 +352,15 @@ config repos.
 - https://blog.doomemacs.org/ — Official Doom blog
 - Emacs Reddit: /r/emacs and /r/doomemacs — frequent config discussion
 - Various GitHub gists: search "doom emacs config" for community examples
+
+## 12. In-Repo Reference Documents
+
+Reference files shipped with this config, beyond the skill system:
+
+| File                                        | Purpose                                        |
+| ------------------------------------------- | ---------------------------------------------- |
+| `references/package-management.md`          | Package lifecycle, pinning, straight recovery  |
+| `references/best-practices.md`              | Consolidated Doom config best practices        |
+| `references/yasnippets.md`                  | Yasnippet inventory and template syntax        |
+| `references/jinx.md`                        | Jinx spell-checking — config and dictionaries  |
+| `references/snippet-validation.md`          | Yasnippet parser-level validation guide        |

@@ -54,6 +54,8 @@ what your task needs:
 | Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |
 |                                       | Checking style or reviewing patterns               | `references/best-practices.md`             |
 |                                       | Writing or editing snippets                        | `references/yasnippets.md`                 |
+|                                       | Validating snippet syntax (parser-level)           | `references/snippet-validation.md`          |
+|                                       | Configuring Jinx spell checking                    | `references/jinx.md`                        |
 |                                       | Upgrading Doom framework                           | `domains/PROCEDURES.md` (G), Safety Checks |
 | Maintaining config repo scripts       | Skill Script Conventions                           |
 
@@ -260,5 +262,7 @@ When you need to understand how a package or Doom module works, the source code 
   - `references/package-management.md` — package lifecycle, pinning, straight internals, recovery
   - `references/best-practices.md` — consolidated Doom config best practices
   - `references/yasnippets.md` — snippet inventory, template syntax, best practices
+  - `references/snippet-validation.md` — parser-level snippet validation, directive reference, false-positive catalog
+  - `references/jinx.md` — Jinx language configuration, dictionary setup, source reference
   - `AGENTS.md` — user-specific policies, workflow, drift prevention
   - `domains/` — depth guides (architecture, procedures, elisp, troubleshooting)
