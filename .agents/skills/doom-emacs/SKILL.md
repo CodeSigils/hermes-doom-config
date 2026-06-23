@@ -197,6 +197,7 @@ registered workflow tools are:
 
 | Script                       | Purpose                                                                        | When to run                                     |
 | :--------------------------- | :----------------------------------------------------------------------------- | :---------------------------------------------- |
+| `check-curator-drift.sh`    | Report files/content added or changed by the Hermes curator                    | Before sync, when investigating auto-update messages |
 | `sync-doom-skill-mirror.sh`  | Validate, stage, and atomically replace the Hermes runtime mirror              | After editing skill or domain files             |
 | `check-doom-skill-mirror.sh` | Verify source/destination identity and byte-level mirror equality              | After sync                                      |
 | `check-stale-patterns.sh`    | Run documentation, script, domain, and section inventory validation            | Before committing documentation or scripts      |
