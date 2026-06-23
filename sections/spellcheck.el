@@ -11,8 +11,8 @@
   (defalias 'incf #'cl-incf))
 (unless (fboundp 'decf)
   (defalias 'decf #'cl-decf))
-
+;; For additional languages, install the Hunspell dictionary and Jinx will find it.
 (use-package! jinx
   :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
   :config
-  (setq! jinx-languages "en_US"))
+  (setq! jinx-languages "en_US el_GR"))
