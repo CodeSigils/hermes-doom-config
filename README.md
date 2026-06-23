@@ -13,11 +13,11 @@ doom sync
 doom doctor
 ```
 
-If you're an AI agent working in this repo, read `PROFILE.md` first (what this config is), then `DOOM-API.md` (idiomatic Doom patterns), then `AGENTS.md` (workflow and policies — also contains a [complete Reference Map](AGENTS.md#reference-map) of all documentation files).
+If you're an AI agent working in this repo, read [`PROFILE.md`](PROFILE.md) first (what this config is), then [`DOOM-API.md`](DOOM-API.md) (idiomatic Doom patterns), then `AGENTS.md` (workflow and policies — also contains a [complete Reference Map](AGENTS.md#reference-map) of all documentation files).
 
-This repo is also a Hermes agent skill. The `.agents/skills/doom-emacs/` directory contains the skill definition — clone and run `scripts/sync-doom-skill-mirror.sh` to make it loadable by agents. The repo's required Doom skill lives at `.agents/skills/doom-emacs/SKILL.md` — a compact core with `domains/ARCHITECTURE.md`, `domains/PROCEDURES.md`, `domains/ELISP.md`, and `domains/TROUBLESHOOTING.md` for depth on demand.
+This repo is also a Hermes agent skill. The `.agents/skills/doom-emacs/` directory contains the skill definition — clone and run `scripts/sync-doom-skill-mirror.sh` to make it loadable by agents. The repo's required Doom skill lives at [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md) — a compact core with [`domains/ARCHITECTURE.md`](.agents/skills/doom-emacs/domains/ARCHITECTURE.md), [`domains/PROCEDURES.md`](.agents/skills/doom-emacs/domains/PROCEDURES.md), [`domains/ELISP.md`](.agents/skills/doom-emacs/domains/ELISP.md), and [`domains/TROUBLESHOOTING.md`](.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md) for depth on demand.
 
-For consolidated best practices, see `references/best-practices.md`. If your Hermes installation also has `emacs-lisp-expert`, load it as an optional companion skill for general Emacs Lisp guidance. If it is missing, consider installing it for deeper Emacs Lisp help, but do not require it for basic repo maintenance.
+For consolidated best practices, see [`references/best-practices.md`](references/best-practices.md). If your Hermes installation also has `emacs-lisp-expert`, load it as an optional companion skill for general Emacs Lisp guidance. If it is missing, consider installing it for deeper Emacs Lisp help, but do not require it for basic repo maintenance.
 
 For first-time local Hermes use by agents, install the repo skill into the runtime mirror:
 
@@ -26,7 +26,7 @@ scripts/sync-doom-skill-mirror.sh
 scripts/check-doom-skill-mirror.sh
 ```
 
-For the full agent workflow and configuration policies, see `AGENTS.md`.
+For the full agent workflow and configuration policies, see [`AGENTS.md`](AGENTS.md).
 
 ## File Layout
 
@@ -71,7 +71,7 @@ Add new settings and hooks to the matching section file. Add new keybindings to
 ## Agent Script Awareness
 
 All repo scripts live under `scripts/`. The canonical reference for every script -- purpose, invocation, and when to run
--- is the Scripts table in `.agents/skills/doom-emacs/SKILL.md`.
+-- is the Scripts table in [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md).
 
 ```text
   AGENTS.md > workflow bullets     --  generic prose, no paths stored here
@@ -105,7 +105,7 @@ start the workflow.
 
 ## Notable Enabled Modules
 
-See `PROFILE.md` for the full module table with flags by category, and `DOOM-API.md` section 3 for how the module system
+See [`PROFILE.md`](PROFILE.md) for the full module table with flags by category, and [`DOOM-API.md`](DOOM-API.md) section 3 for how the module system
 works. `init.el` is the source of truth.
 
 Not currently enabled: Doom's `mu4e`, `irc`, `rss`, `rest`, `web`, `treemacs`, `nav-flash`, `multiple-cursors`,
@@ -159,7 +159,7 @@ If something breaks, restore `~/.config/doom.backup.*` from the backup.
 - Runtime SQLite artifacts under `.open-mem/` are ignored; keep durable notes in human-readable files instead of
   committing WAL/SHM database state
 - The repo skill is canonical; after skill edits, sync the Hermes runtime mirror (see
-  `.agents/skills/doom-emacs/SKILL.md` Scripts table). Treat the runtime mirror as generated state, not an editable
+  [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md) Scripts table). Treat the runtime mirror as generated state, not an editable
   source tree. Sync stages and validates a replacement before swapping it into place
 - Markdown files in this repo should not contain emoji, including generated status summaries or agent notes
 - Unused modules are commented out in `init.el`, never deleted
