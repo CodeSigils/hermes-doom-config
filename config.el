@@ -7,6 +7,10 @@
 ;;; package or mode. Every config surveyed (hlissner, ztlevi, tecosaur) keeps
 ;;; these in the loader rather than moving them to a section file.
 
+;; Identity used by GPG, email, file templates, and snippets.
+(setq! user-full-name "CodeSigils"
+       user-mail-address "toolsoftrade.web@gmail.com")
+
 ;; Ensure pnpm global binaries are on exec-path for formatters (prettier, etc.)
 ;; pnpm stores globals at ~/.local/share/pnpm/bin/ -- independent of fnm.
 (let ((pnpm-global (expand-file-name "~/.local/share/pnpm/bin")))
