@@ -27,26 +27,22 @@ metadata:
 
 # Doom Emacs Skill
 
-A general guide for configuring and troubleshooting Doom Emacs. Load this
-whenever touching files under `~/.config/doom/` or when the user asks about
-Emacs config. This skill is meant to serve a new user — it teaches Doom
+A general guide for configuring and troubleshooting Doom Emacs. Load this whenever touching files under
+`~/.config/doom/` or when the user asks about Emacs config. This skill is meant to serve a new user — it teaches Doom
 conventions, not just this repo's specific choices.
 
-**Companion skill:** If `emacs-lisp-expert` is installed, load it too — it
-covers Emacs Lisp fundamentals that this skill builds on. If it is not
-installed, do not block: use this skill's Doom-specific guidance plus the
-Emacs Lisp guide at `domains/ELISP.md` for non-trivial elisp. Suggest
-installing `emacs-lisp-expert` once as an optional companion for deeper Emacs
-Lisp work. This repo must remain self-contained for new users and agents.
+**Companion skill:** If `emacs-lisp-expert` is installed, load it too — it covers Emacs Lisp fundamentals that this
+skill builds on. If it is not installed, do not block: use this skill's Doom-specific guidance plus the Emacs Lisp guide
+at `domains/ELISP.md` for non-trivial elisp. Suggest installing `emacs-lisp-expert` once as an optional companion for
+deeper Emacs Lisp work. This repo must remain self-contained for new users and agents.
 
-**Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it
-exists — it contains user-specific policies (completion preference, Markdown
-style, verification steps, etc.).
+**Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it exists — it contains user-specific
+policies (completion preference, Markdown style, verification steps, etc.).
 
 ## Quick Index
 
-This skill is organised as a compact core (task-agnostic essentials) with
-domain files for specific needs. Read only what your task needs:
+This skill is organised as a compact core (task-agnostic essentials) with domain files for specific needs. Read only
+what your task needs:
 
 | When your task is...                  | Read this section or file                          |
 | :------------------------------------ | :------------------------------------------------- | ------------------------------------------ |
@@ -63,25 +59,22 @@ domain files for specific needs. Read only what your task needs:
 
 ## Agent Workflow
 
-Follow the workflow defined in `AGENTS.md` ("Agent Workflow" section). That
-is the single source of truth for how agents should operate in this repo.
+Follow the workflow defined in `AGENTS.md` ("Agent Workflow" section). That is the single source of truth for how agents
+should operate in this repo.
 
 The key steps are:
 
 1. Check `git status --short` before changing files.
 2. Inspect the relevant file before patching; do not guess from memory.
 3. Run `check-parens` on changed `.el` files before `doom sync`.
-4. Run `doom sync` after requested edits (including config-only), unless told
-   not to.
+4. Run `doom sync` after requested edits (including config-only), unless told not to.
 5. Run `doom doctor` after `doom sync`.
 6. Run `scripts/check-stale-patterns.sh` before committing.
-7. If skill or domain files were changed: run both sync scripts
-   (`scripts/sync-doom-skill-mirror.sh`, then
+7. If skill or domain files were changed: run both sync scripts (`scripts/sync-doom-skill-mirror.sh`, then
    `scripts/check-doom-skill-mirror.sh`).
 8. Finish with `git diff --check`, `git status --short`, concise summary.
 
-See AGENTS.md for the full workflow with edge cases (failed commands, reference
-consultation, skill mirror sync).
+See AGENTS.md for the full workflow with edge cases (failed commands, reference consultation, skill mirror sync).
 
 ## File Roles — Know What Goes Where
 
@@ -105,16 +98,14 @@ Patterns that apply to any Doom config:
 - Use `after!` for deferred config — never `with-eval-after-load`
 - Use `use-package!` for package configuration — never standard `use-package`
 - Use `map!` for keybindings; `:leader` prefix for global bindings
-- In this repo, keep all `map!` forms in `sections/keys.el`, grouped by
-  package or prefix. Use `(:map override ...)` for global chords that must beat
-  minor-mode maps, and `(:after <pkg> :map <map> ...)` inside `map!` for
-  package-specific maps. Adopt only the external patterns that reduce local
-  complexity; do not cargo-cult larger-config machinery like broad
-  module/platform binding layers, `autoload/` splits, or literate config before
-  this repo has real pressure for them.
+- In this repo, keep all `map!` forms in `sections/keys.el`, grouped by package or prefix. Use `(:map override ...)` for
+  global chords that must beat minor-mode maps, and `(:after <pkg> :map <map> ...)` inside `map!` for package-specific
+  maps. Adopt only the external patterns that reduce local complexity; do not cargo-cult larger-config machinery like
+  broad module/platform binding layers, `autoload/` splits, or literate config before this repo has real pressure for
+  them.
 - Use `fboundp` guards for optional package entrypoints (e.g. `(when (fboundp 'some-command) (some-command 1))`)
-- Use `(executable-find ...)` fallback chains before configuring external
-  binaries such as browsers, terminals, shell helpers, or formatters.
+- Use `(executable-find ...)` fallback chains before configuring external binaries such as browsers, terminals, shell
+  helpers, or formatters.
 - Comment out unused modules in `init.el` — never delete lines
 - Snippets live under `<doom-user-dir>/snippets/<major-mode>/`
 
@@ -180,13 +171,11 @@ package recipe errors that would otherwise fail silently.
 - **Bind launcher keys outside `after!`** — putting a keybinding inside `(after! <pkg> ...)` delays the binding until
   the package loads. For commands meant to be run immediately, bind them directly and defer only the package
   configuration.
-- **Scattering keybindings across feature sections** — this repo intentionally
-  uses a centralized `sections/keys.el`, following the ztlevi-style all-keys
-  inventory. Keep every `map!` form there; review a feature by checking both its
+- **Scattering keybindings across feature sections** — this repo intentionally uses a centralized `sections/keys.el`,
+  following the ztlevi-style all-keys inventory. Keep every `map!` form there; review a feature by checking both its
   section file and `sections/keys.el`.
-- **Hardcoding external binary paths** — use `(executable-find ...)` fallback
-  chains for browser, terminal, shell helper, and formatter commands. Missing
-  optional binaries should degrade gracefully, not break config loading.
+- **Hardcoding external binary paths** — use `(executable-find ...)` fallback chains for browser, terminal, shell
+  helper, and formatter commands. Missing optional binaries should degrade gracefully, not break config loading.
 
 ## Domain Drift Governance
 
@@ -216,8 +205,8 @@ registered workflow tools are:
 
 ## Skill Script Conventions
 
-Scripts under `scripts/` source `scripts/config.sh` for shared variables:
-`SKILL_SRC`, `SKILL_DST`, `DOOMDIR`, `REPO_ROOT`, and expected skill identity. Never duplicate paths.
+Scripts under `scripts/` source `scripts/config.sh` for shared variables: `SKILL_SRC`, `SKILL_DST`, `DOOMDIR`,
+`REPO_ROOT`, and expected skill identity. Never duplicate paths.
 
 Grep within scripts follows cross-platform conventions:
 
@@ -233,27 +222,24 @@ Available via `config.sh` after sourcing:
 - `confirm_skill_src`, `confirm_skill_target`, `confirm_skill_dst`
 - `canonical_existing_path`, `skill_name`
 
-The documentation validator treats stale Doom commands as blocking active
-guidance. A deliberately preserved historical example must carry
-`<!-- stale-check: allow -->` on the same line; do not use the marker to
-suppress current instructions.
+The documentation validator treats stale Doom commands as blocking active guidance. A deliberately preserved historical
+example must carry `<!-- stale-check: allow -->` on the same line; do not use the marker to suppress current
+instructions.
 
 ## Keeping the Config Repo Self-Contained
 
-This skill lives at `.agents/skills/doom-emacs/SKILL.md`. Anyone who clones
-this repo gets the full skill with it. After editing the skill, sync the Hermes
-runtime mirror:
+This skill lives at `.agents/skills/doom-emacs/SKILL.md`. Anyone who clones this repo gets the full skill with it. After
+editing the skill, sync the Hermes runtime mirror:
 
 ```sh
 scripts/sync-doom-skill-mirror.sh
 scripts/check-doom-skill-mirror.sh
 ```
 
-The sync copies into a temporary sibling directory, validates identity and
-byte-level equality, and only then swaps it into place. The prior valid mirror
-is retained until replacement succeeds, so stale mirror-only files cannot
-survive and a failed copy does not remove the working mirror. See `AGENTS.md`
-for the source/mirror invariant and drift-detection steps.
+The sync copies into a temporary sibling directory, validates identity and byte-level equality, and only then swaps it
+into place. The prior valid mirror is retained until replacement succeeds, so stale mirror-only files cannot survive and
+a failed copy does not remove the working mirror. See `AGENTS.md` for the source/mirror invariant and drift-detection
+steps.
 
 ## Reference Sources
 

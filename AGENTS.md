@@ -27,26 +27,25 @@ When opening this repo cold, read files in this order:
 
 `README.md` is human-facing; read it when you need quick-start or dependency info.
 
-Beyond these 5 entry files, additional reference files exist in depth layers
-(`references/` and `.agents/skills/doom-emacs/domains/`). The Reference Map
-below is the source of truth for the full landscape — read it at step 3 before
-you need depth.
+Beyond these 5 entry files, additional reference files exist in depth layers (`references/` and
+`.agents/skills/doom-emacs/domains/`). The Reference Map below is the source of truth for the full landscape — read it
+at step 3 before you need depth.
 
 ## Source-First Reference Policy
 
 The installed Doom source at `~/.config/emacs/` is the authoritative reference for this config — not upstream docs, not
-community configs. Before editing `config.el`, `sections/*.el`, `init.el`, or `packages.el`, consult the corresponding module source at
-`~/.config/emacs/modules/<cat>/<mod>/` to verify flags, patterns, and configuration options. When the user asks about a
-package, flag, or feature, answer from the module source (README.org for flags, config.el for implementation patterns,
-lisp/ for core macros). External references supplement, never replace, the installed source.
+community configs. Before editing `config.el`, `sections/*.el`, `init.el`, or `packages.el`, consult the corresponding
+module source at `~/.config/emacs/modules/<cat>/<mod>/` to verify flags, patterns, and configuration options. When the
+user asks about a package, flag, or feature, answer from the module source (README.org for flags, config.el for
+implementation patterns, lisp/ for core macros). External references supplement, never replace, the installed source.
 
 If `emacs-lisp-expert` is available, load it for general Emacs Lisp guidance; if missing, suggest it once as an optional
 companion, then continue without blocking.
 
 ## Reference Map
 
-Guide to every reference file in this repo, organized by depth tier.
-Read this at step 3 to see the full landscape before you need depth.
+Guide to every reference file in this repo, organized by depth tier. Read this at step 3 to see the full landscape
+before you need depth.
 
 | Tier                   | File                                                   | Purpose                                                                 | Discovers / Entry path                   |
 | :--------------------- | :----------------------------------------------------- | :---------------------------------------------------------------------- | :--------------------------------------- |
@@ -64,9 +63,8 @@ Read this at step 3 to see the full landscape before you need depth.
 | 4 — domains/           | `.agents/skills/doom-emacs/domains/PROCEDURES.md`      | Task-specific procedures (add module, install package)                  | SKILL.md Quick Index                     |
 | 4 — domains/           | `.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md` | Diagnostic guide for Emacs failures                                     | SKILL.md Quick Index                     |
 
-An agent reading the 5-step entry order encounters the entry files and the skill
-entry. The `references/` files and domain files are invisible from the entry
-path alone — this table bridges that gap.
+An agent reading the 5-step entry order encounters the entry files and the skill entry. The `references/` files and
+domain files are invisible from the entry path alone — this table bridges that gap.
 
 ## Agent Workflow
 
@@ -79,9 +77,8 @@ path alone — this table bridges that gap.
 - For changed `.el` files, run `check-parens` before `doom sync`.
 - Run `doom sync` after config edits unless told not to.
 - Run `doom doctor` after `doom sync`.
-- When the skill or any domain file changes, sync the Hermes runtime mirror before
-  committing (see `scripts/sync-doom-skill-mirror.sh` in [Scripts](#scripts) table).
-  The mirror is generated state; do not hand-edit it.
+- When the skill or any domain file changes, sync the Hermes runtime mirror before committing (see
+  `scripts/sync-doom-skill-mirror.sh` in [Scripts](#scripts) table). The mirror is generated state; do not hand-edit it.
 - Verify `DOOM-API.md` patterns against Doom source (`~/.config/emacs/`). If wrong, propose a fix.
 - Before every commit, run the stale-patterns check (see [Scripts](#scripts) table).
 - Before committing script changes, run the network-free contracts (see [Scripts](#scripts) table).
@@ -97,8 +94,8 @@ The canonical reference for all repo scripts — purpose, invocation, and when t
 `.agents/skills/doom-emacs/SKILL.md` (Scripts section).
 
 The Hermes runtime mirror at `~/.hermes/skills/emacs/doom-emacs-config/` is generated state — do not hand-edit it.
-`sync-doom-skill-mirror.sh` stages and validates a complete replacement before swapping it into place; stale
-mirror-only files cannot survive, and the previous mirror is restored if replacement fails. The invariant is:
+`sync-doom-skill-mirror.sh` stages and validates a complete replacement before swapping it into place; stale mirror-only
+files cannot survive, and the previous mirror is restored if replacement fails. The invariant is:
 
 ```text
 ~/.hermes/skills/emacs/doom-emacs-config/ == ~/.config/doom/.agents/skills/doom-emacs/
@@ -118,10 +115,11 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 
 - The preferred completion backend is Doom's `:completion company` module for the fuller Company experience: snippets,
   code completion, file-path completion, and mature completion backends.
-- Company path completion is intentionally expanded in `sections/completion.el` with `company-files` via `set-company-backend!`;
-  preserve that when editing completion behavior.
+- Company path completion is intentionally expanded in `sections/completion.el` with `company-files` via
+  `set-company-backend!`; preserve that when editing completion behavior.
 - Keep Corfu present as a commented `init.el` module line, but do not switch the completion system to Corfu/Cape (the
-  `company-capf` backends in `sections/completion.el` are Company backends, not Corfu configuration -- leave them untouched).
+  `company-capf` backends in `sections/completion.el` are Company backends, not Corfu configuration -- leave them
+  untouched).
 - Do not remove lines from `init.el`; comment disabled modules/settings instead so the original Doom module list stays
   visible and recoverable.
 - After changing `init.el` completion modules, `packages.el`, or requested config-only behavior, run `doom sync` unless
@@ -131,8 +129,7 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 
 - Use `fboundp` guards for optional package entrypoints when practical, such as `org-roam-db-autosync-mode`.
 - Keep global defaults global. For example, `delete-by-moving-to-trash` belongs in the main defaults section of the
-  `config.el` loader and should
-  not be duplicated inside package blocks unless a package needs a different value.
+  `config.el` loader and should not be duplicated inside package blocks unless a package needs a different value.
 
 ## Markdown Policy
 
@@ -194,8 +191,8 @@ When asking an AI (or another agent) about this Doom config, provide context to 
 
 **Helper script:** Run the AI context helper script (see [Scripts](#scripts) table) to auto-generate this context block.
 
-**Note on doom CLI:** The `doom` binary lives at `~/.config/emacs/bin/doom`. If `doom doctor` or other `doom` commands fail
-with "command not found," use the full path or ensure the bin directory is on `$PATH`:
+**Note on doom CLI:** The `doom` binary lives at `~/.config/emacs/bin/doom`. If `doom doctor` or other `doom` commands
+fail with "command not found," use the full path or ensure the bin directory is on `$PATH`:
 `export PATH="$HOME/.config/emacs/bin:$PATH"`.
 
 **Why this works:** AI agents have no persistent memory of your config. The context window is limited and
