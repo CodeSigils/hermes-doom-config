@@ -15,7 +15,7 @@
   ;; Defensive guard: some image/advice integrations can call Org's inline image
   ;; display from non-Org buffers, which makes `org-element' try to parse
   ;; Markdown buffers like AGENTS.md.
-  (defadvice! sand/org-display-inline-images-only-in-org (fn &rest args)
+  (defadvice! user/org-display-inline-images-only-in-org (fn &rest args)
     "Only run Org inline-image display in Org buffers."
     :around #'org-display-inline-images
     (when (derived-mode-p 'org-mode)

@@ -24,7 +24,7 @@ This is a summary. The source of truth is `init.el`, `config.el` (loader with un
 | Terminal         | vterm                                                     |
 | Tab/workspace    | workspaces module (tabspaces)                             |
 | Formatting       | `format +onsave` — Ruff for Python, Prettier for Markdown |
-| Custom prefix    | `sand/`                                                   |
+| Custom prefix    | `user/`                                                   |
 | Module style     | Comment out unused modules, never delete lines            |
 | Keybinding style | `map!` with `:leader`; `:localleader` for major-mode maps |
 | Package installs | via `(package! ...)` in `packages.el` + `doom sync`       |
@@ -67,13 +67,13 @@ Beyond Doom built-ins:
 | `org-roam-ui`        | Org-roam graph browser  |                                            |
 | `rainbow-delimiters` | Color-coded parentheses |                                            |
 
-## Custom Functions (sand/ prefix)
+## Custom Functions (user/ prefix)
 
 | Function                                     | Purpose                                        | Location                 |
 | -------------------------------------------- | ---------------------------------------------- | ------------------------ |
-| `sand/org-display-inline-images-only-in-org` | Only display inline images in org-mode         | `sections/org.el`        |
-| `sand/split-window-sensibly`                 | Prefer side-by-side splits, fall back to below | `sections/navigation.el` |
-| `sand/initial-frame-size`                    | Return a monitor-aware initial frame size      | `sections/navigation.el` |
+| `user/org-display-inline-images-only-in-org` | Only display inline images in org-mode         | `sections/org.el`        |
+| `user/split-window-sensibly`                 | Prefer side-by-side splits, fall back to below | `sections/navigation.el` |
+| `user/initial-frame-size`                    | Return a monitor-aware initial frame size      | `sections/navigation.el` |
 
 ## Config Policies Summary
 

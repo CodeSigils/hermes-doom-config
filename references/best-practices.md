@@ -31,11 +31,11 @@ loading unless there is a specific reason not to.
 ## 2. Config Hygiene
 
 **Namespace everything.** All custom functions, variables, and private state
-use the `sand/` prefix (defined in PROFILE.md). Never use bare `my-`, no
+use the `user/` prefix (defined in PROFILE.md). Never use bare `my-`, no
 prefix at all, or package-internal-looking names.
 
 ```elisp
-(defun sand/my-function () ...)
+(defun user/my-function () ...)
 (setq sand-my-var t)
 ```
 

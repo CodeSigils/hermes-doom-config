@@ -351,7 +351,7 @@ it shouldn't run at startup.**
 
 ### 7.4 Config Hygiene — Code That Stays Maintainable
 
-- **Namespace everything.** Use the `sand/` prefix for all custom functions,
+- **Namespace everything.** Use the `user/` prefix for all custom functions,
   variables, and private state. Never use a bare `my-` prefix or no prefix at
   all — collisions with package-internal functions are silent and hard to
   debug.

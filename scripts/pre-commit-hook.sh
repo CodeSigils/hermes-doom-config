@@ -100,7 +100,7 @@ check '(require' \
     "${FILES[@]}" || true
 
 check '(lambda' \
-    'WARNING: lambda found. Should this be a named function with sand/ prefix? (best-practices.md §4)' \
+    'WARNING: lambda found. Should this be a named function with user/ prefix? (best-practices.md §4)' \
     "${FILES[@]}" || true
 
 # -------- exit --------

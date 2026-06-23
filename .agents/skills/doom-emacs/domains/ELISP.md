@@ -17,7 +17,7 @@ elisp, procedures, and troubleshooting.
 | `setq-local`    | Set value for current buffer | `(setq-local truncate-lines nil)`           |
 | `when`/`unless` | Conditional execution        | `(when (fboundp 'jinx-mode) (jinx-mode 1))` |
 | `let`           | Temporary local binding      | `(let ((url-package-name "foo")) ...)`      |
-| `defun`         | Define a named function      | `(defun sand/my-fn () (message "hi"))`      |
+| `defun`         | Define a named function      | `(defun user/my-fn () (message "hi"))`      |
 
 ## Key Patterns
 
@@ -31,11 +31,11 @@ elisp, procedures, and troubleshooting.
 **Prefer named functions over lambdas in hooks:**
 
 ```elisp
-(defun sand/my-hook-fn () (setq-local truncate-lines nil))
-(add-hook 'org-mode-hook #'sand/my-hook-fn)
+(defun user/my-hook-fn () (setq-local truncate-lines nil))
+(add-hook 'org-mode-hook #'user/my-hook-fn)
 ```
 
-**Custom prefix:** Use the user's custom prefix (e.g. `sand/`) for all custom functions, variables, and private state.
+**Custom prefix:** Use the user's custom prefix (e.g. `user/`) for all custom functions, variables, and private state.
 Never use bare `my-` or no prefix — collisions with package-internal functions are silent and hard to debug.
 
 ## Discovering Emacs APIs

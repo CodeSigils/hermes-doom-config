@@ -11,7 +11,7 @@
 
 (winner-mode 1)
 
-(defun sand/split-window-sensibly (&optional window)
+(defun user/split-window-sensibly (&optional window)
   "Prefer side-by-side splits, then fall back to below splits."
   (let ((window (or window (selected-window))))
     (or (and (window-splittable-p window t)
@@ -21,7 +21,7 @@
              (with-selected-window window
                (split-window-below))))))
 
-(setq! split-window-preferred-function #'sand/split-window-sensibly)
+(setq! split-window-preferred-function #'user/split-window-sensibly)
 
 ;; Keep common transient/help buffers out of the main editing layout without
 ;; capturing every star buffer.
@@ -33,7 +33,7 @@
   (set-popup-rule! "^\\*doom:[^*]+\\*"
     :size 0.35 :ttl 0 :quit t :select nil))
 
-(defun sand/initial-frame-size ()
+(defun user/initial-frame-size ()
   "Return a monitor-aware initial frame size."
   (cond
    ((>= (display-pixel-width) 2560) '((width . 140) (height . 60)))
@@ -42,4 +42,4 @@
 
 (setq! initial-frame-alist
       (append '((top . 1) (left . 1))
-              (sand/initial-frame-size)))
+              (user/initial-frame-size)))
