@@ -244,6 +244,18 @@ Note: TypeScript mode inherits all 12 JavaScript snippets via `.yas-parents` poi
 - **Use `.yas-parents` for inheritance** — avoids duplicating snippets across related modes (e.g., TypeScript inheriting
   from JavaScript).
 
+## Agent Workflow
+
+When adding or modifying a snippet:
+
+1. **Consult the official reference first.** The authoritative docs are at
+   [joaotavora.github.io/yasnippet/](https://joaotavora.github.io/yasnippet/)
+   (Writing Snippets section) and this file (`references/yasnippets.md`). Verify
+   syntax, directives, and tab-stop semantics against these sources before
+   writing or changing a snippet file.
+
+2. **Follow the syntax checklist below** before committing.
+
 ## Syntax Checks
 
 Before committing snippet changes, verify:
