@@ -14,11 +14,11 @@
     (add-to-list 'exec-path pnpm-global)))
 
 (setq! delete-by-moving-to-trash t
-      window-combination-resize t
-      confirm-kill-emacs nil
-      confirm-kill-processes nil
-      evil-want-fine-undo t
-      truncate-string-ellipsis "...")
+       window-combination-resize t
+       confirm-kill-emacs nil
+       confirm-kill-processes nil
+       evil-want-fine-undo t
+       truncate-string-ellipsis "...")
 
 (global-prettify-symbols-mode 1)
 (global-subword-mode 1)
@@ -26,20 +26,11 @@
 (display-time-mode 1)
 
 ;;; SECTIONS — loaded in reviewed order; keys loaded last.
-;;
-;;   sections/appearance.el    Font, theme, line-numbers
-;;   sections/spellcheck.el    Jinx spell-checking
-;;   sections/org.el           Org, Org-Roam, Org-Roam-UI
-;;   sections/completion.el    Company backends, dabbrev
-;;   sections/navigation.el    Browser, window management, popups, frame
-;;   sections/ui.el            Dirvish, which-key, smartparens, rainbow-delimiters
-;;   sections/formatting.el    Ruff (Python), Prettier (Markdown)
-;;   sections/keys.el          All keybindings, loaded last
-(load! "sections/appearance")
-(load! "sections/spellcheck")
-(load! "sections/org")
-(load! "sections/completion")
-(load! "sections/navigation")
-(load! "sections/ui")
-(load! "sections/formatting")
-(load! "sections/keys")
+(load! "sections/appearance") ;; Font, theme, line-numbers
+(load! "sections/spellcheck") ;; Jinx spell-checking
+(load! "sections/org")        ;; Org, Org-Roam, Org-Roam-UI
+(load! "sections/completion") ;; Company backends, dabbrev
+(load! "sections/navigation") ;; Browser, window management, popups, frame
+(load! "sections/ui")         ;; Dirvish, which-key, smartparens, rainbow-delimiters
+(load! "sections/formatting") ;; Ruff (Python), Prettier (Markdown)
+(load! "sections/keys")       ;; All keybindings, loaded last
