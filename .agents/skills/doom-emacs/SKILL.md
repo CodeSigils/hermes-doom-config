@@ -108,6 +108,7 @@ Patterns that apply to any Doom config:
   helpers, or formatters.
 - Comment out unused modules in `init.el` — never delete lines
 - Snippets live under `<doom-user-dir>/snippets/<major-mode>/`
+- When adding a new `sand/` custom function, register it in the `PROFILE.md` custom functions table; update the table when a function is removed
 
 ## Doom API Essentials (Compact)
 
