@@ -10,19 +10,7 @@
   ;; Inline images
   (setq! org-startup-with-inline-images t
         org-display-remote-inline-images 'cache
-        org-image-actual-width 600)
-
-  ;; Defensive guard: some image/advice integrations can call Org's inline image
-  ;; display from non-Org buffers, which makes `org-element' try to parse
-  ;; Markdown buffers like AGENTS.md.
-  (defadvice! user/org-display-inline-images-only-in-org (fn &rest args)
-    "Only run Org inline-image display in Org buffers."
-    :around #'org-display-inline-images
-    (when (derived-mode-p 'org-mode)
-      (apply fn args)))
-  (when (fboundp 'org-display-user-inline-images)
-    (advice-remove #'org-display-inline-images
-                   #'org-display-user-inline-images)))
+        org-image-actual-width 600))
 
 (setq! org-roam-directory "~/notes/org/roam");  ; Why: separate directory for Org Roam notes to keep them organized.
 

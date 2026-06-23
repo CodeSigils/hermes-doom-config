@@ -71,7 +71,6 @@ Beyond Doom built-ins:
 
 | Function                                     | Purpose                                        | Location                 |
 | -------------------------------------------- | ---------------------------------------------- | ------------------------ |
-| `user/org-display-inline-images-only-in-org` | Only display inline images in org-mode         | `sections/org.el`        |
 | `user/split-window-sensibly`                 | Prefer side-by-side splits, fall back to below | `sections/navigation.el` |
 | `user/initial-frame-size`                    | Return a monitor-aware initial frame size      | `sections/navigation.el` |
 
