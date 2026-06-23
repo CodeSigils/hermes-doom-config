@@ -9,6 +9,7 @@
 | `references/INDEX.md`                | Reference catalogue — Doom resources, community configs, exploration          |
 | `references/package-management.md`   | Doom package lifecycle — pinning, straight, recovery                          |
 | `references/best-practices.md`       | Consolidated best practices for writing Doom config                           |
+| `references/yasnippets.md`           | Snippet inventory, template syntax, best practices                            |
 | `.agents/skills/doom-emacs/SKILL.md` | Compact core: file roles, API essentials, pitfalls; plus `domains/` for depth |
 | `README.md`                          | Human quick-start (verify module lists against `init.el`)                     |
 
@@ -56,6 +57,7 @@ Read this at step 3 to see the full landscape before you need depth.
 | 2 — references/        | `references/INDEX.md`                                  | External Doom resources, community configs, exploration                 | Entry step 4                             |
 | 2 — references/        | `references/package-management.md`                     | Package lifecycle — pinning, straight, recovery                         | INDEX.md SS9, SKILL.md Reference Sources |
 | 2 — references/        | `references/best-practices.md`                         | Consolidated Doom config best practices                                 | AGENTS.md Reference Map (this table)     |
+| 2 — references/        | `references/yasnippets.md`                             | Snippet inventory, template syntax, best practices                      | SKILL.md Quick Index                     |
 | 3 — Skill entry        | `.agents/skills/doom-emacs/SKILL.md`                   | Compact core: file roles, API essentials, pitfalls; plus domains/ index | Entry step 5                             |
 | 4 — domains/           | `.agents/skills/doom-emacs/domains/ARCHITECTURE.md`    | Doom framework, module system, reload semantics                         | SKILL.md Quick Index                     |
 | 4 — domains/           | `.agents/skills/doom-emacs/domains/ELISP.md`           | Emacs Lisp for Doom config                                              | SKILL.md Quick Index                     |
@@ -164,6 +166,8 @@ When you change a source of truth, update its dependent files in the same change
 | `SKILL.md` Scripts table              | `README.md` Agent Script Awareness section                                                                                                | Update diagram, path descriptions                                                                              |
 | `domains/` files                      | `SKILL.md` Quick Index table                                                                                                              | Add/remove/rename rows to match domain files                                                                   |
 | `references/best-practices.md`        | `AGENTS.md` Reference Map, `AGENTS.md` Cross-References, `SKILL.md` Quick Index, `SKILL.md` Reference Sources, `PROFILE.md` Related Files | Add/remove rows, update paths, register in Reference Map                                                       |
+| `references/yasnippets.md`            | `AGENTS.md` Reference Map, `AGENTS.md` Cross-References, `SKILL.md` Quick Index, `SKILL.md` Reference Sources                             | Update snippet inventory, register in Reference Map and Quick Index                                            |
+| `snippets/`                           | `references/yasnippets.md`                                                                                                                | Update snippet inventory when adding or removing snippet files                                                 |
 | Doom module source (README.org)       | `references/INDEX.md` flags/features tables                                                                                               | Flag changes, new module features                                                                              |
 | Doom CLI (`~/.config/emacs/bin/doom`) | `references/package-management.md`                                                                                                        | Command changes, new subcommands                                                                               |
 

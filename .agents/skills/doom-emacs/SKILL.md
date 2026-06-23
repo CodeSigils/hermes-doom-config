@@ -49,15 +49,16 @@ This skill is organised as a compact core (task-agnostic essentials) with
 domain files for specific needs. Read only what your task needs:
 
 | When your task is...                  | Read this section or file                          |
-| :------------------------------------ | :------------------------------------------------- |
+| :------------------------------------ | :------------------------------------------------- | ------------------------------------------ |
 | First time in this repo               | Agent Workflow, Writing Conventions, Safety Checks |
 | Editing `init.el`                     | `domains/ARCHITECTURE.md`, Safety Checks           |
 | Adding a module or package            | `domains/PROCEDURES.md` (A, B)                     |
 | Setting a keybinding                  | `domains/PROCEDURES.md` (E), Doom API Essentials   |
 | Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                       |
 | Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |
-| Checking style or reviewing patterns  | `references/best-practices.md`                     |
-| Upgrading Doom framework              | `domains/PROCEDURES.md` (G), Safety Checks         |
+|                                       | Checking style or reviewing patterns               | `references/best-practices.md`             |
+|                                       | Writing or editing snippets                        | `references/yasnippets.md`                 |
+|                                       | Upgrading Doom framework                           | `domains/PROCEDURES.md` (G), Safety Checks |
 | Maintaining config repo scripts       | Skill Script Conventions                           |
 
 ## Agent Workflow
@@ -268,5 +269,6 @@ When you need to understand how a package or Doom module works, the source code 
   - `references/INDEX.md` — external resource catalogue (community configs, keybinding reference, performance tips)
   - `references/package-management.md` — package lifecycle, pinning, straight internals, recovery
   - `references/best-practices.md` — consolidated Doom config best practices
+  - `references/yasnippets.md` — snippet inventory, template syntax, best practices
   - `AGENTS.md` — user-specific policies, workflow, drift prevention
   - `domains/` — depth guides (architecture, procedures, elisp, troubleshooting)
