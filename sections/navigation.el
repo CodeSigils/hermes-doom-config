@@ -33,12 +33,38 @@
   (set-popup-rule! "^\\*doom:[^*]+\\*"
     :size 0.35 :ttl 0 :quit t :select nil))
 
+(defvar user/frame-geometry-file
+  (expand-file-name ".frame-geometry" "~/.local/share/doom/")
+  "File storing last frame width/height for persistence across sessions.")
+
 (defun user/initial-frame-size ()
-  "Return a monitor-aware initial frame size."
-  (cond
-   ((>= (display-pixel-width) 2560) '((width . 140) (height . 60)))
-   ((>= (display-pixel-width) 1920) '((width . 124) (height . 55)))
-   (t '((width . 100) (height . 45)))))
+  "Return saved frame geometry, or pixel-width-based defaults.
+Saves last geometry on exit so Emacs remembers your manual resizes."
+  (or (user/load-frame-geometry)
+      (cond
+       ((>= (display-pixel-width) 2560) '((width . 140) (height . 60)))
+       ((>= (display-pixel-width) 1920) '((width . 124) (height . 55)))
+       (t '((width . 100) (height . 45))))))
+
+(defun user/load-frame-geometry ()
+  "Read saved frame geometry from disk if it exists."
+  (when (file-exists-p user/frame-geometry-file)
+    (condition-case nil
+        (with-temp-buffer
+          (insert-file-contents user/frame-geometry-file)
+          (read (current-buffer)))
+      (error nil))))
+
+(defun user/save-frame-geometry ()
+  "Save current frame pixel width and height for next session."
+  (when (display-graphic-p)
+    (let ((params `((width . ,(frame-pixel-width))
+                    (height . ,(frame-pixel-height)))))
+      (with-temp-file user/frame-geometry-file
+        (insert (prin1-to-string params))))))
+
+;; Remember frame size across restarts
+(add-hook 'kill-emacs-hook #'user/save-frame-geometry)
 
 (setq! initial-frame-alist
       (append '((top . 1) (left . 1))

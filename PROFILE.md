@@ -72,7 +72,9 @@ Beyond Doom built-ins:
 | Function                                     | Purpose                                        | Location                 |
 | -------------------------------------------- | ---------------------------------------------- | ------------------------ |
 | `user/split-window-sensibly`                 | Prefer side-by-side splits, fall back to below | `sections/navigation.el` |
-| `user/initial-frame-size`                    | Return a monitor-aware initial frame size      | `sections/navigation.el` |
+| `user/initial-frame-size`                    | Return saved or pixel-width-based frame size   | `sections/navigation.el` |
+| `user/load-frame-geometry`                   | Read saved frame geometry from disk            | `sections/navigation.el` |
+| `user/save-frame-geometry`                   | Save frame geometry to disk on Emacs exit      | `sections/navigation.el` |
 
 ## Config Policies Summary
 
