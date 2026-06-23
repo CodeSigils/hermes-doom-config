@@ -247,3 +247,8 @@ Before committing snippet changes, verify:
 4. **`.yas-parents` target exists** — the parent mode directory must exist.
 5. **Body is valid** — literal `{`/`}` in JS/LaTeX bodies are fine (yasnippet only interprets `${...}` as field syntax
    when `${` opens together).
+
+## External Resources
+
+- **Official yasnippet documentation:** [joaotavora.github.io/yasnippet/](https://joaotavora.github.io/yasnippet/) — snippet syntax, field/mirror/transformation reference, and advanced usage.
+- **Yasnippet GitHub repo:** [github.com/joaotavora/yasnippet](https://github.com/joaotavora/yasnippet) — issue tracker, examples, and source.
