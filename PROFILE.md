@@ -5,7 +5,7 @@ before making suggestions or modifications.
 
 This is a summary. The source of truth is `init.el`, `config.el` (loader with universal defaults), `sections/*.el`
 (per-feature config), `sections/keys.el` (keybindings), and `packages.el`; policy and reference guides live in
-`AGENTS.md` and `references/` (see AGENTS.md Reference Map for the full inventory).
+`AGENTS.md` and `references/` (see the [Reference Map in AGENTS.md](AGENTS.md#reference-map) for the full inventory).
 
 ---
 

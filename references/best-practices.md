@@ -367,4 +367,4 @@ literate config (`config.org` tangle). Unnecessary here:
 
 ---
 
-For the full file inventory, see the Reference Map in `AGENTS.md`.
+For the full file inventory, see the [Reference Map in AGENTS.md](AGENTS.md#reference-map).

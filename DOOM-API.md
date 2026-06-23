@@ -435,4 +435,4 @@ wrong or omits:
 
 ---
 
-For the full file inventory, see the Reference Map in `AGENTS.md`.
+For the full file inventory, see the [Reference Map in AGENTS.md](AGENTS.md#reference-map).
