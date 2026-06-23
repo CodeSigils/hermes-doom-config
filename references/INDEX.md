@@ -143,18 +143,18 @@ against the local `~/.config/emacs/` source when examples don't work.
 
 ### Doom Macros (Use These, Not Vanilla)
 
-| Doom Macro             | Replaces                       | Purpose                        |
-| ---------------------- | ------------------------------ | ------------------------------ |
-| `after!`               | `with-eval-after-load`         | Deferred config after load     |
-| `use-package!`         | `use-package`                  | Package declaration + config   |
-| `map!`                 | `define-key`, `global-set-key` | Keybinding (evil-aware)        |
-| `add-hook!`            | `add-hook` (multi-mode)        | Multi-mode hook registration   |
-| `setq-hook!`           | `add-hook` + lambda            | Buffer-local var in a hook     |
-| `set-company-backend!` | `setq company-backends`        | Per-mode company backends      |
-| `set-popup-rule!`      | `display-buffer-alist`         | Popup buffer display rules     |
-| `defadvice!`           | `defun` + `advice-add`         | Named advice with docstring    |
-| `load!`                | `load-file`                    | Load relative to doom-user-dir |
-| `featurep!`            | `featurep`                     | Compile-time module check      |
+| Doom Macro             | Replaces                       | Purpose                                                     |
+| ---------------------- | ------------------------------ | ----------------------------------------------------------- |
+| `after!`               | `with-eval-after-load`         | Deferred config after load                                  |
+| `use-package!`         | `use-package`                  | Package declaration + config                                |
+| `map!`                 | `define-key`, `global-set-key` | Keybinding (evil-aware)                                     |
+| `add-hook!`            | `add-hook` (multi-mode)        | Multi-mode hook registration                                |
+| `setq-hook!`           | `add-hook` + lambda            | Buffer-local var in a hook                                  |
+| `set-company-backend!` | `setq company-backends`        | Per-mode company backends                                   |
+| `set-popup-rule!`      | `display-buffer-alist`         | Popup buffer display rules                                  |
+| `defadvice!`           | `defun` + `advice-add`         | Named advice with docstring                                 |
+| `load!`                | `load-file`                    | Load relative to doom-user-dir                              |
+| `modulep!`             | `modulep`                      | Compile-time module check (replaces deprecated `featurep!`) |
 
 For full syntax and examples, see `DOOM-API.md` at the repo root.
 

@@ -9,19 +9,19 @@ scannable reference.
 
 ## 1. Macro Decisions — Doom API Over Emacs API
 
-| Doom macro             | Replaces                            | Why prefer it                                                       |
-| ---------------------- | ----------------------------------- | ------------------------------------------------------------------- |
-| `use-package!`         | `use-package`                       | Different deferral semantics via straight.el; wrong one causes bugs |
-| `after!`               | `with-eval-after-load` / `require`  | Handles Doom's deferred ordering; never `require` in config         |
-| `setq!`                | `setq` / `setq-default`             | Tracks variables set via Doom's system; handles default semantics   |
-| `map!`                 | `define-key` / `global-set-key`     | Evil-state aware, which-key descriptions, mode unloading            |
-| `add-hook!`            | `add-hook` (repeated)               | Multi-mode, local variables, `:append` in one form                  |
-| `setq-hook!`           | `add-hook` + lambda                 | Buffer-local var in a hook, cleaner than a lambda                   |
-| `set-company-backend!` | `setq company-backends`             | Per-mode company backends                                           |
-| `set-popup-rule!`      | `display-buffer-alist`              | Transient buffer display rules                                      |
-| `featurep!`            | `(when (require ... nil 'noerror))` | Compile-time check; disabled modules never compiled                 |
-| `load!`                | `load-file`                         | Relative to `doom-user-dir` — portable, no hardcoded paths          |
-| `defadvice!`           | `defun` + `advice-add`              | Named advice with docstring, manageable                             |
+| Doom macro             | Replaces                            | Why prefer it                                                                                    |
+| ---------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `use-package!`         | `use-package`                       | Wraps use-package with disabled-package awareness; adds `:after-call` and `:defer-incrementally` |
+| `after!`               | `with-eval-after-load` / `require`  | Handles Doom's deferred ordering; never `require` in config                                      |
+| `setq!`                | `setq` / `setq-default`             | Triggers custom setters on customizable variables via `set-default-toplevel-value`               |
+| `map!`                 | `define-key` / `global-set-key`     | Evil-state aware, which-key descriptions, mode unloading                                         |
+| `add-hook!`            | `add-hook` (repeated)               | Multi-mode, local variables, `:append` in one form                                               |
+| `setq-hook!`           | `add-hook` + lambda                 | Buffer-local var in a hook, cleaner than a lambda                                                |
+| `set-company-backend!` | `setq company-backends`             | Per-mode company backends                                                                        |
+| `set-popup-rule!`      | `display-buffer-alist`              | Transient buffer display rules                                                                   |
+| `modulep!`             | `(when (require ... nil 'noerror))` | Compile-time check; disabled modules never compiled. Replaces deprecated `featurep!`             |
+| `load!`                | `load-file`                         | Relative to the currently executing file (`load-file-name`) — portable, no hardcoded paths       |
+| `defadvice!`           | `defun` + `advice-add`              | Named advice with docstring, manageable                                                          |
 
 The ordering principle: **lazy by default**. Every macro choice should defer
 loading unless there is a specific reason not to.
@@ -66,13 +66,13 @@ value.
 
 ## 3. File Organization
 
-| File               | Purpose                                                  | `doom sync` needed? |
-| :----------------- | :------------------------------------------------------- | :------------------ |
-| `init.el`          | Module declarations only — single `(doom! ...)` form     | Yes                 |
-| `packages.el`      | Package declarations via `(package! ...)`                | Yes                 |
-| `config.el`        | Thin loader with universal defaults and `load!` calls    | Depends on config   |
-| `sections/`        | Split config (see SECTIONS_PLAN.md) — loaded via `load!` | No                  |
-| `sections/keys.el` | Centralized keybinding inventory, loaded last            | No                  |
+| File               | Purpose                                               | `doom sync` needed? |
+| :----------------- | :---------------------------------------------------- | :------------------ |
+| `init.el`          | Module declarations only — single `(doom! ...)` form  | Yes                 |
+| `packages.el`      | Package declarations via `(package! ...)`             | Yes                 |
+| `config.el`        | Thin loader with universal defaults and `load!` calls | Depends on config   |
+| `sections/`        | Split config — loaded via `load!` from config.el      | No                  |
+| `sections/keys.el` | Centralized keybinding inventory, loaded last         | No                  |
 
 **Splitting rule:** This config already uses a `sections/` split. Put new
 settings/hooks/advice in the matching section file under `sections/<topic>.el`
@@ -94,18 +94,37 @@ Each `.el` file must start with a lexical-binding cookie:
 
 ## 4. Startup Performance
 
-| Principle                             | Practice                                                                                         |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Defer everything                      | Every `use-package!` gets `:defer t` unless the package is needed at startup                     |
-| Prefer `after!` over `(require '...)` | `after!` runs when the feature loads; `(require)` force-loads at config time                     |
-| Use `:commands` for autoloads         | Declare entry-point commands that autoload the package on first use                              |
-| Use `:hook` in `use-package!`         | Cleaner and more efficient than a separate `(add-hook! ...)` outside the declaration             |
-| Keep `:init` blocks lean              | `:init` runs at startup even with `:defer t`. Put expensive setup in `:config` (post-load)       |
-| Prefer `featurep!` over runtime check | Compile-time — disabled modules are never compiled, producing zero startup cost                  |
-| Avoid lambdas in hooks                | `(lambda () ...)` creates a new closure each time the hook runs. Prefer a named function         |
-| Bind launcher keys outside `after!`   | `(map! ...)` inside `(after! <pkg> ...)` delays the binding until the package loads              |
-| Use `setq-hook!` for buffer-local     | Cleaner than `(add-hook! ... (lambda () (setq-local ...)))`                                      |
-| Guard external tools                  | Use `(executable-find ...)` fallback chains before setting browser, formatter, or shell commands |
+> **Note:** The principles below are a compact summary. See
+> `DOOM-API.md` section 7.2 for detailed explanations and examples.
+
+- **Defer everything** — Every `use-package!` gets `:defer t` unless the package is needed at startup.
+- **Understand implicit deferral** — `:commands`, `:hook`, `:mode`, and `:after` all imply `:defer t`. No need to specify both.
+- **Prefer `after!` over `(require '...)`** — `after!` runs when the feature loads; `(require)` force-loads at config time.
+- **Use `:commands` for autoloads** — Declare entry-point commands that autoload the package on first use.
+- **Use `:hook` in `use-package!`** — Cleaner and more efficient than a separate `(add-hook! ...)` outside the declaration.
+- **Keep `:init` blocks lean** — `:init` runs at startup even with `:defer t`. Put expensive setup in `:config` (post-load).
+- **Prefer `modulep!` over runtime check** — Compile-time; disabled modules are never compiled, producing zero startup cost.
+- **Avoid lambdas in hooks** — `(lambda () ...)` creates a new closure each time the hook runs. Prefer a named function.
+- **Bind launcher keys outside `after!`** — `(map! ...)` inside `(after! <pkg> ...)` delays the binding until the package loads.
+- **Use `setq-hook!` for buffer-local** — Cleaner than `(add-hook! ... (lambda () (setq-local ...)))`.
+- **Guard external tools** — Use `(executable-find ...)` fallback chains before setting browser, formatter, or shell commands.
+
+**Implicit deferral explained:** These `use-package` keywords automatically set
+`:defer t` — you don't need to specify both:
+
+```elisp
+;; :hook implies :defer t — package loads when the hook triggers
+(use-package! rainbow-delimiters
+  :hook ((org-mode prog-mode) . rainbow-delimiters-mode))
+
+;; :commands implies :defer t — package loads when the command is first called
+(use-package! org-roam-ui
+  :commands org-roam-ui-mode)
+
+;; No deferral keyword → package loads at startup
+(use-package! some-package
+  :config ...)  ; BAD: loads eagerly at startup
+```
 
 **External tool fallback pattern:**
 
@@ -242,23 +261,22 @@ practice:
 
 ## 9. Common Pitfalls
 
-| Pitfall                                                           | Fix                                                                                                  |
-| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Using `with-eval-after-load` instead of `after!`                  | Use `after!` — handles Doom's deferred ordering correctly                                            |
-| Using standard `use-package` instead of `use-package!`            | Note the trailing `!` — different deferral semantics                                                 |
-| Editing `early-init.el` or `~/.emacs.d/init.el`                   | Doom manages those. All user config goes in `~/.config/doom/`                                        |
-| Missing lexical-binding cookie on `.el` file                      | Add `;;; file.el -*- lexical-binding: t; -*-` as first line                                          |
-| `(setq-default ...)` when `setq!` suffices                        | Doom handles default-value semantics internally — use `setq!`                                        |
-| Deleting `init.el` lines instead of commenting                    | Comment them out — the comment documents a considered-and-rejected option                            |
-| `package-install` interactively                                   | Always use `(package! ...)` in `packages.el` + `doom sync`                                           |
-| Keybinding inside `after!` for launcher commands                  | Bind outside `after!` in `sections/keys.el` so the command is available immediately and can autoload |
-| `require` in config.el                                            | Use `after!` or `use-package! :init`                                                                 |
-| Lambda in hook where `setq-hook!` works                           | `(setq-hook! 'mode-hook var val)` is cleaner and debuggable                                          |
-| Stale upstream comments recommending vanilla patterns             | Replace or annotate them — e.g. `with-eval-after-load` → `after!`                                    |
-| Format on save after `doom sync` breaks indentation               | Run `M-x doom/reload` after `doom sync` before saving                                                |
-| `(featurep! ...)` guard in navigation section for disabled module | Already wrapped in this config — keep the guard. Code inside won't compile without the module        |
-| Package keybindings scattered across feature files                | Keep every `map!` form in `sections/keys.el`; group by package or leader prefix                      |
-| Hardcoded external binary path                                    | Use `(executable-find ...)` fallback chains and tolerate missing binaries                            |
+- **Using `with-eval-after-load` instead of `after!`** — Use `after!`. It handles Doom's deferred ordering correctly.
+- **Using standard `use-package` instead of `use-package!`** — `use-package!` adds disabled-package awareness and extra keywords; the regular `use-package` misses these.
+- **Editing `early-init.el` or `~/.emacs.d/init.el`** — Doom manages those. All user config goes in `~/.config/doom/`.
+- **Missing lexical-binding cookie on `.el` file** — Add `;;; file.el -*- lexical-binding: t; -*-` as first line.
+- **`(setq-default ...)` when `setq!` suffices** — `setq!` triggers custom setters on customizable variables; more efficient than `setopt`.
+- **Deleting `init.el` lines instead of commenting** — Comment them out. The comment documents a considered-and-rejected option.
+- **`package-install` interactively** — Always use `(package! ...)` in `packages.el` + `doom sync`.
+- **Keybinding inside `after!` for launcher commands** — Bind outside `after!` in `sections/keys.el` so the command is available immediately and can autoload.
+- **`require` in config.el** — Use `after!` or `use-package! :init`.
+- **Lambda in hook where `setq-hook!` works** — `(setq-hook! 'mode-hook var val)` is cleaner and debuggable.
+- **Stale upstream comments recommending vanilla patterns** — Replace or annotate them (e.g. `with-eval-after-load` → `after!`).
+- **Format on save after `doom sync` breaks indentation** — Run `M-x doom/reload` after `doom sync` before saving.
+- **`(modulep! ...)` guard in a section for a disabled module** — Already wrapped in this config — keep the guard. Code inside won't compile without the module.
+- **Package keybindings scattered across feature files** — Keep every `map!` form in `sections/keys.el`; group by package or leader prefix.
+- **Hardcoded external binary path** — Use `(executable-find ...)` fallback chains and tolerate missing binaries.
+- **Forgetting `:defer t` on `use-package!` without trigger keywords** — Add `:defer t` explicitly if the package has no `:commands`, `:hook`, `:mode`, or `:after` keywords.
 
 ---
 
@@ -354,7 +372,7 @@ live in config.el as universal defaults.
 
 **Exceptional: incf/decf aliases.** These are a backward-compat workaround
 for Jinx, so they belong in the spellcheck section, not the loader. This
-was a deliberate decision documented in the plan (SECTIONS_PLAN.md).
+was a deliberate decision documented when the sections were created.
 
 ### Why Not Literate Config?
 

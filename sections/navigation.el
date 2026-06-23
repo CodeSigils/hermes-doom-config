@@ -25,7 +25,7 @@
 
 ;; Keep common transient/help buffers out of the main editing layout without
 ;; capturing every star buffer.
-(when (featurep! :ui popup)
+(when (modulep! :ui popup)
   (set-popup-rule! "^\\*\\(?:Help\\|Apropos\\|Warnings\\|Backtrace\\|Messages\\|Completions\\)\\*"
     :size 0.35 :ttl 0 :quit t :select nil)
   (set-popup-rule! "^\\*\\(?:Compile-Log\\|compilation\\|Shell Command Output\\|Async Shell Command\\)\\*"

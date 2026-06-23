@@ -32,7 +32,8 @@ frequency of use.
 
 ### `use-package!` — Configure a Package
 
-Doom's version of `use-package` (note the trailing `!`). Use for _any_ package
+Doom's version of `use-package` (note the trailing `!`). A thin wrapper around `use-package` that adds disabled-package awareness
+and two extra keywords (`:after-call`, `:defer-incrementally`). Use for _any_ package
 that needs setup beyond defaults.
 
 ```elisp
@@ -46,8 +47,8 @@ that needs setup beyond defaults.
 ```
 
 **Do NOT** use the standard `use-package` from MELPA — Doom's `use-package!`
-handles deferral via `straight.el` differently and using the wrong one causes
-subtle timing bugs.
+adds disabled-package awareness and extra keywords; the regular `use-package`
+misses these.
 
 ### `after!` — Defer Config After Something Loads
 
@@ -105,8 +106,8 @@ position flag. Simpler than writing separate `add-hook` calls.
 
 ### `setq!` — Safe Variable Setting
 
-Doom's wrapper around `setq` that respects lexical-binding and Doom's variable
-tracking.
+Doom's wrapper around `setq` that triggers custom setters on customizable
+variables via `set-default-toplevel-value`. More efficient than `setopt`.
 
 ```elisp
 (setq! delete-by-moving-to-trash t
@@ -140,14 +141,14 @@ quit), `:select` (auto-select), `:side` (bottom/left/right/top), `:slot`.
 **Important:** Match buffer names with a regex. `"^\\*"` captures every star
 buffer — too broad. Prefer specific names like `"^\\*Help\\*"`.
 
-### `featurep!` — Compile-Time Module Check
+### `modulep!` — Compile-Time Module Check (replaces deprecated `featurep!`)
 
 ```elisp
-(when (featurep! :ui popup)
+(when (modulep! :ui popup)
   (set-popup-rule! ...))
 ```
 
-This is evaluated at compile time, not runtime. Code inside a `featurep!` block
+This is evaluated at compile time, not runtime. Code inside a `modulep!` block
 for a disabled module is never compiled. Use when you need conditional config
 that depends on whether a module is enabled.
 
@@ -320,15 +321,15 @@ files can have different binding strategies.
 
 Doom's design philosophy is "lazy by default." Stay consistent:
 
-| Principle                                                        | Practice                                                                                                                                                                              |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Defer everything                                                 | Every `use-package!` gets `:defer t` unless the package is needed at startup                                                                                                          |
-| Prefer `after!` over `(require '...)`                            | `(require 'foo)` force-loads `foo` at config time. `(after! foo ...)` runs when the feature actually loads. Never `(require)` in config unless you have a specific startup dependency |
-| Use `:commands` for autoloads                                    | Instead of loading a package, declare entry-point commands that autoload it on first use                                                                                              |
-| Use `:hook` in `use-package!`                                    | `(use-package! foo :hook (mode . func))` is cleaner and more efficient than a separate `(add-hook! ...)` outside the declaration                                                      |
-| Keep `:init` blocks lean                                         | `:init` runs at startup even with `:defer t`. Put expensive setup in `:config` (runs after actual load)                                                                               |
-| Prefer `featurep!` over `(when (require 'foo nil 'noerror) ...)` | `featurep!` is a compile-time check — disabled modules are never compiled, producing zero startup cost                                                                                |
-| Avoid lambdas in hooks                                           | `:hook (mode . (lambda () ...))` creates a new closure each time the hook runs. Prefer a named function                                                                               |
+| Principle                                                       | Practice                                                                                                                                                                              |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Defer everything                                                | Every `use-package!` gets `:defer t` unless the package is needed at startup                                                                                                          |
+| Prefer `after!` over `(require '...)`                           | `(require 'foo)` force-loads `foo` at config time. `(after! foo ...)` runs when the feature actually loads. Never `(require)` in config unless you have a specific startup dependency |
+| Use `:commands` for autoloads                                   | Instead of loading a package, declare entry-point commands that autoload it on first use                                                                                              |
+| Use `:hook` in `use-package!`                                   | `(use-package! foo :hook (mode . func))` is cleaner and more efficient than a separate `(add-hook! ...)` outside the declaration                                                      |
+| Keep `:init` blocks lean                                        | `:init` runs at startup even with `:defer t`. Put expensive setup in `:config` (runs after actual load)                                                                               |
+| Prefer `modulep!` over `(when (require 'foo nil 'noerror) ...)` | `modulep!` is a compile-time check — disabled modules are never compiled, producing zero startup cost                                                                                 |
+| Avoid lambdas in hooks                                          | `:hook (mode . (lambda () ...))` creates a new closure each time the hook runs. Prefer a named function                                                                               |
 
 **Hot take: if you can't justify why a piece of code needs to run at startup,
 it shouldn't run at startup.**
@@ -337,9 +338,9 @@ it shouldn't run at startup.**
 
 | Wrong / Anti-pattern                                  | Right / Doom Way                                       | Why                                                                                                                                  |
 | ----------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `(use-package foo ...)`                               | `(use-package! foo ...)`                               | Doom's bang suffix changes deferral — the wrong one causes timing bugs                                                               |
+| `(use-package foo ...)`                               | `(use-package! foo ...)`                               | Adds disabled-package awareness and extra keywords; the regular `use-package` misses these                                           |
 | `(with-eval-after-load 'foo ...)` or `(require 'foo)` | `(after! foo ...)`                                     | Doom's macro handles ordering through its deferred system. Never `require` in config                                                 |
-| `(setq-default ...)` or bare `setq`                   | `setq!`                                                | Doom handles default semantics and tracks variables set via `setq!`                                                                  |
+| `(setq-default ...)` or bare `setq`                   | `setq!`                                                | Triggers custom setters on customizable variables; more efficient than `setopt`                                                      |
 | `(define-key map k f)` or `(global-set-key ...)`      | `(map! ...)` with `:leader`, `:map`, or `:localleader` | Integrates with which-key for discoverability and evil-state awareness                                                               |
 | `(add-hook 'foo-hook ...)` with a lambda              | `(add-hook! ...)` or `use-package!` `:hook`            | Supports multiple hooks, local variables natively (`setq-local` inside the form), and mode-specific behavior without lambda wrappers |
 | `(loop for ... collect ...)`                          | `(cl-loop for ... collect ...)`                        | `cl-lib` is the modern, namespaced version. Bare `loop` pollutes the namespace                                                       |

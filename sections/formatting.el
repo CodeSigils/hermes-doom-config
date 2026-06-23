@@ -14,6 +14,7 @@
 ;; Doom's markdown module may register its own formatter entry that
 ;; overrides set-formatter! when markdown-mode is loaded lazily.
 (use-package! apheleia
+  :defer t
   :config
   (setf (alist-get 'prettier-markdown apheleia-formatters)
         '("prettier" "--parser" "markdown"))
