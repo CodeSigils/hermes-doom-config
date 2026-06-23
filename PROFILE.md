@@ -69,9 +69,11 @@ Beyond Doom built-ins:
 
 ## Custom Functions (sand/ prefix)
 
-| Function                                     | Purpose                                | Location          |
-| -------------------------------------------- | -------------------------------------- | ----------------- |
-| `sand/org-display-inline-images-only-in-org` | Only display inline images in org-mode | `sections/org.el` |
+| Function                                     | Purpose                                        | Location                 |
+| -------------------------------------------- | ---------------------------------------------- | ------------------------ |
+| `sand/org-display-inline-images-only-in-org` | Only display inline images in org-mode         | `sections/org.el`        |
+| `sand/split-window-sensibly`                 | Prefer side-by-side splits, fall back to below | `sections/navigation.el` |
+| `sand/initial-frame-size`                    | Return a monitor-aware initial frame size      | `sections/navigation.el` |
 
 ## Config Policies Summary
 
