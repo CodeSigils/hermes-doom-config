@@ -22,23 +22,31 @@ snippets/
 
 ## File Format
 
-Each snippet file is plain text with a standard header:
+Each snippet file is plain text. A `# -*- mode: snippet -*-` line at the top tells Emacs which major mode to use when editing the file (optional, but recommended for proper syntax highlighting). Lines above a `# --` separator are metadata directives; the remainder is the template body.
 
 ```text
-# -*- mode: snippet -*-
+# -*- mode: snippet -*-    ; file-local variable for Emacs (optional)
 # name: <human-readable description>
 # key: <trigger key>
 # --
 <template body>
 ```
 
-| Field                     | Required | Purpose                                              |
-| ------------------------- | -------- | ---------------------------------------------------- |
-| `# -*- mode: snippet -*-` | Yes      | Tells Emacs this is a snippet editing buffer         |
-| `# name:`                 | Yes      | Human-readable description shown in completion menus |
-| `# key:`                  | Yes      | Trigger string — type this followed by Tab to expand |
-| `# --`                    | Yes      | Separator between header and body                    |
-| body                      | Yes      | Template with fields, mirrors, and literal text      |
+Supported directives (metadata lines above `# --`):
+
+| Directive        | Required | Purpose                                                                        |
+| ---------------- | -------- | ------------------------------------------------------------------------------ |
+| `# key:`         | Yes^     | Trigger string — type this followed by Tab to expand                           |
+| `# name:`        | No       | Human-readable description (defaults to filename if absent)                    |
+| `# condition:`   | No       | Emacs-Lisp condition; snippet only expands when non-nil                        |
+| `# group:`       | No       | Menu/sub-menu grouping                                                         |
+| `# expand-env:`  | No       | Override variables during expansion (e.g. `yas-indent-line`)                   |
+| `# binding:`     | No       | Direct keybinding for expansion                                                |
+| `# type:`        | No       | `snippet` (default) or `command`                                               |
+| `# uuid:`        | No       | Unique identifier (loading a second snippet with same UUID replaces the first) |
+| `# contributor:` | No       | Snippet author credit (no functional effect)                                   |
+
+^ `# key:` is required for trigger-key expansion. Without it the snippet can still be inserted via `M-x yas-insert-snippet` or the menu.
 
 The filename is used as the default key if `# key:` is absent, but this config always sets `# key:` explicitly.
 
@@ -84,8 +92,7 @@ Yasnippet supports snippet inheritance via `.yas-parents` files. This config use
 | --------------------------------------- | --------- | ------------------------------------------ |
 | `snippets/typescript-mode/.yas-parents` | `js-mode` | TypeScript buffers inherit all JS snippets |
 
-When a `.yas-parents` file exists in a mode directory, it lists one parent mode per line. Snippets from the parent mode
-are available in the child mode, but the child's own snippets can override parent snippets with the same key.
+When a `.yas-parents` file exists in a mode directory, it contains a whitespace-separated list of parent mode names on one or more lines. Snippets from the parent mode are available in the child mode, but the child's own snippets can override parent snippets with the same key.
 
 ## Snippet Inventory
 
@@ -241,10 +248,10 @@ Note: TypeScript mode inherits all 12 JavaScript snippets via `.yas-parents` poi
 
 Before committing snippet changes, verify:
 
-1. **Header complete** — has `# -*- mode: snippet -*-`, `# name:`, `# key:`, and `# --` separator.
-2. **Tab-stop order correct** — `$1` through `$N` in order, ending with `$0`.
+1. **Directives correct** — `# key:` and `# name:` are set; other directives are intentional.
+2. **Tab-stop order correct** — `$1` through `$N` in order, ending with `$0` as the final exit position.
 3. **No duplicate keys** within a mode directory.
-4. **`.yas-parents` target exists** — the parent mode directory must exist.
+4. **`.yas-parents` target exists** — the parent mode name must correspond to an existing mode directory.
 5. **Body is valid** — literal `{`/`}` in JS/LaTeX bodies are fine (yasnippet only interprets `${...}` as field syntax
    when `${` opens together).
 
