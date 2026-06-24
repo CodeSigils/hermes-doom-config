@@ -99,6 +99,10 @@ Doom's `M-x doom/help` includes a module browser. From the terminal, `doom
 doctor` reports module-related issues (missing dependencies, conflicting
 flags, unregistered packages).
 
+For a community-maintained module index with available flags and per-module
+links, see
+[fanrenmortals/doom-emacs modules/README.org](https://github.com/fanrenmortals/doom-emacs/blob/develop/modules/README.org).
+
 ## 4. Community and Support
 
 | Resource                | URL / Access                                          |
@@ -357,10 +361,10 @@ config repos.
 
 Reference files shipped with this config, beyond the skill system:
 
-| File                                        | Purpose                                        |
-| ------------------------------------------- | ---------------------------------------------- |
-| `references/package-management.md`          | Package lifecycle, pinning, straight recovery  |
-| `references/best-practices.md`              | Consolidated Doom config best practices        |
-| `references/yasnippets.md`                  | Yasnippet inventory and template syntax        |
-| `references/jinx.md`                        | Jinx spell-checking — config and dictionaries  |
-| `references/snippet-validation.md`          | Yasnippet parser-level validation guide        |
+| File                               | Purpose                                       |
+| ---------------------------------- | --------------------------------------------- |
+| `references/package-management.md` | Package lifecycle, pinning, straight recovery |
+| `references/best-practices.md`     | Consolidated Doom config best practices       |
+| `references/yasnippets.md`         | Yasnippet inventory and template syntax       |
+| `references/jinx.md`               | Jinx spell-checking — config and dictionaries |
+| `references/snippet-validation.md` | Yasnippet parser-level validation guide       |
