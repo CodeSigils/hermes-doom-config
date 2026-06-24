@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate stale guidance, local documentation references, and script registry."""
+"""Validate documentation health: stale guidance, cross-references, script registry, domain file inventory, section inventory, and skill essentials coverage."""
 
 from __future__ import annotations
 
