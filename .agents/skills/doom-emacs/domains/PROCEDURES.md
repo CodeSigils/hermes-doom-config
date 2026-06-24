@@ -66,7 +66,7 @@ Do not try to `use-package!` modules that Doom already manages. Use `after!`.
 
 ## E. Setting a Keybinding
 
-Use `map!` in `config.el`:
+Use `map!` in `sections/keys.el` (this repo centralizes all keybindings there):
 
 ```elisp
 (map! :leader :desc "Description" "f f" #'some-command)

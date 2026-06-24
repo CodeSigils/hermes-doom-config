@@ -92,7 +92,8 @@ All repo scripts live under `scripts/`. The canonical reference for every script
   ───
   scripts/check-stale-patterns.sh  --  delegates to validate-docs.py, which checks stale
                                        guidance, local references, script registration,
-                                       domain inventory, and section inventory
+                                       domain inventory, section inventory, and skill essentials
+                                       coverage
 ```
 
 - `AGENTS.md` workflow bullets reference scripts generically ("run the stale check") without storing concrete paths --
