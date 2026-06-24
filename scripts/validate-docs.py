@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Validate documentation health: stale guidance, cross-references, script registry, domain file inventory, section inventory, skill essentials, snippet inventory, and pipe artifact detection."""
+"""Validate documentation health: stale guidance, cross-references, script registry, domain file inventory, section inventory, skill essentials, snippet inventory, pipe artifacts, frontmatter, module claim alignment, PROFILE table sync, and snippet syntax."""
 
 from __future__ import annotations
 
 import re
 import sys
 from pathlib import Path
+
+try:
+    import yaml
+except ImportError:
+    yaml = None  # type: ignore[assignment]
 
 ROOT = Path(__file__).resolve().parent.parent
 SKILL_ROOT = ROOT / ".agents/skills/doom-emacs"
@@ -34,6 +39,13 @@ API_MACRO_HEADER = re.compile(r"^### `([^`]+)`")
 ESSENTIALS_BULLET = re.compile(r"^- \*\*`([^`]+)`\*\*")
 SNIPPET_HEADER = re.compile(r"^### ([\w-]+) \((\d+)\)$")
 PIPE_ARTIFACT = re.compile(r"^\|\|")
+FRONTMATTER = re.compile(r"^---\s*$")
+SECTION_PURPOSE = re.compile(r"^;;\s+(.+)")
+MODULE_CATEGORY = re.compile(r"^\s+:(input|completion|ui|editor|emacs|term|checkers|tools|os|lang|email|app|config)")
+COMMENTED_MODULE = re.compile(r"^\s+;;(.+)")
+UNCOMMENTED_MODULE = re.compile(r"^\s+(?:\([^)]+\)|[a-z][-a-z]+)")
+PROFILE_MODULE_ROW = re.compile(r'^\| `:(\w+)`\s+\|\s+(.+?)\s+\|$')
+README_DISABLED_LIST = re.compile(r"Not currently enabled: (.*?)\.")
 
 
 def markdown_files() -> list[Path]:
@@ -188,7 +200,7 @@ def section_inventory_findings() -> list[str]:
         f"ORPHAN: {path} exists on disk but is not loaded from config.el"
         for path in sorted(actual - loaded)
     )
-    # TODO: check header comment alignment against (load! ...) lines.
+    findings.extend(section_comment_findings())
     return findings
 
 
@@ -284,6 +296,202 @@ def pipe_artifact_findings(files: list[Path]) -> list[str]:
     return findings
 
 
+def frontmatter_findings() -> list[str]:
+    """Check SKILL.md YAML frontmatter is valid and has required keys."""
+    text = SKILL_FILE.read_text()
+    lines = text.splitlines()
+    if len(lines) < 2 or not FRONTMATTER.match(lines[0]):
+        return ["MISSING: SKILL.md has no YAML frontmatter block"]
+
+    # Find closing ---
+    end = None
+    for i in range(1, len(lines)):
+        if FRONTMATTER.match(lines[i]):
+            end = i
+            break
+    if end is None:
+        return ["BROKEN: SKILL.md frontmatter has no closing ---"]
+
+    if yaml is None:
+        return ["WARNING: PyYAML not installed, cannot validate frontmatter structure"]
+
+    try:
+        data = yaml.safe_load("\n".join(lines[1:end]))
+    except yaml.YAMLError as e:
+        return [f"BROKEN: SKILL.md frontmatter YAML parse error: {e}"]
+
+    if not isinstance(data, dict):
+        return ["BROKEN: SKILL.md frontmatter is not a YAML mapping"]
+
+    findings: list[str] = []
+    for key in ("name",):
+        if key not in data:
+            findings.append(f"MISSING: SKILL.md frontmatter has no '{key}' field")
+    return findings
+
+
+def section_comment_findings() -> list[str]:
+    """Check every section file has a non-empty purpose comment on line 2."""
+    sections_dir = ROOT / "sections"
+    findings: list[str] = []
+    for path in sorted(sections_dir.glob("*.el")):
+        first_lines = path.read_text().splitlines()
+        if len(first_lines) < 2 or not first_lines[1].startswith(";;"):
+            findings.append(
+                f"MISSING: {display(path)} lacks a purpose comment on line 2"
+            )
+        elif not SECTION_PURPOSE.match(first_lines[1]):
+            findings.append(
+                f"WARNING: {display(path)} line 2 comment may be empty or malformed: "
+                f"{first_lines[1].strip()}"
+            )
+    return findings
+
+
+def readme_disabled_module_findings() -> list[str]:
+    """Verify README's list of disabled modules matches init.el's commented modules."""
+    readme = ROOT / "README.md"
+    init = ROOT / "init.el"
+
+    # Parse README disabled module list — extract backtick-quoted names
+    readme_text = readme.read_text()
+    readme_modules = set(re.findall(r"`([a-z][-a-z0-9]*)`", readme_text.split("Not currently enabled")[1].split(".", 1)[0] if "Not currently enabled" in readme_text else ""))
+    if not readme_modules:
+        return ["MISSING: README.md has no 'Not currently enabled:' statement with module names"]
+
+    # Parse init.el for commented modules (excluding section headers)
+    init_text = init.read_text()
+    commented: set[str] = set()
+    for line in init_text.splitlines():
+        if m := COMMENTED_MODULE.match(line):
+            mname = m.group(1).strip()
+            if mname and not mname.startswith(":"):
+                # Extract bare module name: "(mu4e +org +gmail)" -> "mu4e"
+                bare = re.sub(r"^\(?([a-z][-a-z0-9]*).*", r"\1", mname)
+                if bare and not bare.startswith(";"):
+                    commented.add(bare)
+
+    findings: list[str] = []
+    for mod in sorted(readme_modules - commented):
+        findings.append(
+            f"STALE: README.md says '{mod}' is disabled but it is not commented in init.el"
+        )
+    return findings
+
+
+def profile_module_table_findings() -> list[str]:
+    """Compare PROFILE.md module table category counts against init.el."""
+    profile = ROOT / "PROFILE.md"
+    init = ROOT / "init.el"
+
+    # Collect multi-line cell content per category
+    lines = profile.read_text().splitlines()
+    profile_counts: dict[str, int] = {}
+    current_cat = ""
+    column2_buffer = ""
+
+    for line in lines:
+        if m := PROFILE_MODULE_ROW.match(line):
+            # Flush previous category
+            if current_cat and column2_buffer:
+                # Count comma-separated module entries
+                profile_counts[current_cat] = len(
+                    [e for e in column2_buffer.split(",") if e.strip()]
+                )
+            current_cat = m.group(1)
+            column2_buffer = m.group(2).strip()
+        elif current_cat and line.lstrip().startswith("|") and "`" in line:
+            # Continuation of multi-line cell — extract second column
+            parts = line.strip().split("|")
+            if len(parts) >= 3:
+                col2 = parts[2].strip()
+                if col2:
+                    column2_buffer += ", " + col2
+        elif current_cat:
+            # End of multi-line cell
+            if column2_buffer:
+                profile_counts[current_cat] = len(
+                    [e for e in column2_buffer.split(",") if e.strip()]
+                )
+            current_cat = ""
+            column2_buffer = ""
+
+    # Flush last category
+    if current_cat and column2_buffer:
+        profile_counts[current_cat] = len(
+            [e for e in column2_buffer.split(",") if e.strip()]
+        )
+
+    # Parse init.el: category -> count of uncommented modules
+    init_counts: dict[str, int] = {}
+    current_cat = ""
+    for line in init.read_text().splitlines():
+        if m := MODULE_CATEGORY.match(line):
+            current_cat = m.group(1)
+            init_counts.setdefault(current_cat, 0)
+        elif current_cat and UNCOMMENTED_MODULE.match(line) and not line.lstrip().startswith(";"):
+            init_counts[current_cat] = init_counts.get(current_cat, 0) + 1
+
+    findings: list[str] = []
+    for cat in sorted(set(profile_counts) | set(init_counts)):
+        p_count = profile_counts.get(cat, 0)
+        i_count = init_counts.get(cat, 0)
+        if p_count != i_count:
+            findings.append(
+                f"MODULE_DRIFT: PROFILE.md shows {p_count} modules for :{cat} "
+                f"but init.el has {i_count}"
+            )
+    return findings
+
+
+def snippet_syntax_findings() -> list[str]:
+    """Check snippet files for basic syntax validity."""
+    snippets_dir = ROOT / "snippets"
+    findings: list[str] = []
+    key_or_name = re.compile(r"^# (?:key|name):")
+    separator = re.compile(r"^# --")
+    tabstop = re.compile(r"\$(\d+)")
+
+    for mode_dir in sorted(snippets_dir.iterdir()):
+        if not mode_dir.is_dir():
+            continue
+        for snippet_file in sorted(mode_dir.iterdir()):
+            if not snippet_file.is_file() or snippet_file.name == ".yas-parents":
+                continue
+            rel = display(snippet_file)
+            lines = snippet_file.read_text().splitlines()
+
+            # Must have a # -- separator between header and body
+            has_sep = any(separator.match(line) for line in lines)
+            if not has_sep:
+                findings.append(
+                    f"SNIPPET_SYNTAX: {rel} has no `# --` separator"
+                )
+
+            # Must have a # key: or # name: header directive
+            has_key = any(key_or_name.match(line) for line in lines)
+            if not has_key:
+                findings.append(
+                    f"SNIPPET_SYNTAX: {rel} has no `# key:` or `# name:` directive"
+                )
+
+            # Check tab-stop ordering (exclude $0, the yasnippet exit marker)
+            tabstops = []
+            for line in lines:
+                for t_match in tabstop.finditer(line):
+                    val = int(t_match.group(1))
+                    if val > 0:
+                        tabstops.append(val)
+            if tabstops:
+                expected = sorted(tabstops)
+                if tabstops != expected:
+                    findings.append(
+                        f"SNIPPET_SYNTAX: {rel} tab-stops out of order: "
+                        f"expected {expected} but saw {tabstops}"
+                    )
+    return findings
+
+
 def report(title: str, findings: list[str], clean_message: str) -> bool:
     print(f"=== {title} ===\n")
     if findings:
@@ -335,6 +543,26 @@ def main() -> int:
         "Pipe Artifact Detection",
         pipe_artifact_findings(files),
         "No double-pipe artifacts in markdown table rows.",
+    )
+    ok &= report(
+        "SKILL.md Frontmatter Validation",
+        frontmatter_findings(),
+        "SKILL.md YAML frontmatter is valid.",
+    )
+    ok &= report(
+        "README Disabled Module Claims",
+        readme_disabled_module_findings(),
+        "README.md disabled modules match init.el.",
+    )
+    ok &= report(
+        "PROFILE Module Table Sync",
+        profile_module_table_findings(),
+        "PROFILE.md module counts match init.el.",
+    )
+    ok &= report(
+        "Snippet Syntax Validation",
+        snippet_syntax_findings(),
+        "All snippet files have valid syntax.",
     )
     return 0 if ok else 1
 

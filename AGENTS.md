@@ -103,6 +103,11 @@ When you change a source of truth, update its dependents in the same change. The
 - Script/domain/section/snippet inventory is in sync
 - Skill essentials cover all DOOM-API.md core macros
 - No pipe-display artifacts in markdown
+- SKILL.md YAML frontmatter is valid and parseable
+- README.md disabled module claims match init.el
+- PROFILE.md module counts match init.el per category
+- Section files have non-empty purpose comments
+- Snippet files have `# key:`/`# name:` and `# --` separator; tab-stops in order
 
 Run `git diff --check` before committing. Stale documentation is worse than missing — the agent cannot distinguish it from truth.
 
