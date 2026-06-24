@@ -242,6 +242,7 @@ independent completion systems and coexist.
 | [`references/package-management.md`](references/package-management.md)     | Doom package lifecycle: declaration, sync, update, pinning |
 | [`references/best-practices.md`](references/best-practices.md)             | Consolidated Doom config best practices                    |
 | [`references/jinx.md`](references/jinx.md)                                 | Jinx spell-checking — config, dictionaries, verification   |
+| [`references/drift-prevention.md`](references/drift-prevention.md)         | Source-to-dependent drift prevention map                   |
 | [`references/snippet-validation.md`](references/snippet-validation.md)     | Yasnippet parser-level validation — directives, semantics  |
 | [`references/yasnippets.md`](references/yasnippets.md)                     | Snippet inventory, template syntax, best practices         |
 | [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md) | General Doom guide with procedures and troubleshooting     |

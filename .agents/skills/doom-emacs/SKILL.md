@@ -269,5 +269,6 @@ When you need to understand how a package or Doom module works, the source code 
   - `references/yasnippets.md` — snippet inventory, template syntax, best practices
   - `references/snippet-validation.md` — parser-level snippet validation, directive reference, false-positive catalog
   - `references/jinx.md` — Jinx language configuration, dictionary setup, source reference
+  - `references/drift-prevention.md` — source-to-dependent drift map
   - `AGENTS.md` — user-specific policies, workflow, drift prevention
   - `domains/` — depth guides (architecture, procedures, elisp, troubleshooting)
