@@ -43,6 +43,8 @@ that needs setup beyond defaults.
   :init                  ; code that runs before the package loads
   :config                ; code that runs after the package loads
   :commands my-cmd       ; autoload on first invocation
+  :after-call after-find-file  ; load before this hook or command runs
+  :defer-incrementally t       ; lazy-load sub-features one by one
   :after other-pkg)      ; wait for another package before loading
 ```
 
@@ -61,6 +63,12 @@ correctly and supports multiple features.
 
 (after! (org company)   ; wait for BOTH to load
   (do-something))
+
+;; Compound conditions with :or/:and/:any/:all
+(after! (:or magit diff-hl)  ; wait for ANY of these
+  (do-something))
+(after! (:and package-a (:or package-b package-c))  ; nested compound
+  (do-something))
 ```
 
 **When to reach for it:** When you need to set a variable that belongs to a
@@ -77,6 +85,20 @@ mode-specific maps.
 (map! :leader :desc "Find file" "f f" #'find-file)
 (map! :n "C-c C-f" #'foo-command)             ; normal mode only
 (map! :map org-mode-map :n "RET" #'org-open-at-point)
+
+;; Conditional — only bind when a module is enabled
+(map! (:when (modulep! :completion company)
+        :i "C-@" #'+company/complete))
+
+;; Prefix group within map!
+(map! (:prefix "C-x"
+        :i "C-l" #'+company/whole-lines))
+
+;; Unbind a key set elsewhere
+(map! :map lua-mode-map "SPC m b" nil)
+
+;; Global state binding
+(map! :g "C-x y" #'do-something)
 ```
 
 | Prefix         | Scope                                 |
@@ -87,7 +109,10 @@ mode-specific maps.
 | `:i`           | Insert mode only                      |
 | `:v`           | Visual mode only                      |
 | `:m`           | Motion mode only                      |
+| `:g`           | Global (same as no prefix)            |
 | `:map KEYMAP`  | Specific keymap (e.g. `org-mode-map`) |
+
+Supports `:when` for conditional bindings at compile time, `(:prefix ...)` for nested key groups, and passing `nil` as the command to unbind.
 
 **When to use:** Always prefer `map!` over `define-key` or `global-set-key`.
 `map!` handles evil state awareness, which-key descriptions, and mode
@@ -96,9 +121,24 @@ unloading automatically.
 ### `add-hook!` — Multi-Mode Hook Attachment
 
 ```elisp
+;; Single hook
 (add-hook! 'prog-mode-hook #'rainbow-delimiters-mode)
+;; Multiple hooks at once
 (add-hook! '(org-mode-hook markdown-mode-hook) #'flyspell-mode)
+;; Set local variable inside the hook
 (add-hook! 'org-mode-hook (setq-local truncate-lines nil) nil nil)
+
+;; Append to the end of the hook chain
+(add-hook! 'some-mode-hook :append #'enable-something)
+;; Make it buffer-local
+(add-hook! 'some-mode-hook :local #'enable-something)
+;; Append and local together
+(add-hook! 'some-mode-hook :append :local (setq v 5))
+
+;; Inline named hook functions — no separate defun needed
+(add-hook! '(one-mode-hook second-mode-hook)
+  (defun do-something ()
+    (message "Hello")))
 ```
 
 Supports multiple hooks in one form, local variable setting, and `:append`
@@ -155,10 +195,20 @@ that depends on whether a module is enabled.
 ### `setq-hook!` — Hook-Local Variable
 
 ```elisp
+;; Single variable on a single hook
 (setq-hook! 'org-mode-hook truncate-lines nil)
+
+;; Multiple variables at once
+(setq-hook! 'markdown-mode-hook
+  line-spacing 2
+  fill-column 80)
+
+;; Apply to multiple hooks
+(setq-hook! '(eshell-mode-hook term-mode-hook)
+  hscroll-margin 0)
 ```
 
-Cleaner than writing `(add-hook! 'org-mode-hook (lambda () (setq-local ...)))`.
+Cleaner than writing `(add-hook! 'mode-hook (lambda () (setq-local ...)))`. Works with one hook, multiple hooks, and one or more variables — the form is the same.
 
 ---
 
