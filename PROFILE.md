@@ -134,7 +134,7 @@ Keep Doom's `(spell +flyspell)` line commented in `init.el`:
 (use-package! jinx
   :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
   :config
-  (setq! jinx-languages "en_US"))
+  (setq! jinx-languages "en_US el_GR"))
 
 ;; sections/keys.el
 (map! "M-$" #'jinx-correct
