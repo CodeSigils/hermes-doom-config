@@ -30,6 +30,8 @@ MARKDOWN_LINK = re.compile(r"!?\[[^\]]*]\(([^)]+)\)")
 SCRIPT_ROW = re.compile(r"^\|\s*`([^`]+[.](?:sh|py))`\s*\|")
 DOMAIN_ROW = re.compile(r"`(domains/[^`]+)`")
 SECTION_LOAD = re.compile(r'^\(load! "sections/([^"]+)"\)')
+API_MACRO_HEADER = re.compile(r"^### `([^`]+)`")
+ESSENTIALS_BULLET = re.compile(r"^- \*\*`([^`]+)`\*\*")
 
 
 def markdown_files() -> list[Path]:
@@ -188,6 +190,44 @@ def section_inventory_findings() -> list[str]:
     return findings
 
 
+def skill_essentials_findings() -> list[str]:
+    """Check that DOOM-API.md core macros are all covered in SKILL.md Doom API Essentials."""
+    doom_api = ROOT / "DOOM-API.md"
+    skill = SKILL_FILE
+
+    # Parse macro names from DOOM-API.md section 2 (### `macro-name`)
+    api_macros: set[str] = set()
+    in_section2 = False
+    for line in doom_api.read_text().splitlines():
+        if line.strip() == "## 2. The Core Macros (Learn These First)":
+            in_section2 = True
+            continue
+        if in_section2:
+            if line.startswith("## ") and "Core Macros" not in line:
+                break
+            if match := API_MACRO_HEADER.match(line):
+                api_macros.add(match.group(1))
+
+    # Parse macro names from SKILL.md Doom API Essentials bullets
+    skill_macros: set[str] = set()
+    in_essentials = False
+    for line in skill.read_text().splitlines():
+        if line.strip() == "## Doom API Essentials (Compact)":
+            in_essentials = True
+            continue
+        if in_essentials:
+            if line.startswith("## "):
+                break
+            if match := ESSENTIALS_BULLET.match(line):
+                skill_macros.add(match.group(1))
+
+    missing = sorted(api_macros - skill_macros)
+    return [
+        f"MISSING: DOOM-API.md documents `{macro}` but SKILL.md Doom API Essentials has no entry for it"
+        for macro in missing
+    ]
+
+
 def report(title: str, findings: list[str], clean_message: str) -> bool:
     print(f"=== {title} ===\n")
     if findings:
@@ -219,6 +259,11 @@ def main() -> int:
         "Domain File Inventory Coverage",
         domain_inventory_findings(),
         "All .agents/ domain files are registered in SKILL.md Quick Index.",
+    )
+    ok &= report(
+        "Skill Essentials Coverage",
+        skill_essentials_findings(),
+        "All DOOM-API.md core macros are covered in SKILL.md Doom API Essentials.",
     )
     ok &= report(
         "Section Inventory Coverage",

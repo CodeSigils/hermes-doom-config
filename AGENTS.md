@@ -68,6 +68,7 @@ domain files are invisible from the entry path alone — this table bridges that
 - Run `doom doctor` after `doom sync`.
 - When the skill or any domain file changes, sync the Hermes runtime mirror before committing (see [Scripts](#scripts) table). The mirror is generated state; do not hand-edit it.
 - Verify `DOOM-API.md` patterns against Doom source (`~/.config/emacs/`). If wrong, propose a fix.
+- When `DOOM-API.md` macro patterns change, audit `.agents/skills/doom-emacs/SKILL.md` (Doom API Essentials section) and `domains/PROCEDURES.md` (sections C, D, E) for consistency — they must match.
 - Before every commit, run the stale-patterns check (see [Scripts](#scripts) table).
 - Before committing script changes, run the network-free contracts (see [Scripts](#scripts) table).
 - When consulting references, follow "Learn, Don't Copy" — understand first, propose, implement only on request.
@@ -145,6 +146,7 @@ When you change a source of truth, update its dependent files in the same change
 | `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                                                      | Add/remove modules, adjust flags                                                                               |
 | `packages.el`                         | `PROFILE.md` packages table                                                                                 | Add/remove packages with purpose notes                                                                         |
 | `config.el`                           | `sections/*.el`, `PROFILE.md` custom functions table, `DOOM-API.md` patterns, `README.md` File Layout table | Add/remove `(load! ...)` lines, update header comment, update moved function locations, update section listing |
+| `DOOM-API.md`                         | `.agents/skills/doom-emacs/SKILL.md` (Doom API Essentials), `domains/PROCEDURES.md` (sections C, D, E)      | When macro examples or features change in DOOM-API.md, mirror the same patterns in the agent skill files       |
 | `sections/*.el` (`user/` functions)   | `PROFILE.md` custom functions table                                                                         | Register new or removed `defun user/` functions in the table                                                   |
 | `sections/*.el` (config values)       | `PROFILE.md` prose code examples                                                                            | When a config value in a PROFILE.md code block changes in the source .el file, update the example              |
 | `AGENTS.md`                           | `PROFILE.md` Config Policies Summary, `README.md` agent entry section                                       | Update reading order, companion skill mentions                                                                 |
