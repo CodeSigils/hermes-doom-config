@@ -1,7 +1,6 @@
 # doom-emacs-config
 
-My personal Doom Emacs configuration repo. Designed for org-mode, GTD workflows, and general development with Company
-completion on a dual-monitor setup.
+My personal Doom Emacs configuration repo. Designed for org-mode, GTD workflows, and general development with Company completion.
 
 ## Quick Start
 
