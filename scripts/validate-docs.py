@@ -14,6 +14,7 @@ from __future__ import annotations
 import sys
 
 from _checks import (
+    agent_cross_check_findings,
     cross_commit_drift_findings,
     domain_inventory_findings,
     frontmatter_findings,
@@ -52,6 +53,7 @@ def main() -> int:
         profile_functions_findings(repo),
         snippet_syntax_findings(repo),
         cross_commit_drift_findings(repo),
+        agent_cross_check_findings(repo),
     ]
 
     ok = True

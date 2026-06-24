@@ -8,7 +8,7 @@ When you change a source of truth, update its dependent files in the same change
 | `init.el` / `packages.el` | Re-evaluate `.agents/` files for stale module references, install patterns, flags |
 | `packages.el` | `PROFILE.md` packages table |
 | `config.el` | `sections/*.el`, `PROFILE.md` custom functions table (automated), `DOOM-API.md` patterns, `README.md` File Layout |
-| `config.el` / `sections/*.el` | Re-evaluate `.agents/` files for stale examples, paths, procedures |
+| `config.el` / `sections/*.el` | Re-evaluate `.agents/` files for stale examples, paths, procedures (automated advisory)
 | `DOOM-API.md` | `.agents/skills/doom-emacs/SKILL.md` Doom API Essentials (automated), `domains/PROCEDURES.md` sections C, D, E |
 | `sections/*.el` (user/ functions) | `PROFILE.md` custom functions table (automated) |
 | `sections/*.el` (config values) | `PROFILE.md` prose code examples |

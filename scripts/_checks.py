@@ -788,3 +788,78 @@ def cross_commit_drift_findings(repo: Repo) -> CheckResult:
         "No cross-commit drift detected.",
         blocking=False,
     )
+
+
+# ---------------------------------------------------------------------------
+# Agent .agents/ cross-check reminder (advisory, non-blocking)
+# ---------------------------------------------------------------------------
+
+AGENT_CROSS_CHECK_TRIGGERS: list[str] = [
+    "config.el",
+    "sections/",
+    "init.el",
+    "packages.el",
+    "DOOM-API.md",
+]
+
+
+def agent_cross_check_findings(repo: Repo) -> CheckResult:
+    """Advisory check: when project config files are staged, remind the
+    agent to re-evaluate ``.agents/`` files for stale examples, paths,
+    and procedures matching the changes.
+
+    Non-blocking — agents need the nudge but should not be blocked.
+    """
+    import subprocess
+
+    result = subprocess.run(
+        ["git", "diff", "--cached", "--name-only"],
+        capture_output=True,
+        text=True,
+        cwd=str(repo.root),
+    )
+    if result.returncode != 0:
+        return CheckResult(
+            "Agent Cross-Check Reminder",
+            [],
+            "Could not check staged files (git diff failed).",
+            blocking=False,
+        )
+
+    staged = set(result.stdout.splitlines())
+    if not staged:
+        return CheckResult(
+            "Agent Cross-Check Reminder",
+            [],
+            "No staged files; .agents/ cross-check not needed.",
+            blocking=False,
+        )
+
+    triggered = sorted(
+        s
+        for s in staged
+        if any(
+            s == t or (t.endswith("/") and s.startswith(t))
+            for t in AGENT_CROSS_CHECK_TRIGGERS
+        )
+    )
+    if not triggered:
+        return CheckResult(
+            "Agent Cross-Check Reminder",
+            [],
+            "No project config files staged; .agents/ cross-check not needed.",
+            blocking=False,
+        )
+
+    findings = [
+        f"REMINDER: {', '.join(triggered)} changed -- re-evaluate "
+        ".agents/ files (SKILL.md and domains/) for stale examples, "
+        "paths, and procedures matching these changes. "
+        "See AGENTS.md 'Cross-check .agents/ files' workflow step."
+    ]
+    return CheckResult(
+        "Agent Cross-Check Reminder",
+        findings,
+        "No project config changes needing .agents/ review.",
+        blocking=False,
+    )

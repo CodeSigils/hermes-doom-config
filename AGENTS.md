@@ -54,7 +54,7 @@ Tier 1 is loaded in the entry order. Tier 2 is read on demand. Tier 3-4 is read 
 - When skill or domain files change: sync the Hermes runtime mirror before committing (`scripts/sync-doom-skill-mirror.sh`, then `scripts/check-doom-skill-mirror.sh`). The mirror is generated state — do not hand-edit it.
 - Verify `DOOM-API.md` patterns against Doom source. If they conflict, propose a fix.
 - When `DOOM-API.md` macro patterns change, audit `SKILL.md` Doom API Essentials and `domains/PROCEDURES.md` (sections C, D, E) for consistency.
-- Cross-check `.agents/` files in every review and audit. After editing project config files, re-evaluate `.agents/` for stale examples, paths, and patterns.
+- Cross-check `.agents/` files in every review and audit. After editing project config files, re-evaluate `.agents/` for stale examples, paths, and patterns. This is now automated (advisory check in validate-docs.py).
 - The pre-commit hook runs `check-stale-patterns.sh` + `compileall` automatically. Before committing script changes, also run `scripts/run-offline-contracts.sh`.
 - Follow "Learn, Don't Copy" — understand first, propose, implement only on request.
 - On failure, stop and present output. Do not proceed past a failed step without confirmation.
@@ -124,8 +124,9 @@ When you change a source of truth, update its dependents in the same change. The
 - PROFILE.md module counts match init.el per category
 - Section files have non-empty purpose comments
 - Snippet files have `# key:`/`# name:` and `# --` separator; tab-stops in order
-- **Cross-commit drift** (advisory): warns when staged changes miss their drift targets
-- **Compile-all** hook blocks commits with Python syntax errors
+| **Cross-commit drift** (advisory): warns when staged changes miss their drift targets
+| **Agent cross-check** (advisory): reminds to re-evaluate `.agents/` when config files change
+| **Compile-all** hook blocks commits with Python syntax errors
 
 Run `git diff --check` before committing. Stale documentation is worse than missing — the agent cannot distinguish it from truth.
 
