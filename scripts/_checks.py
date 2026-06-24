@@ -778,8 +778,8 @@ def cross_commit_drift_findings(repo: Repo) -> CheckResult:
             findings.append(
                 f"WARNING: {source} staged but no dependent "
                 f"({deps_str}) was staged. "
-                f"Stage the dependent file(s) alongside this change, "
-                f"or acknowledge this is a legitimate single-file fix."
+                f"Stage the dependent file(s) alongside this change. "
+                f"See references/drift-prevention.md for the full map."
             )
 
     return CheckResult(

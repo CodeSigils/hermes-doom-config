@@ -208,7 +208,7 @@ registered workflow tools are:
 | `sync-doom-skill-mirror.sh`  | Validate, stage, and atomically replace the Hermes runtime mirror              | After editing skill or domain files                  |
 | `check-doom-skill-mirror.sh` | Verify source/destination identity and byte-level mirror equality              | After sync                                           |
 | `check-stale-patterns.sh`    | Run documentation, script, domain, and section inventory validation            | Before committing documentation or scripts           |
-| `validate-docs.py`           | Run all 15 doc-health checks (stale guidance, references, scripts, domains, sections, snippets, pipes, frontmatter, module alignment, functions, agent cross-check, cross-commit drift) | Called by `check-stale-patterns.sh`                  |
+| `validate-docs.py`           | Run all doc-health checks (full list: AGENTS.md > Drift Prevention)           | Called by `check-stale-patterns.sh`                  |
 | `run-offline-contracts.sh`   | Exercise documentation and disposable mirror-safety contracts                  | Before committing script changes                     |
 | `ai-context.sh`              | Report config, mirror, tool, and Git context; file content is explicit opt-in  | On demand when enlisting an external model           |
 | `install-hooks.sh`           | Install the pre-commit hook into `.git/hooks/pre-commit`                       | After cloning fresh or when hook script changes      |
