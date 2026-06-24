@@ -36,6 +36,13 @@ Use Doom's `add-hook!` helper from `config.el`:
 ```elisp
 (add-hook! '(mode1-mode-hook mode2-mode-hook) #'some-minor-mode)
 (add-hook! 'prog-mode-hook #'some-global-thing)
+
+;; Run at the end of the hook chain
+(add-hook! 'some-mode :append #'enable-something)
+;; Buffer-local hook (runs only in that buffer)
+(add-hook! 'some-mode :local #'enable-something)
+;; Inline named function — avoids a top-level defun
+(add-hook! 'some-mode (defun user/setup () (setq-local x 5)))
 ```
 
 ## D. Configuring a Built-in Module
@@ -46,6 +53,13 @@ Use `after!` in `config.el`:
 (after! company
   (setq company-idle-delay 0.2)
   (set-company-backend! 'prog-mode 'company-files ...))
+
+;; Compound: wait for any package
+(after! (:or magit diff-hl)
+  (do-something))
+;; Compound: wait for a specific combination
+(after! (:and org (:or python sh))
+  (do-something))
 ```
 
 Do not try to `use-package!` modules that Doom already manages. Use `after!`.
@@ -57,6 +71,15 @@ Use `map!` in `config.el`:
 ```elisp
 (map! :leader :desc "Description" "f f" #'some-command)
 (map! :n "C-c C-f" #'find-file)  ; Normal mode only
+
+;; Conditional — only if a module is enabled
+(map! (:when (modulep! :completion company) :i "C-@" #'+company/complete))
+
+;; Nested prefix group
+(map! (:prefix "C-x" :i "C-l" #'+company/whole-lines))
+
+;; Unbind a key set elsewhere
+(map! :map lua-mode-map "SPC m b" nil)
 ```
 
 ## F. Enabling a Minor Mode Globally
@@ -98,12 +121,13 @@ Use this template when researching a package not yet installed. Example: evaluat
 
 **Research notes template:**
 
-```markdown
+````markdown
 ## <Package Name> — <Brief Purpose>
 
 **Current status:** not installed — evaluation only.
 
 **Doom install:**
+
 ```elisp
 ;; packages.el
 (package! <dependency-1>)
@@ -114,22 +138,28 @@ Use this template when researching a package not yet installed. Example: evaluat
 (after! <package-name>
   (setq <option> <value>))
 ```
+````
 
 **Known pitfalls:**
+
 - List any gotchas found during evaluation.
 - Note provider-specific quirks (e.g. `agent-shell-hermes-acp-command` may use
   symbols instead of strings — override with strings in Doom config).
 - Check whether `executable-find` and `make-process` expect command strings, not symbols.
 
 **Safety defaults for first trial:**
+
 - Start conservatively: disable file access, text file capabilities.
 - Do not globally enable auto-approval helpers.
 - Add keybindings only after the basic flow works.
 
 **Cross-check against upstream:**
+
 - Verify the package's Doom install docs match the current Doom version.
 - Check `doom doctor` for conflicts with enabled modules.
 - If the package needs a CLI tool, add it to PROFILE.md system dependencies.
+
 ```
 
 Remove this section once the research concludes and the result (installed or rejected) is documented.
+```

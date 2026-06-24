@@ -119,14 +119,19 @@ memory:
 
 - **`after!`** — defer config until a feature loads. Use instead of `with-eval-after-load`.
   `(after! org (setq org-adapt-indentation nil))`
+  Supports compound conditions: `(after! (:or magit diff-hl) ...)`, `(after! (:and pkg-a (:or pkg-b pkg-c)) ...)`.
 - **`use-package!`** — Doom's package declaration + config. Not the same as `use-package` from MELPA.
-  `(use-package! foo :defer t :config ...)`
+  Extra keywords: `:after-call` (load before a hook/command fires), `:defer-incrementally` (lazy-load sub-features).
+  `(use-package! foo :defer t :after-call after-find-file :config ...)`
 - **`map!`** — keybinding with evil state-aware prefixes: `:leader` (`SPC`), `:n` (normal), `:i` (insert), `:v`
-  (visual), `:m` (motion). `(map! :leader :desc "Desc" "f f" #'find-file)`
+  (visual), `:m` (motion), `:g` (global). Supports `:when` for conditional bindings and `(:prefix ...)` for
+  nested key groups. Pass `nil` to unbind. `(map! :leader :desc "Desc" "f f" #'find-file)`
 - **`set-company-backend!`** — per-mode company backend configuration
-- **`add-hook!`** — multi-mode hook helper. `(add-hook! '(a-mode b-mode) #'fn)`
+- **`add-hook!`** — multi-mode hook helper with `:append`, `:local`, and inline `defun`.
+  `(add-hook! '(a-mode b-mode) #'fn)`, `(add-hook! 'a-mode :append #'fn)`.
+  `(add-hook! 'a-mode (defun named-fn () ...))` — inline defun avoids a top-level defun.
 - **`setq-hook!`** — set buffer-local variables in a hook, cleaner than a lambda.
-  `(setq-hook! 'org-mode-hook truncate-lines nil)`
+  `(setq-hook! 'org-mode-hook truncate-lines nil)` — also accepts multiple variables or multiple hooks.
 - **`load!`** — load an Elisp file relative to `doom-user-dir`. `(load! "modules/org")` loads
   `~/.config/doom/modules/org.el`
 - **`modulep!`** — compile-time module check. `(when (modulep! :ui popup) ...)`
