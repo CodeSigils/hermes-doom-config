@@ -101,7 +101,7 @@ flags, unregistered packages).
 
 For a community-maintained module index with available flags and per-module
 links, see
-[fanrenmortals/doom-emacs modules/README.org](https://github.com/fanrenmortals/doom-emacs/blob/develop/modules/README.org).
+[fanrenmortals/doom-emacs modules/](https://github.com/fanrenmortals/doom-emacs/tree/develop/modules).
 
 ## 4. Community and Support
 
