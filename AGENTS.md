@@ -71,6 +71,13 @@ All script names and invocation details live in `.agents/skills/doom-emacs/SKILL
 
 When in doubt, propose and wait. The cost of asking is lower than the cost of reverting.
 
+**Automation threshold:** Every automated check must earn its keep on damage prevented, not
+abstract consistency. A gate that blocks commits only for cosmetic violations or hypothetical
+mistakes that have never occurred is not worth the friction it introduces. When proposing a new
+check, state what actual harm it prevents and whether that harm has occurred in this project.
+This principle was established by removing an emoji detection check after it was written and
+committed — it didn't survive the cost-of-omission test.
+
 ## Completion Policy
 
 - Preferred backend: `:completion company +childframe +tng` for the fuller Company experience. Company path completion in `sections/completion.el` uses `company-files` via `set-company-backend!` — preserve that.
