@@ -44,20 +44,20 @@ policies (completion preference, Markdown style, verification steps, etc.).
 This skill is organised as a compact core (task-agnostic essentials) with domain files for specific needs. Read only
 what your task needs:
 
-| When your task is...                  | Read this section or file                          |
-| :------------------------------------ | :------------------------------------------------- | ------------------------------------------ |
-| First time in this repo               | Agent Workflow, Writing Conventions, Safety Checks |
-| Editing `init.el`                     | `domains/ARCHITECTURE.md`, Safety Checks           |
-| Adding a module or package            | `domains/PROCEDURES.md` (A, B)                     |
-| Setting a keybinding                  | `domains/PROCEDURES.md` (E), Doom API Essentials   |
-| Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                       |
-| Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |
+| When your task is...                  | Read this section or file                          | Reference file                             |
+| :------------------------------------ | :------------------------------------------------- | :----------------------------------------- |
+| First time in this repo               | Agent Workflow, Writing Conventions, Safety Checks |                                            |
+| Editing `init.el`                     | `domains/ARCHITECTURE.md`, Safety Checks           |                                            |
+| Adding a module or package            | `domains/PROCEDURES.md` (A, B)                     |                                            |
+| Setting a keybinding                  | `domains/PROCEDURES.md` (E), Doom API Essentials   |                                            |
+| Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                       |                                            |
+| Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |                                            |
 |                                       | Checking style or reviewing patterns               | `references/best-practices.md`             |
 |                                       | Writing or editing snippets                        | `references/yasnippets.md`                 |
 |                                       | Validating snippet syntax (parser-level)           | `references/snippet-validation.md`         |
 |                                       | Configuring Jinx spell checking                    | `references/jinx.md`                       |
 |                                       | Upgrading Doom framework                           | `domains/PROCEDURES.md` (G), Safety Checks |
-| Maintaining config repo scripts       | Skill Script Conventions                           |
+| Maintaining config repo scripts       | Skill Script Conventions                           |                                            |
 
 ## Agent Workflow
 
@@ -110,7 +110,8 @@ Patterns that apply to any Doom config:
   helpers, or formatters.
 - Comment out unused modules in `init.el` — never delete lines
 - Snippets live under `<doom-user-dir>/snippets/<major-mode>/`
-- When adding a new `user/` custom function, register it in the `PROFILE.md` custom functions table; update the table when a function is removed
+- When adding a new `user/` custom function, register it in the `PROFILE.md` custom functions table; update the table
+  when a function is removed
 
 ## Doom API Essentials (Compact)
 
@@ -118,18 +119,18 @@ See `DOOM-API.md` for the full syntax and examples. These are the patterns agent
 memory:
 
 - **`after!`** — defer config until a feature loads. Use instead of `with-eval-after-load`.
-  `(after! org (setq org-adapt-indentation nil))`
-  Supports compound conditions: `(after! (:or magit diff-hl) ...)`, `(after! (:and pkg-a (:or pkg-b pkg-c)) ...)`.
-- **`use-package!`** — Doom's package declaration + config. Not the same as `use-package` from MELPA.
-  Extra keywords: `:after-call` (load before a hook/command fires), `:defer-incrementally` (lazy-load sub-features).
+  `(after! org (setq org-adapt-indentation nil))` Supports compound conditions: `(after! (:or magit diff-hl) ...)`,
+  `(after! (:and pkg-a (:or pkg-b pkg-c)) ...)`.
+- **`use-package!`** — Doom's package declaration + config. Not the same as `use-package` from MELPA. Extra keywords:
+  `:after-call` (load before a hook/command fires), `:defer-incrementally` (lazy-load sub-features).
   `(use-package! foo :defer t :after-call after-find-file :config ...)`
 - **`map!`** — keybinding with evil state-aware prefixes: `:leader` (`SPC`), `:n` (normal), `:i` (insert), `:v`
-  (visual), `:m` (motion), `:g` (global). Supports `:when` for conditional bindings and `(:prefix ...)` for
-  nested key groups. Pass `nil` to unbind. `(map! :leader :desc "Desc" "f f" #'find-file)`
+  (visual), `:m` (motion), `:g` (global). Supports `:when` for conditional bindings and `(:prefix ...)` for nested key
+  groups. Pass `nil` to unbind. `(map! :leader :desc "Desc" "f f" #'find-file)`
 - **`set-company-backend!`** — per-mode company backend configuration
 - **`add-hook!`** — multi-mode hook helper with `:append`, `:local`, and inline `defun`.
-  `(add-hook! '(a-mode b-mode) #'fn)`, `(add-hook! 'a-mode :append #'fn)`.
-  `(add-hook! 'a-mode (defun named-fn () ...))` — inline defun avoids a top-level defun.
+  `(add-hook! '(a-mode b-mode) #'fn)`, `(add-hook! 'a-mode :append #'fn)`. `(add-hook! 'a-mode (defun named-fn () ...))`
+  — inline defun avoids a top-level defun.
 - **`setq-hook!`** — set buffer-local variables in a hook, cleaner than a lambda.
   `(setq-hook! 'org-mode-hook truncate-lines nil)` — also accepts multiple variables or multiple hooks.
 - **`load!`** — load an Elisp file relative to `doom-user-dir`. `(load! "modules/org")` loads
@@ -202,26 +203,25 @@ its purpose changes, **update the Quick Index in the same change**:
 All repo scripts live under `scripts/`. Sourcing `scripts/config.sh` provides shared paths and safety checks; the
 registered workflow tools are:
 
-| Script                       | Purpose                                                                        | When to run                                          |
-| :--------------------------- | :----------------------------------------------------------------------------- | :--------------------------------------------------- |
-| `check-curator-drift.sh`     | Report files/content added or changed by the Hermes curator                    | Before sync, when investigating auto-update messages |
-| `sync-doom-skill-mirror.sh`  | Validate, stage, and atomically replace the Hermes runtime mirror              | After editing skill or domain files                  |
-| `check-doom-skill-mirror.sh` | Verify source/destination identity and byte-level mirror equality              | After sync                                           |
-| `check-stale-patterns.sh`    | Run documentation, script, domain, and section inventory validation            | Before committing documentation or scripts           |
+| Script                       | Purpose                                                                       | When to run                                          |
+| :--------------------------- | :---------------------------------------------------------------------------- | :--------------------------------------------------- |
+| `check-curator-drift.sh`     | Report files/content added or changed by the Hermes curator                   | Before sync, when investigating auto-update messages |
+| `sync-doom-skill-mirror.sh`  | Validate, stage, and atomically replace the Hermes runtime mirror             | After editing skill or domain files                  |
+| `check-doom-skill-mirror.sh` | Verify source/destination identity and byte-level mirror equality             | After sync                                           |
+| `check-stale-patterns.sh`    | Run documentation, script, domain, and section inventory validation           | Before committing documentation or scripts           |
 | `validate-docs.py`           | Run all doc-health checks (full list: AGENTS.md > Drift Prevention)           | Called by `check-stale-patterns.sh`                  |
-| `run-offline-contracts.sh`   | Exercise documentation and disposable mirror-safety contracts                  | Before committing script changes                     |
-| `ai-context.sh`              | Report config, mirror, tool, and Git context; file content is explicit opt-in  | On demand when enlisting an external model           |
-| `install-hooks.sh`           | Install the pre-commit hook into `.git/hooks/pre-commit`                       | After cloning fresh or when hook script changes      |
-| `pre-commit-hook.sh`         | Canonical pre-commit hook source (installed by install-hooks.sh)               | Automatically on every commit (via git hook)         |
+| `run-offline-contracts.sh`   | Exercise documentation and disposable mirror-safety contracts                 | Before committing script changes                     |
+| `ai-context.sh`              | Report config, mirror, tool, and Git context; file content is explicit opt-in | On demand when enlisting an external model           |
+| `install-hooks.sh`           | Install the pre-commit hook into `.git/hooks/pre-commit`                      | After cloning fresh or when hook script changes      |
+| `pre-commit-hook.sh`         | Canonical pre-commit hook source (installed by install-hooks.sh)              | Automatically on every commit (via git hook)         |
 
 ## Skill Script Conventions
 
 Scripts under `scripts/` source `scripts/config.sh` for shared variables: `SKILL_SRC`, `SKILL_DST`, `DOOMDIR`,
 `REPO_ROOT`, and expected skill identity. Never duplicate paths.
 
-Files prefixed with ``_`` (e.g. ``_repo.py``, ``_checks.py``, ``_findings.py``) are library modules imported
-by standalone scripts. They are **not** standalone entry points and are excluded from the Scripts table
-inventory check.
+Files prefixed with `_` (e.g. `_repo.py`, `_checks.py`, `_findings.py`) are library modules imported by standalone
+scripts. They are **not** standalone entry points and are excluded from the Scripts table inventory check.
 
 Grep within scripts follows cross-platform conventions:
 
