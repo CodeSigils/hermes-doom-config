@@ -54,8 +54,8 @@ what your task needs:
 | Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |
 |                                       | Checking style or reviewing patterns               | `references/best-practices.md`             |
 |                                       | Writing or editing snippets                        | `references/yasnippets.md`                 |
-|                                       | Validating snippet syntax (parser-level)           | `references/snippet-validation.md`          |
-|                                       | Configuring Jinx spell checking                    | `references/jinx.md`                        |
+|                                       | Validating snippet syntax (parser-level)           | `references/snippet-validation.md`         |
+|                                       | Configuring Jinx spell checking                    | `references/jinx.md`                       |
 |                                       | Upgrading Doom framework                           | `domains/PROCEDURES.md` (G), Safety Checks |
 | Maintaining config repo scripts       | Skill Script Conventions                           |
 
@@ -129,7 +129,7 @@ memory:
   `(setq-hook! 'org-mode-hook truncate-lines nil)`
 - **`load!`** — load an Elisp file relative to `doom-user-dir`. `(load! "modules/org")` loads
   `~/.config/doom/modules/org.el`
-- **`featurep!`** — compile-time module check. `(when (featurep! :ui popup) ...)`
+- **`modulep!`** — compile-time module check. `(when (modulep! :ui popup) ...)`
 - **`set-popup-rule!`** — control popup buffer display
 - **`setq!`** — Doom's wrapper around `setq`. Use instead of `setq-default`.
 
@@ -197,17 +197,17 @@ its purpose changes, **update the Quick Index in the same change**:
 All repo scripts live under `scripts/`. Sourcing `scripts/config.sh` provides shared paths and safety checks; the
 registered workflow tools are:
 
-| Script                       | Purpose                                                                        | When to run                                     |
-| :--------------------------- | :----------------------------------------------------------------------------- | :---------------------------------------------- |
-| `check-curator-drift.sh`    | Report files/content added or changed by the Hermes curator                    | Before sync, when investigating auto-update messages |
-| `sync-doom-skill-mirror.sh`  | Validate, stage, and atomically replace the Hermes runtime mirror              | After editing skill or domain files             |
-| `check-doom-skill-mirror.sh` | Verify source/destination identity and byte-level mirror equality              | After sync                                      |
-| `check-stale-patterns.sh`    | Run documentation, script, domain, and section inventory validation            | Before committing documentation or scripts      |
-| `validate-docs.py`           | Check stale guidance, local references, script registry, domains, and sections | Called by `check-stale-patterns.sh`             |
-| `run-offline-contracts.sh`   | Exercise documentation and disposable mirror-safety contracts                  | Before committing script changes                |
-| `ai-context.sh`              | Report config, mirror, tool, and Git context; file content is explicit opt-in  | On demand when enlisting an external model      |
-| `install-hooks.sh`           | Install the pre-commit hook into `.git/hooks/pre-commit`                       | After cloning fresh or when hook script changes |
-| `pre-commit-hook.sh`         | Canonical pre-commit hook source (installed by install-hooks.sh)               | Automatically on every commit (via git hook)    |
+| Script                       | Purpose                                                                        | When to run                                          |
+| :--------------------------- | :----------------------------------------------------------------------------- | :--------------------------------------------------- |
+| `check-curator-drift.sh`     | Report files/content added or changed by the Hermes curator                    | Before sync, when investigating auto-update messages |
+| `sync-doom-skill-mirror.sh`  | Validate, stage, and atomically replace the Hermes runtime mirror              | After editing skill or domain files                  |
+| `check-doom-skill-mirror.sh` | Verify source/destination identity and byte-level mirror equality              | After sync                                           |
+| `check-stale-patterns.sh`    | Run documentation, script, domain, and section inventory validation            | Before committing documentation or scripts           |
+| `validate-docs.py`           | Check stale guidance, local references, script registry, domains, and sections | Called by `check-stale-patterns.sh`                  |
+| `run-offline-contracts.sh`   | Exercise documentation and disposable mirror-safety contracts                  | Before committing script changes                     |
+| `ai-context.sh`              | Report config, mirror, tool, and Git context; file content is explicit opt-in  | On demand when enlisting an external model           |
+| `install-hooks.sh`           | Install the pre-commit hook into `.git/hooks/pre-commit`                       | After cloning fresh or when hook script changes      |
+| `pre-commit-hook.sh`         | Canonical pre-commit hook source (installed by install-hooks.sh)               | Automatically on every commit (via git hook)         |
 
 ## Skill Script Conventions
 

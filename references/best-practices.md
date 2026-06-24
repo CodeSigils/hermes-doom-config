@@ -36,7 +36,7 @@ prefix at all, or package-internal-looking names.
 
 ```elisp
 (defun user/my-function () ...)
-(setq sand-my-var t)
+(setq user-my-var t)
 ```
 
 **Guard optional integrations.** When enabling a minor mode or calling a

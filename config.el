@@ -8,8 +8,18 @@
 ;;; these in the loader rather than moving them to a section file.
 
 ;; Identity used by GPG, email, file templates, and snippets.
-(setq! user-full-name "CodeSigils"
-       user-mail-address "toolsoftrade.web@gmail.com")
+;; Read from ~/.gitconfig so there's one source of truth — change it in git
+;; config and Emacs picks it up after a restart, no config file edit needed.
+;; Falls back to the OS-level default if gitconfig values are missing.
+(defun user/git-config (key)
+  "Return value of git config KEY from the global gitconfig, or nil."
+  (with-temp-buffer
+    (when (zerop (call-process "git" nil t nil "config" "--global" key))
+      (string-trim (buffer-string)))))
+(let ((name (user/git-config "user.name"))
+      (email (user/git-config "user.email")))
+  (when name  (setq user-full-name name))
+  (when email (setq user-mail-address email)))
 
 ;; Ensure pnpm global binaries are on exec-path for formatters (prettier, etc.)
 ;; pnpm stores globals at ~/.local/share/pnpm/bin/ -- independent of fnm.

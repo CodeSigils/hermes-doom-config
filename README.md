@@ -15,6 +15,18 @@ doom doctor
 
 If you're an AI agent working in this repo, read [`PROFILE.md`](PROFILE.md) first (what this config is), then [`DOOM-API.md`](DOOM-API.md) (idiomatic Doom patterns), then `AGENTS.md` (workflow and policies — also contains a [complete Reference Map](AGENTS.md#reference-map) of all documentation files).
 
+## Hermes Agent Integration
+
+This config is designed to take full advantage of **Hermes AI Agent** and its **curator daemon**. The `.agents/skills/doom-emacs/` directory is structured as a self-contained Hermes skill — when installed, it makes AI agents **Doom Emacs-aware**:
+
+- Agents understand the module system, Doom's macro API (`after!`, `use-package!`, `map!`, etc.), and the split-config layout before making any edit.
+- They can read and follow repo-specific policies (where keybindings go, how to name functions, which completion system to use) from `AGENTS.md` and `PROFILE.md`.
+- They validate changes against documented patterns — stale-guidance scans, shellcheck, paren balancing, and `doom doctor` — instead of guessing.
+
+The **curator daemon** runs autonomously and detects when the Hermes skill mirror drifts from this repo's definition. It can backport upstream updates or flag discrepancies for review. The `scripts/check-curator-drift.sh` script reports any differences the curator has introduced before a manual sync overwrites them, so the user stays aware of what changed and why.
+
+This means maintaining the config becomes a collaborative process: the user makes the decisions, the agent handles the mechanical work within documented guardrails, and the curator keeps the skill definitions current.
+
 This repo is also a Hermes agent skill. The `.agents/skills/doom-emacs/` directory contains the skill definition — clone and run `scripts/sync-doom-skill-mirror.sh` to make it loadable by agents. The repo's required Doom skill lives at [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md) — a compact core with [`domains/ARCHITECTURE.md`](.agents/skills/doom-emacs/domains/ARCHITECTURE.md), [`domains/PROCEDURES.md`](.agents/skills/doom-emacs/domains/PROCEDURES.md), [`domains/ELISP.md`](.agents/skills/doom-emacs/domains/ELISP.md), and [`domains/TROUBLESHOOTING.md`](.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md) for depth on demand.
 
 For consolidated best practices, see [`references/best-practices.md`](references/best-practices.md). If your Hermes installation also has `emacs-lisp-expert`, load it as an optional companion skill for general Emacs Lisp guidance. If it is missing, consider installing it for deeper Emacs Lisp help, but do not require it for basic repo maintenance.

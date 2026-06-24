@@ -69,12 +69,13 @@ Beyond Doom built-ins:
 
 ## Custom Functions (user/ prefix)
 
-| Function                                     | Purpose                                        | Location                 |
-| -------------------------------------------- | ---------------------------------------------- | ------------------------ |
-| `user/split-window-sensibly`                 | Prefer side-by-side splits, fall back to below | `sections/navigation.el` |
-| `user/initial-frame-size`                    | Return saved or pixel-width-based frame size   | `sections/navigation.el` |
-| `user/load-frame-geometry`                   | Read saved frame geometry from disk            | `sections/navigation.el` |
-| `user/save-frame-geometry`                   | Save frame geometry to disk on Emacs exit      | `sections/navigation.el` |
+| Function                     | Purpose                                        | Location                 |
+| ---------------------------- | ---------------------------------------------- | ------------------------ |
+| `user/git-config`            | Read a git config key from global gitconfig    | `config.el`              |
+| `user/split-window-sensibly` | Prefer side-by-side splits, fall back to below | `sections/navigation.el` |
+| `user/initial-frame-size`    | Return saved or pixel-width-based frame size   | `sections/navigation.el` |
+| `user/load-frame-geometry`   | Read saved frame geometry from disk            | `sections/navigation.el` |
+| `user/save-frame-geometry`   | Save frame geometry to disk on Emacs exit      | `sections/navigation.el` |
 
 ## Config Policies Summary
 
@@ -240,6 +241,8 @@ independent completion systems and coexist.
 | [`references/INDEX.md`](references/INDEX.md)                               | External Doom Emacs reference catalogue                    |
 | [`references/package-management.md`](references/package-management.md)     | Doom package lifecycle: declaration, sync, update, pinning |
 | [`references/best-practices.md`](references/best-practices.md)             | Consolidated Doom config best practices                    |
+| [`references/jinx.md`](references/jinx.md)                                 | Jinx spell-checking — config, dictionaries, verification   |
+| [`references/snippet-validation.md`](references/snippet-validation.md)     | Yasnippet parser-level validation — directives, semantics  |
 | [`references/yasnippets.md`](references/yasnippets.md)                     | Snippet inventory, template syntax, best practices         |
 | [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md) | General Doom guide with procedures and troubleshooting     |
 | [`README.md`](README.md)                                                   | Human-facing quick start                                   |
