@@ -124,9 +124,9 @@ When you change a source of truth, update its dependents in the same change. The
 - PROFILE.md module counts match init.el per category
 - Section files have non-empty purpose comments
 - Snippet files have `# key:`/`# name:` and `# --` separator; tab-stops in order
-| **Cross-commit drift** (advisory): warns when staged changes miss their drift targets
-| **Agent cross-check** (advisory): reminds to re-evaluate `.agents/` when config files change
-| **Compile-all** hook blocks commits with Python syntax errors
+- **Cross-commit drift** (advisory): warns when staged changes miss their drift targets
+- **Agent cross-check** (advisory): reminds to re-evaluate `.agents/` when config files change
+- **Compile-all** hook blocks commits with Python syntax errors
 
 Run `git diff --check` before committing. Stale documentation is worse than missing — the agent cannot distinguish it from truth.
 
