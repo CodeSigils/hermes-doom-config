@@ -19,6 +19,7 @@ from _checks import (
     frontmatter_findings,
     inventory_findings,
     pipe_artifact_findings,
+    profile_functions_findings,
     profile_module_table_findings,
     readme_disabled_module_findings,
     reference_findings,
@@ -48,6 +49,7 @@ def main() -> int:
         frontmatter_findings(repo),
         readme_disabled_module_findings(repo),
         profile_module_table_findings(repo),
+        profile_functions_findings(repo),
         snippet_syntax_findings(repo),
         cross_commit_drift_findings(repo),
     ]

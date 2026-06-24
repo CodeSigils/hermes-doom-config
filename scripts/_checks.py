@@ -596,6 +596,64 @@ def profile_module_table_findings(repo: Repo) -> CheckResult:
 
 
 # ---------------------------------------------------------------------------
+# PROFILE custom-functions table vs actual user/ defuns
+# ---------------------------------------------------------------------------
+
+PROFILE_FN_ROW = re.compile(r"^\|\s*`user/([^`]+)`\s+\|")
+DEFUN_USER = re.compile(r"\(defun\s+(user/[-\w]+)")
+
+
+def profile_functions_findings(repo: Repo) -> CheckResult:
+    """Compare the ``## Custom Functions`` table in PROFILE.md against
+    actual ``(defun user/...)`` declarations in all `.el` files."""
+    profile = repo.root / "PROFILE.md"
+    text = repo.read_text(profile)
+
+    try:
+        section = text.split("## Custom Functions", 1)[1].split("## ", 1)[0]
+    except IndexError:
+        return CheckResult(
+            "PROFILE Custom Functions Sync",
+            ["MISSING: PROFILE.md has no ## Custom Functions section"],
+            "",
+        )
+
+    claimed: set[str] = set()
+    for line in section.splitlines():
+        if m := PROFILE_FN_ROW.match(line):
+            claimed.add(f"user/{m.group(1)}")
+
+    actual: dict[str, set[str]] = {}
+    for path in sorted(repo.root.rglob("*.el")):
+        if ".git" in path.parts:
+            continue
+        for m in DEFUN_USER.finditer(repo.read_text(path)):
+            fn = m.group(1)
+            actual.setdefault(fn, set()).add(repo.display(path))
+
+    actual_names = set(actual.keys())
+
+    findings: list[str] = []
+    for fn in sorted(claimed - actual_names):
+        findings.append(
+            f"STALE: PROFILE.md lists `{fn}` but no matching "
+            f"(defun {fn} ...) exists on disk"
+        )
+    for fn in sorted(actual_names - claimed):
+        locs = ", ".join(sorted(actual[fn]))
+        findings.append(
+            f"MISSING: (defun {fn} ...) in {locs} "
+            f"is not listed in PROFILE.md ## Custom Functions table"
+        )
+
+    return CheckResult(
+        "PROFILE Custom Functions Sync",
+        findings,
+        "PROFILE.md custom-functions table matches actual defuns.",
+    )
+
+
+# ---------------------------------------------------------------------------
 # Snippet syntax validation
 # ---------------------------------------------------------------------------
 
