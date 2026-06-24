@@ -648,3 +648,124 @@ def snippet_syntax_findings(repo: Repo) -> CheckResult:
         findings,
         "All snippet files have valid syntax.",
     )
+
+
+# ---------------------------------------------------------------------------
+# Emoji detection
+# ---------------------------------------------------------------------------
+
+EMOJI = re.compile(
+    "["
+    "\U0001F300-\U0001F9F0"  # Misc pictographs, emoticons, supplements
+    "\U0001FA00-\U0001FAFF"  # Chess symbols
+    "\U0001FB00-\U0001FBFF"  # Symbols Extended-A
+    "\uFE00-\uFE0F"          # Variation Selectors (emoji sequences)
+    "\u200D"                 # Zero-Width Joiner (emoji sequences)
+    "]"
+)
+
+
+def emoji_findings(repo: Repo, files: list[Path]) -> CheckResult:
+    """Check all markdown files for emoji.
+
+    AGENTS.md enforces a project-wide no-emoji policy.  This automated
+    check catches violations the agent might not self-police.
+    """
+    findings: list[str] = []
+    for path in files:
+        for line_number, line in enumerate(
+            repo.read_text(path).splitlines(), start=1
+        ):
+            if repo.allow_marker in line:
+                continue
+            for m in EMOJI.finditer(line):
+                findings.append(
+                    f"EMOJI: {repo.display(path)}:{line_number}: "
+                    f"emoji found: {m.group()!r}"
+                )
+                break  # one finding per line at most
+    return CheckResult(
+        "Emoji Detection", findings, "No emoji found in markdown files."
+    )
+
+
+# ---------------------------------------------------------------------------
+# Cross-commit drift (advisory, non-blocking)
+# ---------------------------------------------------------------------------
+
+DRIFT_PAIRS: list[tuple[str, set[str]]] = [
+    ("init.el", {"PROFILE.md", "README.md"}),
+    ("config.el", {"PROFILE.md", "DOOM-API.md", "README.md"}),
+    ("packages.el", {"PROFILE.md"}),
+    (
+        "DOOM-API.md",
+        {
+            ".agents/skills/doom-emacs/SKILL.md",
+            ".agents/skills/doom-emacs/domains/PROCEDURES.md",
+        },
+    ),
+    ("sections/", {"PROFILE.md"}),
+    (".agents/", {".agents/skills/doom-emacs/SKILL.md"}),
+    ("scripts/", {".agents/skills/doom-emacs/SKILL.md"}),
+]
+
+
+def cross_commit_drift_findings(repo: Repo) -> CheckResult:
+    """Advisory check: when a source file is staged but none of its
+    drift targets are, warn the user.
+
+    Non-blocking (``blocking=False``) — better to over-notify than to
+    silently allow drift.
+    """
+    import subprocess
+
+    result = subprocess.run(
+        ["git", "diff", "--cached", "--name-only"],
+        capture_output=True,
+        text=True,
+        cwd=str(repo.root),
+    )
+    if result.returncode != 0:
+        return CheckResult(
+            "Cross-Commit Drift",
+            [],
+            "Could not check cross-commit drift (git diff failed).",
+            blocking=False,
+        )
+
+    staged = set(result.stdout.splitlines())
+    if not staged:
+        return CheckResult(
+            "Cross-Commit Drift",
+            [],
+            "No staged files -- cross-commit drift not applicable.",
+            blocking=False,
+        )
+
+    findings: list[str] = []
+    for source, dependents in DRIFT_PAIRS:
+        source_changed = any(
+            s.startswith(source) if source.endswith("/") else s == source
+            for s in staged
+        )
+        if not source_changed:
+            continue
+
+        dependent_changed = any(
+            d in staged for d in dependents
+        )
+        if not dependent_changed:
+            deps_str = ", ".join(sorted(dependents))
+            findings.append(
+                f"WARNING: {source} staged but no dependent "
+                f"({deps_str}) was staged. "
+                f"Update the matching files or add the "
+                f"allow-marker comment to suppress."
+            )
+
+    return CheckResult(
+        "Cross-Commit Drift",
+        findings,
+        "No cross-commit drift detected.",
+        blocking=False,
+    )

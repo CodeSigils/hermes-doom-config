@@ -14,7 +14,9 @@ from __future__ import annotations
 import sys
 
 from _checks import (
+    cross_commit_drift_findings,
     domain_inventory_findings,
+    emoji_findings,
     frontmatter_findings,
     inventory_findings,
     pipe_artifact_findings,
@@ -48,11 +50,16 @@ def main() -> int:
         readme_disabled_module_findings(repo),
         profile_module_table_findings(repo),
         snippet_syntax_findings(repo),
+        emoji_findings(repo, files),
+        cross_commit_drift_findings(repo),
     ]
 
     ok = True
     for check in checks:
-        ok &= check.report()
+        if check.blocking:
+            ok &= check.report()
+        else:
+            check.report()
     return 0 if ok else 1
 
 

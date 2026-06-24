@@ -15,6 +15,13 @@ if ! bash scripts/check-stale-patterns.sh; then
     exit 1
 fi
 
+# -------- Python compile-all (always run) --------
+
+if ! python3 -m compileall -q scripts/ 2>/dev/null; then
+    printf '\nBLOCKING: Python syntax error in scripts/. Fix before committing.\n'
+    exit 1
+fi
+
 # -------- helpers --------
 
 # Return staged .el files (added, copied, modified, renamed).

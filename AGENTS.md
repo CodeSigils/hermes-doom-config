@@ -55,7 +55,7 @@ Tier 1 is loaded in the entry order. Tier 2 is read on demand. Tier 3-4 is read 
 - Verify `DOOM-API.md` patterns against Doom source. If they conflict, propose a fix.
 - When `DOOM-API.md` macro patterns change, audit `SKILL.md` Doom API Essentials and `domains/PROCEDURES.md` (sections C, D, E) for consistency.
 - Cross-check `.agents/` files in every review and audit. After editing project config files, re-evaluate `.agents/` for stale examples, paths, and patterns.
-- The pre-commit hook runs `check-stale-patterns.sh` automatically. Before committing script changes, also run `scripts/run-offline-contracts.sh`.
+- The pre-commit hook runs `check-stale-patterns.sh` + `compileall` automatically. Before committing script changes, also run `scripts/run-offline-contracts.sh`.
 - Follow "Learn, Don't Copy" — understand first, propose, implement only on request.
 - On failure, stop and present output. Do not proceed past a failed step without confirmation.
 
@@ -88,12 +88,22 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 - No emoji in any Markdown file in this repo, including generated memory summaries, tables, and agent notes.
 - Prettier auto-formats on save (`--parser markdown`). Installed globally via pnpm at `~/.local/share/pnpm/bin/prettier`.
 - Pipe-display pitfall is caught automatically: the pre-commit hook and CI run `pipe_artifact_findings()` which blocks commits with `||` at line start in markdown table rows.
+- **Emoji detection** is automated: `validate-docs.py` blocks commits with emoji across all markdown files.
 
 ## Python Policy
 
 - Ruff is the Python formatter and linter (not prettier). Installed globally at `~/.local/bin/ruff`.
 - Format on save via `(format +onsave)` with explicit `set-formatter! 'ruff` for Python buffers.
 - Type checking via `mypy` (run in CI/terminal), not via LSP in the editor.
+- **Sibling-script consistency** — when editing one script in `scripts/`, grep its constants,
+  paths, and patterns across sibling `.py` and `.sh` files before concluding. Shared values
+  (`ROOT`, `SKILL_ROOT`, etc.) belong in a `_*.py` library module imported by all.
+- **`_`-prefix convention** — files starting with `_` (e.g. `_repo.py`, `_checks.py`) are
+  library modules, not standalone entry points. They are excluded from the script inventory
+  check and do not appear in the SKILL.md Scripts table.
+- **Compile-all gate** — run `python3 -m compileall -q scripts/` after editing Python;
+  catches syntax errors the linter misses. (Also runs automatically in the
+  pre-commit hook.)
 
 ## Drift Prevention
 
@@ -103,11 +113,14 @@ When you change a source of truth, update its dependents in the same change. The
 - Script/domain/section/snippet inventory is in sync
 - Skill essentials cover all DOOM-API.md core macros
 - No pipe-display artifacts in markdown
+- No emoji in markdown
 - SKILL.md YAML frontmatter is valid and parseable
 - README.md disabled module claims match init.el
 - PROFILE.md module counts match init.el per category
 - Section files have non-empty purpose comments
 - Snippet files have `# key:`/`# name:` and `# --` separator; tab-stops in order
+- **Cross-commit drift** (advisory): warns when staged changes miss their drift targets
+- **Compile-all** hook blocks commits with Python syntax errors
 
 Run `git diff --check` before committing. Stale documentation is worse than missing — the agent cannot distinguish it from truth.
 

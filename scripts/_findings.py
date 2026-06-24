@@ -4,8 +4,8 @@
 fallback.  ``report()`` returns ``True`` when clean (no findings) and
 ``False`` when there are items to show.
 
-Later you can add ``CheckResult.to_json()`` for CI output without touching
-any check function.
+Non-blocking checks (``blocking=False``) are printed but don't affect
+the exit code — useful for advisory warnings like cross-commit drift.
 """
 
 from __future__ import annotations
@@ -26,11 +26,15 @@ class CheckResult:
         Empty list means "everything OK".
     clean_message:
         What to print when findings is empty.
+    blocking:
+        If True (default), findings cause a non-zero exit code.
+        If False, findings are printed but don't fail the run.
     """
 
     title: str
     findings: list[str] = field(default_factory=list)
     clean_message: str = ""
+    blocking: bool = True
 
     @property
     def ok(self) -> bool:
@@ -43,9 +47,14 @@ class CheckResult:
         if self.findings:
             print("\n".join(self.findings))
             print()
-            return False
+            return False if self.blocking else True
         print(f"{self.clean_message}\n")
         return True
 
     def to_json(self) -> dict:
-        return {"title": self.title, "ok": self.ok, "findings": self.findings}
+        return {
+            "title": self.title,
+            "ok": self.ok,
+            "findings": self.findings,
+            "blocking": self.blocking,
+        }
