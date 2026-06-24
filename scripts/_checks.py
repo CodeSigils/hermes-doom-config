@@ -791,8 +791,146 @@ def cross_commit_drift_findings(repo: Repo) -> CheckResult:
 
 
 # ---------------------------------------------------------------------------
-# Agent .agents/ cross-check reminder (advisory, non-blocking)
+# Agent-config GFM table structural validation
 # ---------------------------------------------------------------------------
+
+
+def _split_gfm_cells(line: str) -> list[str]:
+    """Split a GFM table row into cells, handling escaped pipes and inline code.
+
+    Escaped pipe ``\\|`` is not a separator.  Pipes inside backtick-delimited
+    inline code spans are also not separators.  Leading and trailing ``|``
+    are stripped before parsing.
+    """
+    trimmed = line.strip()
+    start = 1 if trimmed.startswith("|") else 0
+    end = len(trimmed) - 1 if len(trimmed) > 1 and trimmed.endswith("|") else len(trimmed)
+
+    cells: list[str] = []
+    cell: list[str] = []
+    escaped = False
+    in_code = False
+    for ch in trimmed[start:end]:
+        if escaped:
+            cell.append(ch)
+            escaped = False
+            continue
+        if ch == "\\":
+            cell.append(ch)
+            escaped = True
+            continue
+        if ch == "`":
+            if in_code:
+                in_code = False
+            else:
+                in_code = True
+            cell.append(ch)
+            continue
+        if ch == "|" and not in_code:
+            cells.append("".join(cell).strip())
+            cell = []
+            continue
+        cell.append(ch)
+    cells.append("".join(cell).strip())
+    return cells
+
+
+def _is_gfm_delimiter(line: str) -> bool:
+    """Check if *line* is a GFM delimiter row (``|---|`` / ``:---|`` / ...)."""
+    cells = _split_gfm_cells(line)
+    if not cells:
+        return False
+    return all(bool(re.fullmatch(r":?-{1,}:?", c)) for c in cells)
+
+
+def _find_table_errors(content: str) -> list[tuple[str, int, str]]:
+    """Return ``(path_display, line_number, message)`` tuples for every
+    table column-count mismatch in *content*.
+
+    Matches the same structural check as the markdown-formatter's
+    ``check-tables.js`` but in Python, keeping this repo self-contained.
+    """
+    errors: list[tuple[str, int, str]] = []
+    lines = content.splitlines()
+
+    for i in range(len(lines) - 1):
+        header = lines[i]
+        delimiter = lines[i + 1]
+
+        header_cells = _split_gfm_cells(header)
+        if len(header_cells) <= 1:
+            continue
+
+        if not _is_gfm_delimiter(delimiter):
+            continue
+
+        delimiter_cells = _split_gfm_cells(delimiter)
+        target = max(len(header_cells), len(delimiter_cells))
+
+        if len(delimiter_cells) != len(header_cells):
+            errors.append(
+                (
+                    "",  # caller sets path
+                    i + 2,  # line of delimiter (1-indexed)
+                    f"delimiter has {len(delimiter_cells)} cols "
+                    f"but header has {len(header_cells)}",
+                )
+            )
+
+        row_index = 1
+        j = i + 2
+        while j < len(lines):
+            data_cells = _split_gfm_cells(lines[j])
+            if len(data_cells) <= 1:
+                break
+            if _is_gfm_delimiter(lines[j]):
+                break
+            if len(data_cells) < target:
+                errors.append(
+                    (
+                        "",
+                        j + 1,
+                        f"row {row_index} has {len(data_cells)} cols "
+                        f"but expected {target}",
+                    )
+                )
+            row_index += 1
+            j += 1
+
+    return errors
+
+
+def table_structural_findings(repo: Repo) -> CheckResult:
+    """Check every ``.agents/`` markdown file for GFM table column-count mismatches.
+
+    Reports header-vs-delimiter and data-row-vs-header mismatches.
+    """
+    findings: list[str] = []
+    agent_md_files: list[Path] = []
+    for pattern in (".agents/**/*.md", ".agents/skills/**/*.md"):
+        agent_md_files.extend(repo.root.glob(pattern))
+
+    seen: set[Path] = set()
+    for path in agent_md_files:
+        if path in seen:
+            continue
+        seen.add(path)
+
+        content = repo.read_text(path)
+        for _, line_num, msg in _find_table_errors(content):
+            findings.append(
+                f"TABLE_MISMATCH: {repo.display(path)}:{line_num}: {msg}"
+            )
+
+    return CheckResult(
+        "Agent-Config Table Structure",
+        findings,
+        "No GFM table column-count mismatches in .agents/ files.",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Agent .agents/ cross-check reminder (advisory, non-blocking)
 
 AGENT_CROSS_CHECK_TRIGGERS: list[str] = [
     "config.el",

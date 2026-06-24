@@ -29,6 +29,7 @@ from _checks import (
     snippet_inventory_findings,
     snippet_syntax_findings,
     stale_findings,
+    table_structural_findings,
 )
 from _findings import CheckResult
 from _repo import Repo
@@ -52,6 +53,7 @@ def main() -> int:
         profile_module_table_findings(repo),
         profile_functions_findings(repo),
         snippet_syntax_findings(repo),
+        table_structural_findings(repo),
         cross_commit_drift_findings(repo),
         agent_cross_check_findings(repo),
     ]
