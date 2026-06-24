@@ -413,6 +413,7 @@ wrong or omits:
    - `~/.config/emacs/core/` — Doom's own macro definitions and documentation
    - `K` key on a module or flag in `init.el` — inline docs
    - `gd` on a module or flag in `init.el` — jump to definition
+   - Doom Core API Demos at https://github.com/doomemacs/core/blob/master/modules/doom/demos.org — real usage examples for every Doom macro
    - Doom's wiki at https://github.com/doomemacs/doomemacs/wiki
    - Doom's issue tracker and pull requests for recent changes
 

@@ -26,8 +26,9 @@ macros. This index points to those sources.
 | Contributing Guide       | `~/.config/emacs/docs/contributing.org`                                  |
 | Doom CLI Help            | `doom help` (terminal) or `M-x doom/help` (in Emacs)                     |
 | Doom Online Help         | https://github.com/doomemacs/doomemacs/wiki                              |
+| Doom Core API Demos      | https://github.com/doomemacs/core/blob/master/modules/doom/demos.org     |
 
-Note: the official docs site is version-lagging. The authoritative docs live
+Note: the official docs site is version-lagging.
 inside Emacs: `M-x doom/help` opens an interactive info browser with current
 documentation matching the installed version.
 
