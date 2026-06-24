@@ -8,6 +8,13 @@ set -euo pipefail
 # visible and git plumbing is unaffected.
 exec 1>&2
 
+# -------- stale-patterns check (always run) --------
+
+if ! bash scripts/check-stale-patterns.sh; then
+    printf '\nBLOCKING: documentation or script validation failed. Fix before committing.\n'
+    exit 1
+fi
+
 # -------- helpers --------
 
 # Return staged .el files (added, copied, modified, renamed).

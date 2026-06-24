@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate documentation health: stale guidance, cross-references, script registry, domain file inventory, section inventory, and skill essentials coverage."""
+"""Validate documentation health: stale guidance, cross-references, script registry, domain file inventory, section inventory, skill essentials, snippet inventory, and pipe artifact detection."""
 
 from __future__ import annotations
 
@@ -32,6 +32,8 @@ DOMAIN_ROW = re.compile(r"`(domains/[^`]+)`")
 SECTION_LOAD = re.compile(r'^\(load! "sections/([^"]+)"\)')
 API_MACRO_HEADER = re.compile(r"^### `([^`]+)`")
 ESSENTIALS_BULLET = re.compile(r"^- \*\*`([^`]+)`\*\*")
+SNIPPET_HEADER = re.compile(r"^### ([\w-]+) \((\d+)\)$")
+PIPE_ARTIFACT = re.compile(r"^\|\|")
 
 
 def markdown_files() -> list[Path]:
@@ -228,6 +230,60 @@ def skill_essentials_findings() -> list[str]:
     ]
 
 
+def snippet_inventory_findings() -> list[str]:
+    """Check that references/yasnippets.md snippet counts match disk."""
+    yasnippets = ROOT / "references" / "yasnippets.md"
+    text = yasnippets.read_text()
+
+    claimed: dict[str, int] = {}
+    for line in text.splitlines():
+        if match := SNIPPET_HEADER.match(line):
+            claimed[match.group(1)] = int(match.group(2))
+
+    snippets_dir = ROOT / "snippets"
+    actual_dirs = {d.name for d in snippets_dir.iterdir() if d.is_dir()}
+    findings: list[str] = []
+
+    for mode in sorted(actual_dirs):
+        mode_dir = snippets_dir / mode
+        actual_count = len(
+            [f for f in mode_dir.iterdir() if f.is_file() and f.name != ".yas-parents"]
+        )
+        claimed_count = claimed.get(mode)
+        if claimed_count is None:
+            findings.append(
+                f"MISSING: snippets/{mode} exists on disk but has no inventory "
+                f"table in references/yasnippets.md"
+            )
+        elif actual_count != claimed_count:
+            findings.append(
+                f"SNIPPET_DRIFT: references/yasnippets.md claims "
+                f"{claimed_count} snippets for {mode} "
+                f"but disk has {actual_count}"
+            )
+
+    for mode in sorted(set(claimed) - actual_dirs):
+        findings.append(
+            f"STALE: references/yasnippets.md lists {mode} "
+            f"but directory snippets/{mode}/ does not exist"
+        )
+    return findings
+
+
+def pipe_artifact_findings(files: list[Path]) -> list[str]:
+    """Check markdown table rows for double-pipe artifacts (|| at line start)."""
+    findings: list[str] = []
+    for path in files:
+        for line_number, line in enumerate(path.read_text().splitlines(), start=1):
+            if PIPE_ARTIFACT.match(line) and ALLOW_MARKER not in line:
+                findings.append(
+                    f"PIPE_ARTIFACT: {display(path)}:{line_number}: "
+                    f"table row starts with double pipe (|| artifact): "
+                    f"{line.strip()}"
+                )
+    return findings
+
+
 def report(title: str, findings: list[str], clean_message: str) -> bool:
     print(f"=== {title} ===\n")
     if findings:
@@ -269,6 +325,16 @@ def main() -> int:
         "Section Inventory Coverage",
         section_inventory_findings(),
         "All sections/*.el files are loaded from config.el.",
+    )
+    ok &= report(
+        "Snippet Inventory Coverage",
+        snippet_inventory_findings(),
+        "All snippets/ directories are registered in references/yasnippets.md and counts agree.",
+    )
+    ok &= report(
+        "Pipe Artifact Detection",
+        pipe_artifact_findings(files),
+        "No double-pipe artifacts in markdown table rows.",
     )
     return 0 if ok else 1
 

@@ -8,6 +8,7 @@ on:
       - "**/*.el"
       - "scripts/**"
       - ".github/workflows/**"
+      - "snippets/**"
   pull_request:
     branches: [master]
     paths:
@@ -15,6 +16,7 @@ on:
       - "**/*.el"
       - "scripts/**"
       - ".github/workflows/**"
+      - "snippets/**"
 
 permissions:
   contents: read
@@ -59,6 +61,9 @@ jobs:
           while IFS= read -r path; do
             case "$path" in
               *.md) docs=true ;;
+            esac
+            case "$path" in
+              snippets/*) docs=true ;;
             esac
             case "$path" in
               scripts/*.sh) shell=true ;;
