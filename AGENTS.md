@@ -74,6 +74,7 @@ domain files are invisible from the entry path alone — this table bridges that
 - Verify `DOOM-API.md` patterns against Doom source (`~/.config/emacs/`). If wrong, propose a fix.
 - When `DOOM-API.md` macro patterns change, audit `.agents/skills/doom-emacs/SKILL.md` (Doom API Essentials section) and `domains/PROCEDURES.md` (sections C, D, E) for consistency — they must match.
 - Include `.agents/` files (SKILL.md, domains/) in any review or audit scope. Cross-check them against source config files for stale patterns, missing updates, or drift from documented best practices.
+- After editing project config files (`config.el`, `sections/*.el`, `init.el`, `packages.el`), re-evaluate `.agents/` guidance for stale examples, paths, procedures, or patterns that no longer match the current config.
 - Before every commit, run the stale-patterns check (see [Scripts](#scripts) table).
 - Before committing script changes, run the network-free contracts (see [Scripts](#scripts) table).
 - When consulting references, follow "Learn, Don't Copy" — understand first, propose, implement only on request.
@@ -133,6 +134,11 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
   and fence consistency without touching prose content.
 - Prettier is installed globally via `pnpm add -g prettier` at `~/.local/share/pnpm/bin/prettier` -- survives fnm Node
   migrations.
+- **Leading pipe display ambiguity.** `read_file` uses `|` as its line-number delimiter. A markdown table row
+  containing `| `init.el` | ... |` displays as `NNN|| `init.el` | ... |` — the visual shows an extra pipe. When
+  constructing `patch` old_string for table rows, use `| ` (single pipe, space) as the row prefix, not `|| ` (double
+  pipe). The patch tool's fuzzy matching may accept the wrong pipe count and silently introduce double-pipe artifacts
+  (`|||` in read_file output = `||` in actual file). Verify by checking the staged diff before committing.
 
 ## Python Policy
 
@@ -149,8 +155,10 @@ When you change a source of truth, update its dependent files in the same change
 | Source of truth                       | Dependent files                                                                                             | What to update                                                                                                 |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `init.el`                             | `PROFILE.md` module table, `README.md` notable modules                                                      | Add/remove modules, adjust flags                                                                               |
+| `init.el` / `packages.el`             | `.agents/skills/doom-emacs/SKILL.md`, `.agents/skills/doom-emacs/domains/*.md`                              | Re-evaluate for stale module references, package install patterns, and flags                                  |
 | `packages.el`                         | `PROFILE.md` packages table                                                                                 | Add/remove packages with purpose notes                                                                         |
 | `config.el`                           | `sections/*.el`, `PROFILE.md` custom functions table, `DOOM-API.md` patterns, `README.md` File Layout table | Add/remove `(load! ...)` lines, update header comment, update moved function locations, update section listing |
+| `config.el` / `sections/*.el`         | `.agents/skills/doom-emacs/SKILL.md`, `.agents/skills/doom-emacs/domains/*.md`                              | Re-evaluate for stale examples, file paths, procedures, and patterns                                          |
 | `DOOM-API.md`                         | `.agents/skills/doom-emacs/SKILL.md` (Doom API Essentials), `domains/PROCEDURES.md` (sections C, D, E)      | When macro examples or features change in DOOM-API.md, mirror the same patterns in the agent skill files       |
 | `sections/*.el` (`user/` functions)   | `PROFILE.md` custom functions table                                                                         | Register new or removed `defun user/` functions in the table                                                   |
 | `sections/*.el` (config values)       | `PROFILE.md` prose code examples                                                                            | When a config value in a PROFILE.md code block changes in the source .el file, update the example              |

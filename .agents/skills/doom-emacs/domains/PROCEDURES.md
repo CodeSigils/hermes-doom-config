@@ -113,6 +113,7 @@ Periodically audit the config repo for drift between documentation and actual st
 6. Check comments in config files for stale upstream Doom template advice
    (`with-eval-after-load`, standard `use-package`, deleting module lines, etc.).
 7. Verify the snippet directory (if present) is documented in README.
+8. Cross-check `.agents/` files (SKILL.md, domains/) against source config files and `DOOM-API.md` for stale patterns, missing updates, or drift from documented best practices.
 
 ## I. Evaluating a New Doom Package (Research Template)
 
@@ -159,7 +160,4 @@ Use this template when researching a package not yet installed. Example: evaluat
 - Check `doom doctor` for conflicts with enabled modules.
 - If the package needs a CLI tool, add it to PROFILE.md system dependencies.
 
-```
-
 Remove this section once the research concludes and the result (installed or rejected) is documented.
-```

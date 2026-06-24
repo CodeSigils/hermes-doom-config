@@ -14,9 +14,9 @@ elisp, procedures, and troubleshooting.
 Split `config.el` into topic-specific files when a topic block exceeds ~50 lines. Load them with `load!`:
 
 ```elisp
-;; In config.el near the bottom:
-(load! "modules/org")
-(load! "modules/lsp")
+;; In this repo, sections/ files are loaded from config.el:
+(load! "sections/org")
+(load! "sections/completion")
 ```
 
 Each topic file gets its own lexical-binding cookie. This keeps `config.el` readable and makes it easy to temporarily
