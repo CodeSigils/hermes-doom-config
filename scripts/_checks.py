@@ -852,10 +852,8 @@ def agent_cross_check_findings(repo: Repo) -> CheckResult:
         )
 
     findings = [
-        f"REMINDER: {', '.join(triggered)} changed -- re-evaluate "
-        ".agents/ files (SKILL.md and domains/) for stale examples, "
-        "paths, and procedures matching these changes. "
-        "See AGENTS.md 'Cross-check .agents/ files' workflow step."
+        f"REMINDER: {', '.join(triggered)} changed. "
+        "Cross-check .agents/ files (AGENTS.md Agent Workflow)."
     ]
     return CheckResult(
         "Agent Cross-Check Reminder",
