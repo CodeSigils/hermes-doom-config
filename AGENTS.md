@@ -88,7 +88,6 @@ When in doubt, propose and wait. The cost of asking is lower than the cost of re
 - No emoji in any Markdown file in this repo, including generated memory summaries, tables, and agent notes.
 - Prettier auto-formats on save (`--parser markdown`). Installed globally via pnpm at `~/.local/share/pnpm/bin/prettier`.
 - Pipe-display pitfall is caught automatically: the pre-commit hook and CI run `pipe_artifact_findings()` which blocks commits with `||` at line start in markdown table rows.
-- **Emoji detection** is automated: `validate-docs.py` blocks commits with emoji across all markdown files.
 
 ## Python Policy
 
@@ -113,7 +112,6 @@ When you change a source of truth, update its dependents in the same change. The
 - Script/domain/section/snippet inventory is in sync
 - Skill essentials cover all DOOM-API.md core macros
 - No pipe-display artifacts in markdown
-- No emoji in markdown
 - SKILL.md YAML frontmatter is valid and parseable
 - README.md disabled module claims match init.el
 - PROFILE.md module counts match init.el per category

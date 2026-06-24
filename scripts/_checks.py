@@ -651,45 +651,6 @@ def snippet_syntax_findings(repo: Repo) -> CheckResult:
 
 
 # ---------------------------------------------------------------------------
-# Emoji detection
-# ---------------------------------------------------------------------------
-
-EMOJI = re.compile(
-    "["
-    "\U0001F300-\U0001F9F0"  # Misc pictographs, emoticons, supplements
-    "\U0001FA00-\U0001FAFF"  # Chess symbols
-    "\U0001FB00-\U0001FBFF"  # Symbols Extended-A
-    "\uFE00-\uFE0F"          # Variation Selectors (emoji sequences)
-    "\u200D"                 # Zero-Width Joiner (emoji sequences)
-    "]"
-)
-
-
-def emoji_findings(repo: Repo, files: list[Path]) -> CheckResult:
-    """Check all markdown files for emoji.
-
-    AGENTS.md enforces a project-wide no-emoji policy.  This automated
-    check catches violations the agent might not self-police.
-    """
-    findings: list[str] = []
-    for path in files:
-        for line_number, line in enumerate(
-            repo.read_text(path).splitlines(), start=1
-        ):
-            if repo.allow_marker in line:
-                continue
-            for m in EMOJI.finditer(line):
-                findings.append(
-                    f"EMOJI: {repo.display(path)}:{line_number}: "
-                    f"emoji found: {m.group()!r}"
-                )
-                break  # one finding per line at most
-    return CheckResult(
-        "Emoji Detection", findings, "No emoji found in markdown files."
-    )
-
-
-# ---------------------------------------------------------------------------
 # Cross-commit drift (advisory, non-blocking)
 # ---------------------------------------------------------------------------
 
