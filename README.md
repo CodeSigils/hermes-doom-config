@@ -112,8 +112,8 @@ scripts/run-offline-contracts.sh
 ```
 
 CI follows the same boundaries: documentation/script checks run only for Markdown or script changes, shellcheck runs
-only for shell changes, and the Emacs `check-parens` job runs only for changed `.el` files. Snippet-only changes do not
-start the workflow.
+only for shell changes, and the Emacs `check-parens` job runs only for changed `.el` files. Snippet-only changes run
+only the documentation validation job.
 
 ## Notable Enabled Modules
 
