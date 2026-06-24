@@ -8,7 +8,7 @@ completion on a dual-monitor setup.
 Requires [Doom Emacs](https://github.com/doomemacs/doomemacs) installed.
 
 ```sh
-git clone <remote-url> ~/.config/doom
+git clone https://github.com/CodeSigils/hermes-doom-config.git ~/.config/doom
 doom sync
 doom doctor
 ```

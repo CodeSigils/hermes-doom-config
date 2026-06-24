@@ -18,8 +18,8 @@
       (string-trim (buffer-string)))))
 (let ((name (user/git-config "user.name"))
       (email (user/git-config "user.email")))
-  (when name  (setq user-full-name name))
-  (when email (setq user-mail-address email)))
+  (when name  (setq! user-full-name name))
+  (when email (setq! user-mail-address email)))
 
 ;; Ensure pnpm global binaries are on exec-path for formatters (prettier, etc.)
 ;; pnpm stores globals at ~/.local/share/pnpm/bin/ -- independent of fnm.
