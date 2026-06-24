@@ -66,8 +66,7 @@ domain files are invisible from the entry path alone — this table bridges that
 - For changed `.el` files, run `check-parens` before `doom sync`.
 - Run `doom sync` after config edits unless told not to.
 - Run `doom doctor` after `doom sync`.
-- When the skill or any domain file changes, sync the Hermes runtime mirror before committing (see
-  `scripts/sync-doom-skill-mirror.sh` in [Scripts](#scripts) table). The mirror is generated state; do not hand-edit it.
+- When the skill or any domain file changes, sync the Hermes runtime mirror before committing (see [Scripts](#scripts) table). The mirror is generated state; do not hand-edit it.
 - Verify `DOOM-API.md` patterns against Doom source (`~/.config/emacs/`). If wrong, propose a fix.
 - Before every commit, run the stale-patterns check (see [Scripts](#scripts) table).
 - Before committing script changes, run the network-free contracts (see [Scripts](#scripts) table).
