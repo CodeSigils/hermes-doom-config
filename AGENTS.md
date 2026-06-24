@@ -26,6 +26,10 @@ module source at `~/.config/emacs/modules/<cat>/<mod>/` to verify flags, pattern
 user asks about a package, flag, or feature, answer from the module source (README.org for flags, config.el for
 implementation patterns, lisp/ for core macros). External references supplement, never replace, the installed source.
 
+**Agent config is config.** `.agents/` files (SKILL.md and domains/) govern how the agent operates in this repo.
+Include them in reviews, audits, and consistency checks alongside `init.el`, `config.el`, and `packages.el` — stale
+agent guidance compounds across sessions.
+
 If `emacs-lisp-expert` is available, load it for general Emacs Lisp guidance; if missing, suggest it once as an optional
 companion, then continue without blocking.
 
@@ -69,6 +73,7 @@ domain files are invisible from the entry path alone — this table bridges that
 - When the skill or any domain file changes, sync the Hermes runtime mirror before committing (see [Scripts](#scripts) table). The mirror is generated state; do not hand-edit it.
 - Verify `DOOM-API.md` patterns against Doom source (`~/.config/emacs/`). If wrong, propose a fix.
 - When `DOOM-API.md` macro patterns change, audit `.agents/skills/doom-emacs/SKILL.md` (Doom API Essentials section) and `domains/PROCEDURES.md` (sections C, D, E) for consistency — they must match.
+- Include `.agents/` files (SKILL.md, domains/) in any review or audit scope. Cross-check them against source config files for stale patterns, missing updates, or drift from documented best practices.
 - Before every commit, run the stale-patterns check (see [Scripts](#scripts) table).
 - Before committing script changes, run the network-free contracts (see [Scripts](#scripts) table).
 - When consulting references, follow "Learn, Don't Copy" — understand first, propose, implement only on request.
