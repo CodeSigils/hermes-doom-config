@@ -6,6 +6,7 @@
       :leader
       (:prefix ("s" . "spelling")
        :desc "Correct word" "c" #'jinx-correct
+       :desc "Toggle Greek input" "s g" #'user/greek-input-method
        :desc "Next misspelling" "n" #'jinx-next
        :desc "Previous misspelling" "p" #'jinx-previous))
 

@@ -42,6 +42,7 @@
 ;;; SECTIONS — loaded in reviewed order; keys loaded last.
 (load! "sections/appearance") ;; Font, theme, line-numbers
 (load! "sections/spellcheck") ;; Jinx spell-checking
+(load! "sections/input")
 (load! "sections/org")        ;; Org, Org-Roam, Org-Roam-UI
 (load! "sections/completion") ;; Company backends, dabbrev
 (load! "sections/navigation") ;; Browser, window management, popups, frame
