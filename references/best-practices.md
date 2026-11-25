@@ -97,7 +97,7 @@ Runtime configuration `.el` files should start with a lexical-binding cookie:
 > **Note:** The principles below are a compact summary. See
 > `DOOM-API.md` section 7.2 for detailed explanations and examples.
 
-- **Defer everything** — Every `use-package!` gets `:defer t` unless the package is needed at startup.
+- **Defer where appropriate** — Use a real loading trigger and verify the package still loads when needed.
 - **Understand implicit deferral** — `:commands`, `:hook`, `:mode`, and `:after` all imply `:defer t`. No need to specify both.
 - **Prefer `after!` over `(require '...)`** — `after!` runs when the feature loads; `(require)` force-loads at config time.
 - **Use `:commands` for autoloads** — Declare entry-point commands that autoload the package on first use.
@@ -154,7 +154,7 @@ it shouldn't run at startup.
 | `check-parens`    | After every `.el` edit                      | Mismatched parentheses                                   |
 | `byte-compile`    | Before committing non-trivial `.el` changes | Free variable refs, unused lexical vars, type mismatches |
 | `doom doctor`     | After every `doom sync`                     | Config errors, module conflicts, missing binaries        |
-| `doom sync`       | After init.el / packages.el changes         | Recompiles, updates autoloads, resolves straight recipes |
+| `doom sync`       | After config edits, per `AGENTS.md`         | Recompiles, updates autoloads, resolves straight recipes |
 | `M-x doom/reload` | After config changes in a running Emacs     | Verifies config loads without restart                    |
 | `M-x checkdoc`    | Before submitting package-quality code      | Docstring formatting, missing arguments                  |
 
@@ -162,7 +162,7 @@ it shouldn't run at startup.
 
 1. Edit the `.el` file
 2. Run `check-parens`
-3. If `init.el` or `packages.el`: run `doom sync`
+3. Run `doom sync` after config edits, per `AGENTS.md`
 4. Run `doom doctor`
 5. Restart or `M-x doom/reload`
 6. Commit

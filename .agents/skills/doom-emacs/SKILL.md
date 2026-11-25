@@ -1,6 +1,6 @@
 ---
-name: doom-emacs-config
-description: Maintain this Doom Emacs configuration using its module conventions, package workflow, and verification steps. Load when working in this configuration repository.
+name: doom-emacs
+description: Maintain the Doom Emacs configuration in this repository, including its modules, packages and diagnostics. Use when the target is this checkout or an explicitly identified checkout of this repository.
 ---
 
 # Doom Emacs Skill
@@ -13,10 +13,10 @@ at `domains/ELISP.md` for non-trivial elisp. Suggest installing `emacs-lisp-expe
 deeper Emacs Lisp work.
 
 This skill is an adapter for this Doom configuration, not a standalone general
-Doom skill. Root-relative
-references, policies and scripts require the configuration checkout: use the
-current checkout when working in it, or `DOOMDIR` when set, otherwise
-`~/.config/doom/`. Confirm the checkout and its `AGENTS.md` before applying
+Doom skill. Root-relative references, policies and scripts require this repository's
+checkout. Identify the actual target using the working directory and `DOOMDIR`
+when relevant; do not assume another Doom checkout is this repository. Confirm
+the checkout and its `AGENTS.md` before applying
 repo-specific policy. If it is unavailable, report the missing context and do
 not assume those references or policies are present. General Emacs questions
 outside this configuration do not require this repo's personal policies.
@@ -31,35 +31,29 @@ what your task needs:
 
 | When your task is...                  | Read this section or file                          | Reference file                             |
 | :------------------------------------ | :------------------------------------------------- | :----------------------------------------- |
-| First time in this repo               | Agent Workflow, Writing Conventions, Safety Checks |                                            |
+| First time in this repo               | Doom Task Method, Writing Conventions, Safety Checks |                                          |
 | Editing `init.el`                     | `domains/ARCHITECTURE.md`, Safety Checks           |                                            |
 | Adding a module or package            | `domains/PROCEDURES.md` (A, B)                     |                                            |
 | Setting a keybinding                  | `domains/PROCEDURES.md` (E), Doom API Essentials   |                                            |
 | Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                       |                                            |
 | Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |                                            |
-|                                       | Checking style or reviewing patterns               | `references/best-practices.md`             |
-|                                       | Writing or editing snippets                        | `references/yasnippets.md`                 |
-|                                       | Validating snippet syntax (parser-level)           | `references/snippet-validation.md`         |
-|                                       | Configuring Jinx spell checking                    | `references/jinx.md`                       |
-|                                       | Upgrading Doom framework                           | `domains/PROCEDURES.md` (G), Safety Checks |
+| Checking style or reviewing patterns  | Checkout reference                                 | `references/best-practices.md`             |
+| Writing or editing snippets           | Checkout reference                                 | `references/yasnippets.md`                 |
+| Validating snippet syntax             | Checkout reference                                 | `references/snippet-validation.md`         |
+| Configuring Jinx spell checking       | Checkout reference                                 | `references/jinx.md`                       |
+| Upgrading Doom framework              | Skill domain and Safety Checks                     | `domains/PROCEDURES.md` (G)                |
 | Maintaining config repo scripts       | Skill Script Conventions                           |                                            |
 
-## Agent Workflow
+## Doom Task Method
 
-Follow the workflow defined in `AGENTS.md` ("Agent Workflow" section). That is the single source of truth for how agents
-should operate in this repo.
-
-The key steps are:
-
-1. Check `git status --short` before changing files.
-2. Inspect the relevant file before patching; do not guess from memory.
-3. Run `check-parens` on changed `.el` files before `doom sync`.
-4. Run `doom sync` after requested edits (including config-only), unless told not to.
-5. Run `doom doctor` after `doom sync`.
-6. Run `scripts/check-stale-patterns.sh` before committing.
-7. Finish with `git diff --check`, `git status --short`, and a concise summary.
-
-See AGENTS.md for the full workflow with edge cases (failed commands and reference consultation).
+1. Identify this repository's target checkout and requested outcome; apply its
+   `AGENTS.md` for local-config and repository policy.
+2. Inspect the relevant config and installed Doom source or CLI; identify any
+   unavailable evidence before relying on version-sensitive behavior.
+3. Select the smallest relevant domain or checkout reference in the Quick Index.
+4. Make the authorized change or report findings, preserving existing work.
+5. Validate the affected surface under `AGENTS.md`; distinguish static checks,
+   observed runtime behavior, and delivery status in the handoff.
 
 ## File Roles — Know What Goes Where
 
@@ -69,9 +63,9 @@ Doom splits config across three files. Putting the wrong thing in the wrong file
 | :----------------- | :------------------------------------------------------- | :------------------ |
 | `init.el`          | Declare which Doom modules are enabled, with their flags | Yes                 |
 | `packages.el`      | Install external packages (MELPA, git repos)             | Yes                 |
-| `config.el`        | Thin loader with universal defaults and `load!` calls    | Depends on config   |
-| `sections/`        | Split config loaded via `(load! ...)` from `config.el`   | No                  |
-| `sections/keys.el` | Centralized keybinding inventory loaded last             | No                  |
+| `config.el`        | Thin loader with universal defaults and `load!` calls    | Yes, per repo policy |
+| `sections/`        | Split config loaded via `(load! ...)` from `config.el`   | Yes, per repo policy |
+| `sections/keys.el` | Centralized keybinding inventory loaded last             | Yes, per repo policy |
 
 ## Writing Conventions
 
@@ -98,7 +92,7 @@ Patterns that apply to any Doom config:
 
 ## Doom API Essentials (Compact)
 
-See `DOOM-API.md` for the full syntax and examples. These are the patterns agents most often get wrong — commit them to
+`DOOM-API.md` owns the detailed macro guidance; `AGENTS.md` owns repo workflow policy. These are the patterns agents most often get wrong — commit them to
 memory:
 
 - **`after!`** — defer config until a feature loads. Use instead of `with-eval-after-load`.
@@ -129,7 +123,7 @@ memory:
 | Any requested Doom edit | `check-parens` for changed `.el` files, then `doom sync` unless told not to |
 | `init.el` change        | `doom sync` (required after any module change)                              |
 | `packages.el` change    | `doom sync` (required after any package change)                             |
-| `config.el` change      | `M-x eval-buffer` or restart; `doom sync` works but check parens first      |
+| `config.el` change      | `doom sync`, then reload or restart the running session                      |
 | Any `.el` file change   | `check-parens` to verify balanced parens                                    |
 | After `doom sync`       | `doom doctor` — catches missing deps, wrong flags, broken recipes           |
 | Emacs won't start (CLI) | `emacs --debug-init` for stack trace; `emacs --batch` for paren check       |

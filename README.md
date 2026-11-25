@@ -12,7 +12,7 @@ doom sync
 doom doctor
 ```
 
-If you're an AI agent working in this repo, read [`PROFILE.md`](PROFILE.md) first (what this config is), then [`DOOM-API.md`](DOOM-API.md) (idiomatic Doom patterns), then `AGENTS.md` (workflow and policies — also contains a [complete Reference Map](AGENTS.md#reference-map) of all documentation files).
+If you're an AI agent working in this repo, read [`AGENTS.md`](AGENTS.md) first for policy and its [Reference Map](AGENTS.md#reference-map), then consult the profile, skill, and API guidance relevant to the task.
 
 ## Agent Skill
 
@@ -74,12 +74,13 @@ All repo scripts live under `scripts/`. The canonical reference for every script
   SKILL.md > Scripts table         --  single source of truth for all scripts
   ───
   scripts/check-stale-patterns.sh  --  delegates to validate-docs.py, which checks stale
-                                       guidance, local references, script registration,
+                                       guidance, selected local file paths, script registration,
                                        domain inventory, section inventory, and skill essentials
                                        coverage
 ```
 
-- `AGENTS.md` states the workflow and links to the skill's script inventory.
+- `AGENTS.md` owns repo workflow policy; the skill summarizes it and lists scripts.
+- The path check covers selected inline link forms, including angle-bracketed and percent-encoded paths, and resolves Markdown links relative to their containing file. It is not a full Markdown parser; anchors and external URLs are not checked.
 - `SKILL.md` is the single source for script metadata. Add or rename a script there, update the table.
 - `check-stale-patterns.sh` enforces script-table coverage in both directions and preserves paths containing spaces.
 - It also checks that every `sections/*.el` file is loaded from `config.el`, and every section loaded from `config.el`

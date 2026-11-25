@@ -35,7 +35,7 @@ Stale documentation is worse than missing documentation — the agent cannot dis
 | Repository policy | `AGENTS.md` | Skill summaries; recheck on policy changes |
 | Doom macro guidance | `DOOM-API.md` | Skill essentials and procedures; recheck against installed source on API changes |
 | Package lifecycle | `references/package-management.md` | Procedures and index; recheck on CLI changes |
-| Diagnosis | `domains/TROUBLESHOOTING.md` | Index links; recheck when failures or installed behavior change |
+| Diagnosis | `domains/TROUBLESHOOTING.md` | Index links; route package recovery to `references/package-management.md`; recheck on failures or behavior changes |
 | Jinx setup and workaround | `references/jinx.md` | Profile and troubleshooting; recheck on Jinx, compat or Emacs updates |
 | Source discovery | `references/INDEX.md` | Entry guides; recheck paths on Doom layout changes |
 

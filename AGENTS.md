@@ -6,11 +6,11 @@ When opening this repo cold, read files in this order:
 
 | Step | File | What it tells you | Why this order |
 | :--- | :--- | :--- | :--- |
-| 1 | `PROFILE.md` | What this config is — modules, packages, environment | Understand the setup before suggesting changes |
-| 2 | `DOOM-API.md` | Idiomatic Doom patterns — which macros to use when | Learn the dialect before editing `.el` files |
-| 3 | This file (`AGENTS.md`) | Agent behavior policies and workflow for this repo | Know the rules before making changes |
-| 4 | `.agents/skills/doom-emacs/SKILL.md` | Compact core: file roles, API essentials, pitfalls; plus `domains/` for depth | Deep reference on demand |
-| 5 | `references/INDEX.md` | External Doom resources and community configs | Find what's possible outside this config |
+| 1 | This file (`AGENTS.md`) | Repo and local-config rules | Establish scope and authority |
+| 2 | `PROFILE.md` | Config modules, packages, environment | Consult when setup context is relevant |
+| 3 | `.agents/skills/doom-emacs/SKILL.md` | Doom task method and routing | Select relevant domain guidance |
+| 4 | `DOOM-API.md` | Idiomatic Doom patterns | Consult relevant sections for `.el` work |
+| 5 | `references/INDEX.md` | External resources and community configs | Consult when external references are needed |
 
 `README.md` is human-facing; read it when you need quick-start or dependency info. Beyond these 5 entry files, additional reference files exist in depth layers (`references/` and `.agents/skills/doom-emacs/domains/`). The Reference Map below is the full landscape.
 
@@ -22,7 +22,7 @@ The installed Doom source at `~/.config/emacs/` is the authoritative reference f
 
 ## Reference Map
 
-Guide to every reference file in this repo, organized by depth tier. Read this at step 3 to see the full landscape before you need depth.
+Guide to reference files in this repo, organized by depth tier. Consult it when selecting task-specific depth.
 
 | Tier | File | Purpose |
 | :--- | :--- | :--- |
@@ -43,7 +43,7 @@ Guide to every reference file in this repo, organized by depth tier. Read this a
 | 4 — domains/ | `domains/PROCEDURES.md` | Task procedures (add module, install package) |
 | 4 — domains/ | `domains/TROUBLESHOOTING.md` | Diagnostic guide for Emacs failures |
 
-Tier 1 is loaded in the entry order. Tier 2 is read on demand. Tier 3-4 is read when the SKILL.md Quick Index points to a domain file.
+Read only the task-relevant material after this file. Tier 2 is on demand; the skill routes to tier 4 domains.
 
 ## Agent Workflow
 
@@ -114,7 +114,7 @@ committed — it didn't survive the cost-of-omission test.
 
 When you change a source of truth, update its dependents in the same change. The full mapping is in `references/drift-prevention.md`. The automated checks (pre-commit hook and CI via validate-docs.py) enforce:
 - No stale active guidance patterns
-- All cross-references resolve
+- Selected local file paths resolve; anchors, external URLs, and full Markdown syntax are not checked
 - Script/domain/section/snippet inventory is in sync
 - Skill essentials cover all DOOM-API.md core macros
 - No pipe-display artifacts in markdown
