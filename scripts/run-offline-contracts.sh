@@ -56,7 +56,7 @@ grep -F 'references/missing file.md' "$temp_root/output" >/dev/null
 sed -i '$d' "$fixture/README.md"
 # Bounded non-goals: anchors, external URLs, and external mailto are ignored;
 # local file targets with fragments resolve by file path.
-printf '\n[anchor](#local-section) [external](https://example.com/path) [mail](mailto:test@example.com) [fragmented](references/space file.md#heading)\n' >>"$fixture/README.md"
+printf '\n[anchor](#local-section) [external](https://example.com/path) [mail](mailto:test@example.com) [fragmented](<references/space file.md#heading>)\n' >>"$fixture/README.md"
 (cd "$fixture" && bash scripts/check-stale-patterns.sh >/dev/null)
 sed -i '$d' "$fixture/README.md"
 # Local image/link targets are still checked when present.
