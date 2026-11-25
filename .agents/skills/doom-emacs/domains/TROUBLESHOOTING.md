@@ -28,7 +28,7 @@ When something breaks, gather this information before changing anything:
 | Blank screen, Emacs exits immediately          | Unbalanced parens or syntax error in a `.el` file         | `emacs --debug-init` to locate the error; `check-parens` on affected files         |
 | Error mentions a specific file or line         | An error in that file at that line                        | Inspect the file around that line, check recent edits                              |
 | Error is a missing function or variable        | A `require` or autoload is failing                        | The stack trace shows what Emacs tried to load and where                           |
-| Error about `void-variable` or `void-function` | A referenced symbol doesn't exist, or load order is wrong | Check `featurep!` guards, ensure `use-package!` declarations precede config blocks |
+| Error about `void-variable` or `void-function` | A referenced symbol doesn't exist, or load order is wrong | Check module guards, package availability, and load order |
 | Error about an unknown module flag             | Typo or removed flag in `init.el`                         | Check the module's README.org for valid flags                                      |
 | Emacs starts but shows nothing useful          | The daemon started but GUI/X11 failed                     | Run `emacs --no-window-system` or `emacs -nw` to force terminal mode               |
 
@@ -38,7 +38,7 @@ Steps:
    from bottom to top — the first error is at the bottom.
 2. **Check parens.** A missing paren is the most common cause:
    ```sh
-   emacs --batch --eval "(progn (let ((check-parens t)) (check-parens)))"
+   emacs --batch path/to/affected-file.el --eval '(check-parens)'
    ```
    or from inside Emacs: `M-x check-parens`
 3. **Check `*doom*`** for compile warnings after a `doom sync`.
@@ -53,7 +53,7 @@ Steps:
 | :------------ | :--------------------------------- | :----------------------------------------------- |
 | `init.el`     | `doom sync` then restart           | Running `doom/reload` instead of `doom sync`     |
 | `packages.el` | `doom sync` then restart           | Running `package-install` instead of `doom sync` |
-| `config.el`   | `M-x doom/reload` or restart Emacs | Running `doom sync` but not reloading            |
+| `config.el`   | `doom sync`, then reload or restart | Syncing without reloading the running session    |
 | Snippet file  | Save file, no Emacs restart needed | Unclear; check `SPC h i` in the target mode      |
 
 Verify with:
@@ -82,48 +82,15 @@ restart Emacs or run `M-x doom/reload` from inside Emacs.
 - **Run `doom sync` and restart.** If the binding still doesn't appear, verify the key sequence isn't consumed by
   another prefix: `C-h k <partial-seq>` to see what the prefix is bound to.
 
-## Package install failures
+## Package install failures and sync errors
 
-1. **`doom doctor`** — catches most recipe and dependency issues. If it reports a broken recipe, the error text tells
-   you what's wrong.
-2. **`doom sync -u`** — updates straight.el and retries the recipe against the latest package source.
-3. **Check `*doom*` buffer** — recipe errors are logged there. The exact cause (missing git ref, failed compile, version
-   conflict) is in the log.
-4. **Missing git ref.** If a recipe fails with an error about a commit SHA or tag that doesn't exist, the package may
-   have been renamed, force-pushed, or removed upstream. Update the recipe with a current ref or switch to a stable tag.
-5. **Hard reset for a single package:**
-   ```sh
-   rm -rf ~/.config/emacs/.local/straight/repos/<package>
-   doom sync
-   ```
-   This forces straight to reclone from scratch. Useful when the local git checkout is in a bad state.
+Run `doom doctor`, inspect the exact error and `*doom*` or `*Messages*`, and
+check the affected package recipe and checkout. A dirty checkout may contain
+work that must be preserved. For package recovery and the distinction between
+sync, update, and rebuild, see `references/package-management.md`.
 
-See `references/package-management.md` for pin recovery, lockfile repair, and straight internals.
-
-## `doom sync` fails or hangs
-
-- **Hangs during cloning.** A large package or a slow connection can cause it. Check `*doom*` for which repo it's stuck
-  on. Kill and retry with `doom sync`.
-- **Hangs indefinitely.** Often a git credential prompt. Check if a recipe references a private repo. Run `doom sync -d`
-  for debug output.
-- **Error about dirty checkout.** straight refuses to update a package whose local repo has uncommitted changes. Clean
-  it:
-  ```sh
-  cd ~/.config/emacs/.local/straight/repos/<package>
-  git checkout .
-  ```
-  Then retry `doom sync`.
-- **Error about locked package.** A `:pin` in packages.el sets a fixed version. Remove the `:pin` line or update the SHA
-  to unlock.
-- **Full reset of straight:**
-  ```sh
-  rm -rf ~/.config/emacs/.local/straight/build-*/
-  doom sync
-  ```
-  This rebuilds all packages from their cached repos. If repos themselves are corrupted, also remove
-  `~/.config/emacs/.local/straight/repos/` (longer).
-
-See `references/package-management.md` for the full straight lifecycle.
+If a sync hangs, inspect the log and any credential prompt before stopping it.
+Consult the installed `doom help sync` for debugging options.
 
 ## LSP not working
 
@@ -156,8 +123,8 @@ against a definition that is no longer available.
 
 | Symptom                       | Likely cause                           | Fix                                                 |
 | :---------------------------- | :------------------------------------- | :-------------------------------------------------- |
-| Startup > 3 seconds           | Packages loading eagerly               | Add `:defer t` to `use-package!` forms              |
-| Specific package takes long   | Expensive `:config` block runs at load | Move `:config` to an `after!` block; use `:defer t` |
+| Startup feels slow            | Several possible causes                | Measure startup before choosing a change            |
+| A package takes long to load  | Expensive loading or configuration    | Profile it; defer only with an appropriate trigger  |
 | Startup slow only in GUI      | Font or tooltip initialization         | Check font cache, disable unneeded UI features      |
 | Startup slow only in terminal | Frame initialization differences       | Check for terminal-specific config that waits on X  |
 
@@ -167,8 +134,8 @@ Steps:
 - **`benchmark-init`** — enable in init.el for a detailed report of which packages contribute to startup time. Not
   installed by default.
 - **`M-x profiler-start`** then **`M-x profiler-report`** after startup identifies expensive operations during use.
-- **Check `:defer t`** — every `use-package!` form should have `:defer t` unless the package must load at startup.
-  Without defer, the package loads immediately.
+- **Check loading triggers** — defer work where appropriate, and verify a hook,
+  command, or other trigger still loads the package when it is needed.
 - **Verify `lexical-binding: t`** in runtime config files — dynamic binding can limit compiler optimizations and increase memory per
   buffer.
 
@@ -216,37 +183,17 @@ yellow warning means a missing dep that may affect that module's feature.
 | "No module flag matches"                            | `init.el` has a flag that the module doesn't know about | Check the module's README.org and correct the flag |
 | "Package is pinned to a version that may not exist" | `:pin` SHA doesn't match upstream                       | Update the SHA or remove the `:pin`                |
 | "Recipe error for <package>"                        | straight can't process the recipe                       | Check the recipe syntax and the package source     |
-| "Straight repo is dirty"                            | Uncommitted changes in a package checkout               | `git checkout .` in the repo or re-clone           |
+| "Straight repo is dirty"                            | Uncommitted changes in a package checkout               | Inspect and preserve changes before deciding recovery |
+
+
 
 ## Recovery procedures
 
-**After a failed `doom upgrade`:**
+After a failed upgrade, inspect the config and Doom checkout status, logs, and
+available backups. Identify the exact pre-upgrade revision and any local work
+before proposing recovery. A reflog entry is not automatically that revision;
+do not reset, overwrite, or delete changes without explicit authorization.
 
-1. Restore from backup:
-   ```sh
-   cp -a ~/.config/doom.backup.2026???? ~/.config/doom
-   ```
-2. Revert the Doom install:
-   ```sh
-   cd ~/.config/emacs
-   git reset --hard HEAD@{1}
-   ```
-3. Run `doom sync && doom doctor`
-4. If Emacs still won't start, restore `~/.config/doom` from the backup and pin the working Doom version.
-
-**After a git-revert of config changes:**
-
-1. `git log --oneline -5` to find the commit to revert.
-2. `git revert <commit>` or `git checkout <file>` for individual files.
-3. Run `doom sync` if `init.el` or `packages.el` changed with the revert.
-4. Restart Emacs.
-
-**Clean rebuild of all packages (last resort):**
-
-```sh
-rm -rf ~/.config/emacs/.local/straight
-doom sync
-```
-
-This forces straight to re-clone every package. Requires a network connection and takes several minutes. Afterward, run
-`doom doctor` to verify.
+For package-specific sync, rebuild, and recovery choices, see
+`references/package-management.md`. After an authorized config recovery, follow
+`AGENTS.md` for sync and doctor, then reload or restart the running session.

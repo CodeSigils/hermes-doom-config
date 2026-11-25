@@ -117,7 +117,7 @@ This is the single command that:
 
 1. Reads `packages.el` and resolves all `package!` declarations
 2. Clones missing repos via straight.el into `~/.config/emacs/.local/straight/repos/`
-3. Builds packages into `~/.config/emacs/.local/straight/build/`
+3. Builds packages into `~/.config/emacs/.local/straight/build-<version>/`
 4. Byte-compiles `.el` files into `.elc`
 5. (With native-comp) generates `.eln` files
 6. Regenerates autoloads
@@ -130,7 +130,7 @@ This is the single command that:
 | Added a `package!` to `packages.el` | Yes                           |
 | Removed a `package!`                | Yes                           |
 | Changed `init.el` modules           | Yes                           |
-| Changed `config.el` (config only)   | Usually — `doom sync` is safe |
+| Changed `config.el` (config only)   | Yes, per `AGENTS.md`; reload or restart afterward |
 | Changed documentation files         | No                            |
 
 **After `doom sync`, always run `doom doctor`** to catch errors.
@@ -139,23 +139,14 @@ This is the single command that:
 
 ## 4. Updating Packages
 
-### Individual Package
+### Installed Packages
 
 ```sh
-doom update <package-name>
+doom sync -u
 ```
 
-This updates a single package and its dependencies, rebuilding only what
-changed.
-
-### All Packages
-
-```sh
-doom update
-```
-
-Updates every installed package. Slower than individual updates but ensures
-everything is current with Doom's pinned versions.
+Updates all installed packages after syncing. Inspect pins and local checkout
+changes first; consult `doom help sync` for this installed version.
 
 ### Framework Update
 
@@ -172,9 +163,8 @@ Updates the Doom framework itself (core, modules, CLI) plus all packages.
 doom gc
 ```
 
-Removes orphaned repos and stale builds (aliased as `doom purge` for
-backward compatibility). Run after removing `package!` declarations or
-after a `doom upgrade` that may have left stale builds.
+Removes orphaned repos and builds and compacts package repositories. Inspect
+the installed `doom help gc` and affected local work before running it.
 
 ---
 
@@ -231,7 +221,7 @@ Doom uses straight.el as its package manager. Key facts:
 | Directory                                | Contents                         |
 | ---------------------------------------- | -------------------------------- |
 | `~/.config/emacs/.local/straight/repos/` | Full git clones of every package |
-| `~/.config/emacs/.local/straight/build/` | Built/compiled package bytecode  |
+| `~/.config/emacs/.local/straight/build-<version>/` | Version-specific package builds |
 
 Because repos are full git clones, you can inspect local source:
 
@@ -273,21 +263,20 @@ Unknown macro: unpin!
 **Check:** `unpin!` must be in `packages.el`, not `config.el`. It's a
 `packages.el`-only macro.
 
-### Stale Bytecode
+### Package recovery
 
-After major Doom upgrades, old `.elc` files can cause confusing errors.
-Run `doom gc` to remove orphaned builds, or force a full reinstall with
-`doom sync -u` (see below).
+Inspect the exact error and run `doom doctor`. Before changing package checkouts,
+inspect their status and preserve local changes. `doom sync` synchronizes the
+configuration, including removal of unneeded packages and installation of
+needed ones; `doom sync --rebuild` rebuilds installed packages, while
+`doom sync -u` updates all installed packages after syncing. Consult `doom help
+sync` for the installed version. These are different operations; a broad update
+or rebuild should be chosen for the actual problem.
 
-### Want to Start Fresh
-
-```sh
-doom sync -u   # Force reinstall of all packages from scratch
-```
-
-This removes and reclones every package repo. Useful when the straight lock
-file is corrupted or too many pinned versions conflict. Time-consuming but
-definitive.
+If recovery requires removing a checkout, build tree, or resetting history,
+identify the exact target and any local changes first. Do not discard them
+without explicit authorization. After an approved recovery, run `doom doctor`
+and restart or reload as appropriate.
 
 ---
 
@@ -300,16 +289,15 @@ definitive.
 | `~/.config/doom/packages.el`             | Package declarations (`package!`)      |
 | `~/.config/doom/config.el`               | Package configuration (`use-package!`) |
 | `~/.config/emacs/.local/straight/repos/` | Cloned source repos                    |
-| `~/.config/emacs/.local/straight/build/` | Built/compiled packages                |
+| `~/.config/emacs/.local/straight/build-<version>/` | Version-specific package builds |
 
 ### Command Reference
 
 | Command             | When to Use                                    |
 | ------------------- | ---------------------------------------------- |
-| `doom sync`         | After any change to `packages.el` or `init.el` |
-| `doom sync -u`      | Full reinstall from scratch                    |
+| `doom sync`         | After config edits, per `AGENTS.md`            |
+| `doom sync -u`      | Update all installed packages after syncing    |
 | `doom doctor`       | After every `doom sync` — validation           |
-| `doom update <pkg>` | Update a single package                        |
-| `doom update`       | Update all packages                            |
+| `doom sync --rebuild` | Rebuild installed packages                   |
 | `doom upgrade`      | Upgrade Doom framework + all packages          |
 | `doom gc`           | Remove orphaned packages and stale builds      |
