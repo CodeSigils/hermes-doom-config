@@ -1,5 +1,11 @@
 # doom-emacs-config
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/CodeSigils/hermes-doom-config/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeSigils/hermes-doom-config/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/CodeSigils/hermes-doom-config/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/CodeSigils/hermes-doom-config/security/code-scanning)
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting and security scope.
+
 My personal Doom Emacs configuration repo. Designed for org-mode, GTD workflows, and general development with Company completion.
 
 ## Quick Start

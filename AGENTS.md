@@ -89,6 +89,14 @@ committed — it didn't survive the cost-of-omission test.
 - Use `fboundp` guards for optional package entrypoints when practical (`org-roam-db-autosync-mode`).
 - Keep global defaults global — do not duplicate `delete-by-moving-to-trash` inside package blocks unless a package needs a different value.
 
+## Security Policy
+
+- Follow [`SECURITY.md`](SECURITY.md) for vulnerability reporting and security scope. Do not open public issues for suspected vulnerabilities or include secrets/exploit details in public reports.
+- When repository security scope, reporting channels, supported branch policy, or security-relevant controls/processes change, update `SECURITY.md` and keep `README.md`, `AGENTS.md`, and `references/INDEX.md` links/descriptions in sync in the same change.
+- Never commit or paste raw secrets, tokens, credentials, private keys, or secret-bearing URLs into config, docs, scripts, snippets, commit messages, or logs. Redact evidence to filenames, paths, counts, or status.
+- Treat suspected credential exposure as an incident: stop, rotate/revoke, and assess impact before cleanup. Git history rewrites do not replace rotation and require explicit, coordinated action.
+- For GitHub Actions and tooling changes, prefer least-privilege permissions, pinned actions/images, and reviewed supply-chain updates; run the repo validation checks before committing.
+
 ## Markdown Policy
 
 - No emoji in any Markdown file in this repo, including generated memory summaries, tables, and agent notes.
