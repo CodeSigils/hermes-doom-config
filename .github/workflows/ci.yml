@@ -37,6 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           fetch-depth: 0
       - id: classify
         name: Classify changed paths
@@ -99,6 +100,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+      - name: Compile Python scripts
+        if: needs.changes.outputs.scripts == 'true'
+        run: python3 -m compileall -q scripts
       - name: Validate documentation
         run: bash scripts/check-stale-patterns.sh
       - name: Run offline contracts
@@ -111,6 +117,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
       - name: Run shellcheck
         run: shellcheck -x scripts/*.sh
 
@@ -120,6 +128,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
       - name: Install Emacs
         run: |
           sudo apt-get update

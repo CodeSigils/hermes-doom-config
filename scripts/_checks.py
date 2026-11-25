@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from urllib.parse import unquote
 
 from _findings import CheckResult
 from _repo import Repo
@@ -64,23 +65,29 @@ BACKTICK_PATH = re.compile(
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*]\(([^)]+)\)")
 
 
-def _candidate_paths(line: str) -> set[str]:
-    candidates: set[str] = {m.group(1).strip() for m in BACKTICK_PATH.finditer(line)}
+def _candidate_paths(line: str) -> set[tuple[str, bool]]:
+    candidates = {(m.group(1).strip(), False) for m in BACKTICK_PATH.finditer(line)}
     for m in MARKDOWN_LINK.finditer(line):
-        target = m.group(1).strip().split(maxsplit=1)[0]
+        destination = m.group(1).strip()
+        if destination.startswith("<") and ">" in destination:
+            target = destination[1:destination.index(">")]
+        else:
+            target = destination.split(maxsplit=1)[0]
         if not re.match(r"^(?:https?://|mailto:|#)", target):
-            candidates.add(target)
+            candidates.add((target, True))
     return candidates
 
 
-def _resolves(source: Path, raw_target: str, repo: Repo) -> bool:
+def _resolves(source: Path, raw_target: str, repo: Repo, markdown: bool) -> bool:
     target = raw_target.split("#", 1)[0]
+    if markdown:
+        target = unquote(target)
     if not target or any(marker in target for marker in ("<", ">", "[", "]", "*")):
         return True
     if target.startswith("~/") or "$" in target:
         return True
 
-    if target.startswith(("./", "../")):
+    if markdown or target.startswith(("./", "../")):
         choices = [source.parent / target]
     elif source.is_relative_to(repo.skill_root):
         choices = [repo.skill_root / target, repo.root / target, source.parent / target]
@@ -90,21 +97,21 @@ def _resolves(source: Path, raw_target: str, repo: Repo) -> bool:
 
 
 def reference_findings(repo: Repo, files: list[Path]) -> CheckResult:
-    """Check that all local backtick-quoted paths and markdown links resolve."""
+    """Check selected local file paths; fragments and external URLs are excluded."""
     findings: list[str] = []
     for path in files:
         for line_number, line in enumerate(
             repo.read_text(path).splitlines(), start=1
         ):
-            for target in sorted(_candidate_paths(line)):
-                if not _resolves(path, target, repo):
+            for target, markdown in sorted(_candidate_paths(line)):
+                if not _resolves(path, target, repo, markdown):
                     findings.append(
                         f"BROKEN: {repo.display(path)}:{line_number}: {target}"
                     )
     return CheckResult(
         "Cross-Reference Integrity",
         findings,
-        "All local documentation references resolve.",
+        "Selected local file paths resolve (anchors and external URLs not checked).",
     )
 
 
@@ -447,9 +454,11 @@ def frontmatter_findings(repo: Repo) -> CheckResult:
         )
 
     findings: list[str] = []
-    for key in ("name",):
-        if key not in data:
-            findings.append(f"MISSING: SKILL.md frontmatter has no '{key}' field")
+    for key in ("name", "description"):
+        if not isinstance(data.get(key), str) or not data[key].strip():
+            findings.append(f"MISSING: SKILL.md frontmatter has no non-empty '{key}'")
+    if isinstance(data.get("name"), str) and data["name"] != repo.skill_root.name:
+        findings.append("BROKEN: SKILL.md name does not match its directory")
     return CheckResult(
         "SKILL.md Frontmatter Validation",
         findings,
