@@ -28,14 +28,16 @@ concurrency:
 jobs:
   changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       docs: ${{ steps.classify.outputs.docs }}
       shell: ${{ steps.classify.outputs.shell }}
       elisp: ${{ steps.classify.outputs.elisp }}
       scripts: ${{ steps.classify.outputs.scripts }}
+      workflow: ${{ steps.classify.outputs.workflow }}
       elisp_files: ${{ steps.classify.outputs.elisp_files }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -59,6 +61,7 @@ jobs:
           shell=false
           elisp=false
           scripts=false
+          workflow=false
           while IFS= read -r path; do
             case "$path" in
               *.md) docs=true ;;
@@ -81,6 +84,7 @@ jobs:
                 shell=true
                 elisp=true
                 scripts=true
+                workflow=true
                 ;;
             esac
           done < changed-files.txt
@@ -90,6 +94,7 @@ jobs:
             echo "shell=$shell"
             echo "elisp=$elisp"
             echo "scripts=$scripts"
+            echo "workflow=$workflow"
             elisp_files=$(awk '/[.]el$/' changed-files.txt | base64 -w0)
             echo "elisp_files=$elisp_files"
           } >>"$GITHUB_OUTPUT"
@@ -98,8 +103,9 @@ jobs:
     needs: changes
     if: needs.changes.outputs.docs == 'true' || needs.changes.outputs.scripts == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Compile Python scripts
@@ -115,19 +121,35 @@ jobs:
     needs: changes
     if: needs.changes.outputs.shell == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Run shellcheck
         run: shellcheck -x scripts/*.sh
 
+  actionlint:
+    needs: changes
+    if: needs.changes.outputs.workflow == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Run actionlint
+        uses: docker://rhysd/actionlint:1.7.12@sha256:9d36088643581e728c969f35141f88139fec77280b2be23c1f66f8e40e1025e7
+        with:
+          args: -color
+
   elisp:
     needs: changes
     if: needs.changes.outputs.elisp == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Install Emacs
