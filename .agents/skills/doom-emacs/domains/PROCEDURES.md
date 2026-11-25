@@ -144,8 +144,7 @@ Use this template when researching a package not yet installed. Example: evaluat
 **Known pitfalls:**
 
 - List any gotchas found during evaluation.
-- Note provider-specific quirks (e.g. `agent-shell-hermes-acp-command` may use
-  symbols instead of strings — override with strings in Doom config).
+- Note provider-specific command and configuration quirks.
 - Check whether `executable-find` and `make-process` expect command strings, not symbols.
 
 **Safety defaults for first trial:**

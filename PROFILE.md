@@ -22,7 +22,7 @@ This is a summary. The source of truth is `init.el`, `config.el` (loader with un
 | Spelling         | Jinx with Enchant/Hunspell (`en_US el_GR`)                |
 | Git client       | magit                                                     |
 | Terminal         | vterm                                                     |
-| Tab/workspace    | workspaces module (tabspaces)                             |
+| Tab/workspace    | workspaces module (`persp-mode`)                          |
 | Formatting       | `format +onsave` — Ruff for Python, Prettier for Markdown |
 | Custom prefix    | `user/`                                                   |
 | Module style     | Comment out unused modules, never delete lines            |
@@ -84,13 +84,12 @@ For full policy text see [`AGENTS.md`](AGENTS.md):
 
 - **Completion Policy** — Company preferred, Corfu disabled as commented module
 - **Defensive Config Policy** — `fboundp` guards for optional packages; global defaults stay global
-- **Skill Source Policy** — `.agents/skills/doom-emacs/` is canonical; the Hermes mirror is generated and not hand-edited
-- **Script Safety Policy** — mirror updates validate identity, stage replacement, and restore the prior mirror on failure
+- **Skill Source Policy** — `.agents/skills/doom-emacs/` is canonical; local discovery can link to it
 
 ## Environment
 
 - **OS:** PikaOS Linux (with conditional macos module via `:if` form)
-- **Shell:** zsh (enabled in `:lang sh +zsh +lsp`)
+- **Shell editing:** zsh support is enabled in `:lang sh +zsh +lsp`
 - **Display:** Dual monitors
 - **Default browser:** BrowserOS (Chromium agentic browser)
 - **Node manager:** fnm (prettier installed via pnpm, survives Node switches)
@@ -128,5 +127,5 @@ separate; see [the snippet reference](references/yasnippets.md).
 | [`references/drift-prevention.md`](references/drift-prevention.md)         | Source-to-dependent drift prevention map                   |
 | [`references/snippet-validation.md`](references/snippet-validation.md)     | Yasnippet parser-level validation — directives, semantics  |
 | [`references/yasnippets.md`](references/yasnippets.md)                     | Snippet inventory, template syntax, best practices         |
-| [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md) | General Doom guide with procedures and troubleshooting     |
+| [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md) | Repo-specific guide with procedures and troubleshooting     |
 | [`README.md`](README.md)                                                   | Human-facing quick start                                   |

@@ -150,7 +150,7 @@ against the local `~/.config/emacs/` source when examples don't work.
 
 Consult installed module source for version-specific flags and behavior.
 
-## 11. Inspiring Community Configurations
+## 7. Inspiring Community Configurations
 
 A catalogue of what is possible with Doom Emacs, organized by what each config
 teaches. These are exploration material — browse to learn patterns and features,
@@ -197,7 +197,7 @@ config repos.
 - Emacs Reddit: /r/emacs and /r/doomemacs — frequent config discussion
 - Various GitHub gists: search "doom emacs config" for community examples
 
-## 12. In-Repo Reference Documents
+## 8. In-Repo Reference Documents
 
 Reference files shipped with this config, beyond the skill system:
 

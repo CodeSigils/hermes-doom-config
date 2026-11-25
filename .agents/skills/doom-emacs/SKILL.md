@@ -1,42 +1,27 @@
 ---
 name: doom-emacs-config
-description: Configure Doom Emacs correctly — module system, package management, safe patterns, and verification steps. Load before modifying any Doom config file.
-metadata:
-  version: "1.5.0"
-  author: Code Sigils
-  tier: powerful
-  hermes:
-    tags: [doom, emacs, emacs-lisp, config, elisp]
-    related_skills: [emacs-lisp-expert]
-    trigger_keywords:
-      [
-        doom,
-        config.el,
-        init.el,
-        packages.el,
-        emacs config,
-        doom sync,
-        doom doctor,
-        doom upgrade,
-        use-package,
-        after!,
-        config.sh,
-        cross-platform grep,
-      ]
+description: Maintain this Doom Emacs configuration using its module conventions, package workflow, and verification steps. Load when working in this configuration repository.
 ---
 
 # Doom Emacs Skill
 
-A general guide for configuring and troubleshooting Doom Emacs. Load this whenever touching files under
-`~/.config/doom/` or when the user asks about Emacs config. This skill is meant to serve a new user — it teaches Doom
-conventions, not just this repo's specific choices.
+A repo-bound guide for maintaining this Doom configuration.
 
 **Companion skill:** If `emacs-lisp-expert` is installed, load it too — it covers Emacs Lisp fundamentals that this
 skill builds on. If it is not installed, do not block: use this skill's Doom-specific guidance plus the Emacs Lisp guide
 at `domains/ELISP.md` for non-trivial elisp. Suggest installing `emacs-lisp-expert` once as an optional companion for
-deeper Emacs Lisp work. This repo must remain self-contained for new users and agents.
+deeper Emacs Lisp work.
 
-**Critical:** Before making any change, read `~/.config/doom/AGENTS.md` if it exists — it contains user-specific
+This skill is an adapter for this Doom configuration, not a standalone general
+Doom skill. Root-relative
+references, policies and scripts require the configuration checkout: use the
+current checkout when working in it, or `DOOMDIR` when set, otherwise
+`~/.config/doom/`. Confirm the checkout and its `AGENTS.md` before applying
+repo-specific policy. If it is unavailable, report the missing context and do
+not assume those references or policies are present. General Emacs questions
+outside this configuration do not require this repo's personal policies.
+
+**Critical:** Before making any change, read the target checkout's `AGENTS.md` if it exists — it contains user-specific
 policies (completion preference, Markdown style, verification steps, etc.).
 
 ## Quick Index
@@ -72,11 +57,9 @@ The key steps are:
 4. Run `doom sync` after requested edits (including config-only), unless told not to.
 5. Run `doom doctor` after `doom sync`.
 6. Run `scripts/check-stale-patterns.sh` before committing.
-7. If skill or domain files were changed: run both sync scripts (`scripts/sync-doom-skill-mirror.sh`, then
-   `scripts/check-doom-skill-mirror.sh`).
-8. Finish with `git diff --check`, `git status --short`, concise summary.
+7. Finish with `git diff --check`, `git status --short`, and a concise summary.
 
-See AGENTS.md for the full workflow with edge cases (failed commands, reference consultation, skill mirror sync).
+See AGENTS.md for the full workflow with edge cases (failed commands and reference consultation).
 
 ## File Roles — Know What Goes Where
 
@@ -94,7 +77,7 @@ Doom splits config across three files. Putting the wrong thing in the wrong file
 
 Patterns that apply to any Doom config:
 
-- Every `.el` file starts with `;;; <path> -*- lexical-binding: t; -*-`
+- Runtime configuration `.el` files use a lexical-binding cookie; Doom declaration files retain their own headers.
 - Section files under `sections/` should include exactly one short purpose comment after the header, matching the
   `config.el` section inventory wording. This gives local orientation without creating another drift-prone manifest.
 - Use `after!` for deferred config — never `with-eval-after-load`
@@ -135,7 +118,7 @@ memory:
   `(setq-hook! 'org-mode-hook truncate-lines nil)` — also accepts multiple variables or multiple hooks.
 - **`load!`** — load an Elisp file relative to `doom-user-dir`. `(load! "modules/org")` loads
   `~/.config/doom/modules/org.el`
-- **`modulep!`** — compile-time module check. `(when (modulep! :ui popup) ...)`
+- **`modulep!`** — check whether a module is enabled. `(when (modulep! :ui popup) ...)`
 - **`set-popup-rule!`** — control popup buffer display
 - **`setq!`** — Doom's wrapper around `setq`. Use instead of `setq-default`.
 
@@ -205,20 +188,16 @@ registered workflow tools are:
 
 | Script                       | Purpose                                                                       | When to run                                          |
 | :--------------------------- | :---------------------------------------------------------------------------- | :--------------------------------------------------- |
-| `check-curator-drift.sh`     | Report files/content added or changed by the Hermes curator                   | Before sync, when investigating auto-update messages |
-| `sync-doom-skill-mirror.sh`  | Validate, stage, and atomically replace the Hermes runtime mirror             | After editing skill or domain files                  |
-| `check-doom-skill-mirror.sh` | Verify source/destination identity and byte-level mirror equality             | After sync                                           |
 | `check-stale-patterns.sh`    | Run documentation, script, domain, and section inventory validation           | Before committing documentation or scripts           |
 | `validate-docs.py`           | Run all doc-health checks (full list: AGENTS.md > Drift Prevention)           | Called by `check-stale-patterns.sh`                  |
-| `run-offline-contracts.sh`   | Exercise documentation and disposable mirror-safety contracts                 | Before committing script changes                     |
-| `ai-context.sh`              | Report config, mirror, tool, and Git context; file content is explicit opt-in | On demand when enlisting an external model           |
+| `run-offline-contracts.sh`   | Exercise documentation contracts                 | Before committing script changes                     |
+| `ai-context.sh`              | Report config, tool, and Git context; file content is explicit opt-in | On demand when enlisting an external model           |
 | `install-hooks.sh`           | Install the pre-commit hook into `.git/hooks/pre-commit`                      | After cloning fresh or when hook script changes      |
 | `pre-commit-hook.sh`         | Canonical pre-commit hook source (installed by install-hooks.sh)              | Automatically on every commit (via git hook)         |
 
 ## Skill Script Conventions
 
-Scripts under `scripts/` source `scripts/config.sh` for shared variables: `SKILL_SRC`, `SKILL_DST`, `DOOMDIR`,
-`REPO_ROOT`, and expected skill identity. Never duplicate paths.
+Scripts under `scripts/` source `scripts/config.sh` for shared repository paths.
 
 Files prefixed with `_` (e.g. `_repo.py`, `_checks.py`, `_findings.py`) are library modules imported by standalone
 scripts. They are **not** standalone entry points and are excluded from the Scripts table inventory check.
@@ -234,27 +213,15 @@ Grep within scripts follows cross-platform conventions:
 Available via `config.sh` after sourcing:
 
 - `ensure_in_repo`
-- `confirm_skill_src`, `confirm_skill_target`, `confirm_skill_dst`
-- `canonical_existing_path`, `skill_name`
 
 The documentation validator treats stale Doom commands as blocking active guidance. A deliberately preserved historical
 example must carry `<!-- stale-check: allow -->` on the same line; do not use the marker to suppress current
 instructions.
 
-## Keeping the Config Repo Self-Contained
+## Local Skill Discovery
 
-This skill lives at `.agents/skills/doom-emacs/SKILL.md`. Anyone who clones this repo gets the full skill with it. After
-editing the skill, sync the Hermes runtime mirror:
-
-```sh
-scripts/sync-doom-skill-mirror.sh
-scripts/check-doom-skill-mirror.sh
-```
-
-The sync copies into a temporary sibling directory, validates identity and byte-level equality, and only then swaps it
-into place. The prior valid mirror is retained until replacement succeeds, so stale mirror-only files cannot survive and
-a failed copy does not remove the working mirror. See `AGENTS.md` for the source/mirror invariant and drift-detection
-steps.
+The repository owns this skill. A local discovery symlink can point directly to
+`.agents/skills/doom-emacs/`; no copied runtime mirror is required.
 
 ## Reference Sources
 
@@ -262,7 +229,7 @@ When you need to understand how a package or Doom module works, the source code 
 
 - **Doom framework source:** `~/.config/emacs/` — clone of the
   [official Doom Emacs repo](https://github.com/doomemacs/doomemacs). Browse `modules/` for built-in module definitions,
-  `lisp/` for core libraries, and `core/` for the module system.
+  and `lisp/` for core libraries and the module system.
 - **Installed package source:** `~/.config/emacs/.local/straight/repos/` — each package has its own directory with full
   source.
 - **Doom Emacs Issues & Docs:** upstream GitHub repository for recent changes, open issues, and pull requests.

@@ -51,7 +51,6 @@ Tier 1 is loaded in the entry order. Tier 2 is read on demand. Tier 3-4 is read 
 - Check `git status --short` before changing files. Inspect before patching.
 - New settings/hooks/advice go in the matching `sections/*.el` file (register new sections with `(load! ...)` in `config.el`). All keybindings in `sections/keys.el`.
 - Run `check-parens` on changed `.el` files before `doom sync`. Run `doom sync` after config edits, then `doom doctor`.
-- When skill or domain files change: sync the Hermes runtime mirror before committing (`scripts/sync-doom-skill-mirror.sh`, then `scripts/check-doom-skill-mirror.sh`). The mirror is generated state — do not hand-edit it.
 - Verify `DOOM-API.md` patterns against Doom source. If they conflict, propose a fix.
 - When `DOOM-API.md` macro patterns change, audit `SKILL.md` Doom API Essentials and `domains/PROCEDURES.md` (sections C, D, E) for consistency.
 - Cross-check `.agents/` files in every review and audit. After editing project config files, re-evaluate `.agents/` for stale examples, paths, and patterns.
@@ -59,15 +58,15 @@ Tier 1 is loaded in the entry order. Tier 2 is read on demand. Tier 3-4 is read 
 - Follow "Learn, Don't Copy" — understand first, propose, implement only on request.
 - On failure, stop and present output. Do not proceed past a failed step without confirmation.
 
-All script names and invocation details live in `.agents/skills/doom-emacs/SKILL.md` (Scripts section). Do not store script paths in this file.
+The script inventory and invocation details live in `.agents/skills/doom-emacs/SKILL.md` (Scripts section).
 
 ## Decision Thresholds
 
 | Authority level | What the agent does | Examples |
 | :--- | :--- | :--- |
-| Do automatically | Routine maintenance within documented patterns | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add `user/` functions, run `doom sync` + `doom doctor`, sync runtime mirror after skill edits |
+| Do automatically | Routine maintenance within documented patterns | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add `user/` functions, run `doom sync` + `doom doctor` |
 | Propose (ask first) | Structural changes beyond the edit target | New top-level files, new modules, change completion backend, override Doom's core macros, modify popup rules broadly |
-| Never without explicit request | Destructive or irreversible operations | `doom upgrade`, removing lines from `init.el` instead of commenting, hand-editing the runtime mirror |
+| Never without explicit request | Destructive or irreversible operations | `doom upgrade`, removing lines from `init.el` instead of commenting |
 
 When in doubt, propose and wait. The cost of asking is lower than the cost of reverting.
 

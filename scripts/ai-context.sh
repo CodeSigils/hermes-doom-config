@@ -47,15 +47,8 @@ printf '**Source Git State:**\n'
 printf '  HEAD: %s\n' "$(git log -1 --oneline --decorate)"
 git status --short
 printf '\n'
-printf '**Skill Mirror:**\n'
-if "$REPO_ROOT/scripts/check-doom-skill-mirror.sh" >/dev/null 2>&1; then
-  printf '  in sync: %s\n' "$SKILL_DST"
-elif [[ -e "$SKILL_DST" ]]; then
-  printf '  DRIFT or invalid identity: %s\n' "$SKILL_DST"
-else
-  printf '  not installed: %s\n' "$SKILL_DST"
-fi
-printf '\n'
+
+
 if [[ -n "$FILE" ]]; then
     printf '**File Being Edited:** %s\n' "$FILE"
     if [[ -f "$FILE" ]]; then

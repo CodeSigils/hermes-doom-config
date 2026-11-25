@@ -169,7 +169,7 @@ Steps:
 - **`M-x profiler-start`** then **`M-x profiler-report`** after startup identifies expensive operations during use.
 - **Check `:defer t`** — every `use-package!` form should have `:defer t` unless the package must load at startup.
   Without defer, the package loads immediately.
-- **Verify `lexical-binding: t`** in all `.el` files — dynamic binding slows the byte-compiler and increases memory per
+- **Verify `lexical-binding: t`** in runtime config files — dynamic binding can limit compiler optimizations and increase memory per
   buffer.
 
 ## Missing system dependencies
@@ -178,7 +178,7 @@ Steps:
 
 - **Language servers** for LSP modules — install via the system package manager (`pip`, `npm`, `apt`, `brew` depending
   on the server).
-- **Spell checking** — Jinx needs Enchant and a dictionary. See PROFILE.md for this config's system dependencies.
+- **Spell checking** — Jinx needs Enchant and a dictionary. See `references/jinx.md` in the config checkout for dependencies.
 - **PDF tools** — the `:tools pdf` module needs `pdf-tools` epdfinfo compiled (done by `doom sync` if the build
   toolchain is present).
 - **Docker, direnv** — CLI tools must be on `$PATH`. `doom doctor` checks these but the error message says "not found"

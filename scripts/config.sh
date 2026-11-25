@@ -19,10 +19,6 @@ REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
 # ── Directories ───────────────────────────────────────────────────────
 DOOMDIR="${DOOMDIR:-$HOME/.config/doom}"
-SKILL_SRC="${SKILL_SRC:-$DOOMDIR/.agents/skills/doom-emacs}"
-EXPECTED_SKILL_DST="$HOME/.hermes/skills/emacs/doom-emacs-config"
-SKILL_DST="${SKILL_DST:-$EXPECTED_SKILL_DST}"
-EXPECTED_SKILL_NAME="doom-emacs-config"
 
 # ── Helpers ───────────────────────────────────────────────────────────
 
@@ -33,88 +29,4 @@ ensure_in_repo() {
     exit 1
   fi
   cd "$REPO_ROOT"
-}
-
-canonical_existing_path() {
-  local path="$1"
-  local dir
-  dir=$(cd "$(dirname "$path")" && pwd -P)
-  printf '%s/%s\n' "$dir" "$(basename "$path")"
-}
-
-skill_name() {
-  local skill_file="$1"
-  sed -nE 's/^name:[[:space:]]*["'\'']?([^"'\'']+)["'\'']?[[:space:]]*$/\1/p' \
-    "$skill_file" | head -1
-}
-
-# confirm_skill_src: verify the canonical in-repository source and skill identity
-confirm_skill_src() {
-  local git_root
-  git_root=$(git -C "$REPO_ROOT" rev-parse --show-toplevel 2>/dev/null) || {
-    printf 'Source repository is not a Git checkout: %s\n' "$REPO_ROOT" >&2
-    exit 1
-  }
-  if [[ "$(cd "$git_root" && pwd -P)" != "$REPO_ROOT" ]]; then
-    printf 'Script root does not match Git repository root: %s\n' "$REPO_ROOT" >&2
-    exit 1
-  fi
-  if [[ ! -f "$SKILL_SRC/SKILL.md" ]]; then
-    printf 'Source skill missing SKILL.md: %s\n' "$SKILL_SRC" >&2
-    exit 1
-  fi
-  local expected_src actual_src actual_name
-  expected_src=$(canonical_existing_path "$REPO_ROOT/.agents/skills/doom-emacs")
-  actual_src=$(canonical_existing_path "$SKILL_SRC")
-  if [[ "$actual_src" != "$expected_src" ]]; then
-    printf 'Refusing unexpected skill source: %s (expected %s)\n' \
-      "$actual_src" "$expected_src" >&2
-    exit 1
-  fi
-  actual_name=$(skill_name "$SKILL_SRC/SKILL.md")
-  if [[ "$actual_name" != "$EXPECTED_SKILL_NAME" ]]; then
-    printf 'Source skill identity mismatch: %s (expected %s)\n' \
-      "${actual_name:-missing}" "$EXPECTED_SKILL_NAME" >&2
-    exit 1
-  fi
-}
-
-# confirm_skill_target: verify the destination is exactly the configured mirror
-confirm_skill_target() {
-  if [[ "$SKILL_DST" != "$EXPECTED_SKILL_DST" ]]; then
-    printf 'Refusing unexpected skill destination: %s (expected %s)\n' \
-      "$SKILL_DST" "$EXPECTED_SKILL_DST" >&2
-    exit 1
-  fi
-  if [[ -L "$SKILL_DST" ]]; then
-    printf 'Refusing symlinked skill destination: %s\n' "$SKILL_DST" >&2
-    exit 1
-  fi
-  local component
-  for component in \
-    "$HOME/.hermes" \
-    "$HOME/.hermes/skills" \
-    "$HOME/.hermes/skills/emacs"; do
-    if [[ -L "$component" ]]; then
-      printf 'Refusing destination beneath symlinked directory: %s\n' \
-        "$component" >&2
-      exit 1
-    fi
-  done
-}
-
-# confirm_skill_dst: verify an existing mirror has the expected skill identity
-confirm_skill_dst() {
-  confirm_skill_target
-  if [[ ! -f "$SKILL_DST/SKILL.md" ]]; then
-    printf 'Mirror skill missing SKILL.md: %s\n' "$SKILL_DST" >&2
-    exit 1
-  fi
-  local actual_name
-  actual_name=$(skill_name "$SKILL_DST/SKILL.md")
-  if [[ "$actual_name" != "$EXPECTED_SKILL_NAME" ]]; then
-    printf 'Mirror skill identity mismatch: %s (expected %s)\n' \
-      "${actual_name:-missing}" "$EXPECTED_SKILL_NAME" >&2
-    exit 1
-  fi
 }

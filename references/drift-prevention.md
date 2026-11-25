@@ -39,7 +39,8 @@ Stale documentation is worse than missing documentation — the agent cannot dis
 | Jinx setup and workaround | `references/jinx.md` | Profile and troubleshooting; recheck on Jinx, compat or Emacs updates |
 | Source discovery | `references/INDEX.md` | Entry guides; recheck paths on Doom layout changes |
 
-The runtime skill mirror is a generated copy; use the existing sync and check.
-Keep audience-specific summaries short and link to the owner. Add a topic document
-when a concrete task or reference needs depth; avoid empty sections. Existing checks
-cover selected exact relationships, not semantic freshness.
+The skill and domains serve agents working on this configuration. The repository
+owns the payload; local discovery may link directly to it. Root policies,
+references and scripts remain in the checkout. Recheck this boundary when the
+payload, discovery path or consumers change. Existing checks cover selected
+exact relationships, not semantic freshness.

@@ -14,14 +14,13 @@ lazy. Understanding these axioms explains almost every macro decision below:
 
 | Axiom                        | Meaning                                                                                  |
 | ---------------------------- | ---------------------------------------------------------------------------------------- |
-| Lazy by default              | Nothing loads until needed. `use-package! :defer t` is the default stance                |
+| Defer where useful           | Load packages when needed, with a real trigger for deferred configuration               |
 | Declarative over imperative  | Say _what_ a package does, not _how_ to set it up                                        |
 | Composability through macros | `after!`, `map!`, `add-hook!` compose across files without conflict                      |
 | Stable pinned base           | Doom pins all packages. Unpin only when upstream moves faster than Doom                  |
 | Doom API > Emacs API         | Always prefer Doom's macro (`use-package!`, `after!`, `setq!`) over the Emacs equivalent |
 
-An agent that internalizes these five axioms will make correct Doom decisions
-even without looking up every macro.
+Check the installed source when choosing a macro or relying on version-specific behavior.
 
 ---
 
@@ -44,7 +43,7 @@ that needs setup beyond defaults.
   :config                ; code that runs after the package loads
   :commands my-cmd       ; autoload on first invocation
   :after-call after-find-file  ; load before this hook or command runs
-  :defer-incrementally t       ; lazy-load sub-features one by one
+  :defer-incrementally t       ; load this package incrementally during idle time
   :after other-pkg)      ; wait for another package before loading
 ```
 
@@ -112,7 +111,7 @@ mode-specific maps.
 | `:g`           | Global (same as no prefix)            |
 | `:map KEYMAP`  | Specific keymap (e.g. `org-mode-map`) |
 
-Supports `:when` for conditional bindings at compile time, `(:prefix ...)` for nested key groups, and passing `nil` as the command to unbind.
+Supports `:when` for conditional bindings, `(:prefix ...)` for nested key groups, and passing `nil` as the command to unbind.
 
 **When to use:** Always prefer `map!` over `define-key` or `global-set-key`.
 `map!` handles evil state awareness, which-key descriptions, and mode
@@ -126,7 +125,7 @@ unloading automatically.
 ;; Multiple hooks at once
 (add-hook! '(org-mode-hook markdown-mode-hook) #'flyspell-mode)
 ;; Set local variable inside the hook
-(add-hook! 'org-mode-hook (setq-local truncate-lines nil) nil nil)
+(add-hook! 'org-mode-hook (setq-local truncate-lines nil))
 
 ;; Append to the end of the hook chain
 (add-hook! 'some-mode-hook :append #'enable-something)
@@ -146,8 +145,9 @@ position flag. Simpler than writing separate `add-hook` calls.
 
 ### `setq!` — Safe Variable Setting
 
-Doom's wrapper around `setq` that triggers custom setters on customizable
-variables via `set-default-toplevel-value`. More efficient than `setopt`. <!-- stale-check: allow -->
+Doom's setter calls a variable's custom setter when present; otherwise it uses
+`set-default-toplevel-value`. The installed source describes it as avoiding
+unnecessary dependencies.
 
 ```elisp
 (setq! delete-by-moving-to-trash t
@@ -175,22 +175,22 @@ Backends are tried in order. `:with` means "enrich the primary backend."
 (set-popup-rule! "^\\*Help\\*" :size 0.35 :ttl 0 :quit t :select nil)
 ```
 
-Parameters: `:size` (fraction or rows), `:ttl` (0 = forever), `:quit` (q to
-quit), `:select` (auto-select), `:side` (bottom/left/right/top), `:slot`.
+Parameters: `:size` (fraction or rows), `:ttl` (0 kills the buffer on close;
+nil leaves it alive), `:quit` (quit behavior), `:select` (auto-select),
+`:side` (bottom/left/right/top), `:slot`.
 
 **Important:** Match buffer names with a regex. `"^\\*"` captures every star
 buffer — too broad. Prefer specific names like `"^\\*Help\\*"`.
 
-### `modulep!` — Compile-Time Module Check (replaces deprecated `featurep!`)
+### `modulep!` — Module Check (replaces deprecated `featurep!`)
 
 ```elisp
 (when (modulep! :ui popup)
   (set-popup-rule! ...))
 ```
 
-This is evaluated at compile time, not runtime. Code inside a `modulep!` block
-for a disabled module is never compiled. Use when you need conditional config
-that depends on whether a module is enabled.
+Use this to test whether a module and its flags are enabled. Do not assume that
+the body is removed at compile time; behavior depends on the expansion context.
 
 ### `setq-hook!` — Hook-Local Variable
 
@@ -216,8 +216,8 @@ Cleaner than writing `(add-hook! 'mode-hook (lambda () (setq-local ...)))`. Work
 
 ### How `doom!` Works
 
-`init.el` contains a single `(doom! ...)` form with modules grouped by category
-in alphabetical order. Each module can have flags (`+keyword`).
+`init.el` contains a single `(doom! ...)` form with modules grouped by category.
+Some modules support flags (`+keyword`).
 
 ```elisp
 (doom!
@@ -233,15 +233,14 @@ in alphabetical order. Each module can have flags (`+keyword`).
 **Rules:**
 
 - One module per line under its category header
-- Categories appear in a fixed order (completion, ui, editor, emacs, term,
-  checkers, tools, os, lang, email, app, config)
+- Follow the existing category order in `init.el`.
 - Comment disabled modules — never delete them (the comment IS documentation)
 - Flags are `+keyword` suffixes; not all modules support flags
 
 ### How Flags Work
 
-Flags parametrize a module. They are defined as files inside the module
-directory: `~/.config/emacs/modules/<category>/<module>/+<flag>.el`.
+Flags parameterize module behavior. Inspect the installed module's `README.org`
+and source for their definitions and effects; a flag need not have its own file.
 
 In `init.el`, put cursor on a flag and press `K` for docs or `gd` to jump
 to its definition.
@@ -326,7 +325,8 @@ section file and register new sections with `(load! ...)`:
 
 ## 6. Reload Without Restarting
 
-Doom runs an Emacs server by default.
+Terminal reload requires a running Emacs server. If none is available, reload
+inside Emacs or restart it.
 
 | Action            | Command                                                       |
 | ----------------- | ------------------------------------------------------------- |
@@ -345,7 +345,7 @@ Doom runs an Emacs server by default.
 
 ### 7.1 Lexical Binding — Why Every .el File Needs It
 
-Every `.el` file in this config must start with a lexical-binding cookie:
+Runtime config files should start with a lexical-binding cookie:
 
 ```elisp
 ;;; config.el -*- lexical-binding: t; -*-
@@ -354,18 +354,15 @@ Every `.el` file in this config must start with a lexical-binding cookie:
 This tells Emacs to use lexical scoping instead of the default dynamic scoping.
 Without it:
 
-- **Closures don't work** — `(let ((x 1) (lambda () x))` captures `x` by
-  reference, not by value. Dynamic binding means every lambda re-evaluates at
-  call time, not definition time.
-- **Byte-compilation is slower** — the byte-compiler can't optimize variable
-  references, producing larger, slower code.
-- **Variable shadowing is fragile** — a `let` binding can be overridden by
-  any `setq` anywhere in the call stack.
+- **Closures cannot capture lexical bindings** without lexical binding; free
+  variables instead use dynamic lookup.
+- **Optimization is more limited** because variable lookup uses dynamic scope.
+- **Bindings have dynamic extent**, so a called function can see an active
+  dynamic binding of the same variable.
 
-**The cookie is mandatory.** If a file doesn't have it, add it. The `;;;`
-triple-semicolon is the file's major mode header; the `-*- ... -*-` sets
-file-local variables. The cookie only affects the file it's in — different
-files can have different binding strategies.
+The `-*- ... -*-` cookie sets file-local variables. `init.el` and `packages.el`
+are Doom declaration files with their own header conventions; do not change
+their headers merely to apply this runtime-config convention.
 
 ### 7.2 Startup Performance — Every Millisecond Counts
 
@@ -373,13 +370,13 @@ Doom's design philosophy is "lazy by default." Stay consistent:
 
 | Principle                                                       | Practice                                                                                                                                                                              |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Defer everything                                                | Every `use-package!` gets `:defer t` unless the package is needed at startup                                                                                                          |
+| Defer where appropriate                                         | Use a hook, command, or other real load trigger; verify the intended behavior                                                                                                          |
 | Prefer `after!` over `(require '...)`                           | `(require 'foo)` force-loads `foo` at config time. `(after! foo ...)` runs when the feature actually loads. Never `(require)` in config unless you have a specific startup dependency |
 | Use `:commands` for autoloads                                   | Instead of loading a package, declare entry-point commands that autoload it on first use                                                                                              |
-| Use `:hook` in `use-package!`                                   | `(use-package! foo :hook (mode . func))` is cleaner and more efficient than a separate `(add-hook! ...)` outside the declaration                                                      |
+| Use `:hook` in `use-package!`                                   | `(use-package! foo :hook (mode . func))` keeps package-specific hook setup together                                                                                                    |
 | Keep `:init` blocks lean                                        | `:init` runs at startup even with `:defer t`. Put expensive setup in `:config` (runs after actual load)                                                                               |
-| Prefer `modulep!` over `(when (require 'foo nil 'noerror) ...)` | `modulep!` is a compile-time check — disabled modules are never compiled, producing zero startup cost                                                                                 |
-| Avoid lambdas in hooks                                          | `:hook (mode . (lambda () ...))` creates a new closure each time the hook runs. Prefer a named function                                                                               |
+| Use `modulep!` for module conditions                            | Check enabled modules without loading a package just to test for it                                                                                                                    |
+| Prefer named hook functions                                     | Named functions are easier to inspect and remove; use a lambda when appropriate                                                                                                      |
 
 **Hot take: if you can't justify why a piece of code needs to run at startup,
 it shouldn't run at startup.**
@@ -389,13 +386,13 @@ it shouldn't run at startup.**
 | Wrong / Anti-pattern                                  | Right / Doom Way                                       | Why                                                                                                                                  |
 | ----------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `(use-package foo ...)`                               | `(use-package! foo ...)`                               | Adds disabled-package awareness and extra keywords; the regular `use-package` misses these                                           |
-| `(with-eval-after-load 'foo ...)` or `(require 'foo)` | `(after! foo ...)`                                     | Doom's macro handles ordering through its deferred system. Never `require` in config                                                 |
-| `(setq-default ...)` or bare `setq`                   | `setq!`                                                | Triggers custom setters on customizable variables; more efficient than `setopt`. <!-- stale-check: allow -->                         |
+| Deferred package configuration                        | `(after! foo ...)`                                     | Runs after the feature loads; use `require` where a dependency must load immediately                                                 |
+| Global customizable setting                           | `setq!`                                                | Triggers custom setters on customizable variables                                                                                    |
 | `(define-key map k f)` or `(global-set-key ...)`      | `(map! ...)` with `:leader`, `:map`, or `:localleader` | Integrates with which-key for discoverability and evil-state awareness                                                               |
 | `(add-hook 'foo-hook ...)` with a lambda              | `(add-hook! ...)` or `use-package!` `:hook`            | Supports multiple hooks, local variables natively (`setq-local` inside the form), and mode-specific behavior without lambda wrappers |
 | `(loop for ... collect ...)`                          | `(cl-loop for ... collect ...)`                        | `cl-lib` is the modern, namespaced version. Bare `loop` pollutes the namespace                                                       |
 | `(defun* ...)` or `(destructuring-bind ...)`          | `(cl-defun ...)` or `(cl-destructuring-bind ...)`      | All `cl` functions have `cl-` prefixed equivalents                                                                                   |
-| Nested `cond` chains                                  | `pcase`                                                | Byte-compiler optimises `pcase` better; more readable pattern matching                                                               |
+| Complex matching                                      | `pcase` where appropriate                              | Pattern matching can make the cases clearer                                                                                          |
 | Deleting unused `init.el` lines                       | Commenting them out                                    | The comment IS documentation — it tells the next agent a module was considered and turned off                                        |
 | `package-install` (interactive)                       | `(package! ...)` in `packages.el` + `doom sync`        | Straight vs package.el conflict; explicit declarations keep the config reproducible                                                  |
 
@@ -443,7 +440,7 @@ it shouldn't run at startup.**
 | `M-x doom/reload`       | After config changes in a running session | Verifies the config loads without errors                            |
 
 **For this repo:** `check-parens` is required after every `.el` edit
-(mandated by AGENTS.md). `doom doctor` runs automatically after `doom sync`.
+(mandated by AGENTS.md). Run `doom doctor` after `doom sync`.
 Byte-compile before committing if you're touching non-trivial logic (more than
 a few `setq` calls).
 
@@ -460,7 +457,7 @@ wrong or omits:
 
 1. **Check the official source first.** The canonical references are:
    - `~/.config/emacs/modules/` — each module's README.org and config.el
-   - `~/.config/emacs/core/` — Doom's own macro definitions and documentation
+   - `~/.config/emacs/lisp/` — Doom's own macro definitions and documentation
    - `K` key on a module or flag in `init.el` — inline docs
    - `gd` on a module or flag in `init.el` — jump to definition
    - Doom Core API Demos at https://github.com/doomemacs/core/blob/master/modules/doom/demos.org — real usage examples for every Doom macro

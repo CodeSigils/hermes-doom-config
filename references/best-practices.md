@@ -19,7 +19,7 @@ scannable reference.
 | `setq-hook!`           | `add-hook` + lambda                 | Buffer-local var in a hook, cleaner than a lambda                                                |
 | `set-company-backend!` | `setq company-backends`             | Per-mode company backends                                                                        |
 | `set-popup-rule!`      | `display-buffer-alist`              | Transient buffer display rules                                                                   |
-| `modulep!`             | `(when (require ... nil 'noerror))` | Compile-time check; disabled modules never compiled. Replaces deprecated `featurep!`             |
+| `modulep!`             | `(when (require ... nil 'noerror))` | Checks module availability without loading a package; replaces deprecated `featurep!`             |
 | `load!`                | `load-file`                         | Relative to the currently executing file (`load-file-name`) — portable, no hardcoded paths       |
 | `defadvice!`           | `defun` + `advice-add`              | Named advice with docstring, manageable                                                          |
 
@@ -84,7 +84,7 @@ and load any new section from `config.el`. Move every `map!` form to
 (load! "sections/keys")
 ```
 
-Each `.el` file must start with a lexical-binding cookie:
+Runtime configuration `.el` files should start with a lexical-binding cookie:
 
 ```elisp
 ;;; $DOOMDIR/sections/org.el -*- lexical-binding: t; -*-
@@ -103,7 +103,7 @@ Each `.el` file must start with a lexical-binding cookie:
 - **Use `:commands` for autoloads** — Declare entry-point commands that autoload the package on first use.
 - **Use `:hook` in `use-package!`** — Cleaner and more efficient than a separate `(add-hook! ...)` outside the declaration.
 - **Keep `:init` blocks lean** — `:init` runs at startup even with `:defer t`. Put expensive setup in `:config` (post-load).
-- **Prefer `modulep!` over runtime check** — Compile-time; disabled modules are never compiled, producing zero startup cost.
+- **Use `modulep!` for module conditions** — Check enabled modules without loading a package solely to test for it.
 - **Avoid lambdas in hooks** — `(lambda () ...)` creates a new closure each time the hook runs. Prefer a named function.
 - **Bind launcher keys outside `after!`** — `(map! ...)` inside `(after! <pkg> ...)` delays the binding until the package loads.
 - **Use `setq-hook!` for buffer-local** — Cleaner than `(add-hook! ... (lambda () (setq-local ...)))`.
@@ -264,7 +264,7 @@ practice:
 - **Using `with-eval-after-load` instead of `after!`** — Use `after!`. It handles Doom's deferred ordering correctly.
 - **Using standard `use-package` instead of `use-package!`** — `use-package!` adds disabled-package awareness and extra keywords; the regular `use-package` misses these.
 - **Editing `early-init.el` or `~/.emacs.d/init.el`** — Doom manages those. All user config goes in `~/.config/doom/`.
-- **Missing lexical-binding cookie on `.el` file** — Add `;;; file.el -*- lexical-binding: t; -*-` as first line.
+- **Missing lexical-binding cookie on a runtime config file** — Add `;;; file.el -*- lexical-binding: t; -*-` as first line; keep Doom declaration-file headers appropriate to their role.
 - **`(setq-default ...)` when `setq!` suffices** — `setq!` triggers custom setters on customizable variables; more efficient than `setopt`. <!-- stale-check: allow -->
 - **Deleting `init.el` lines instead of commenting** — Comment them out. The comment documents a considered-and-rejected option.
 - **`package-install` interactively** — Always use `(package! ...)` in `packages.el` + `doom sync`.
@@ -273,7 +273,7 @@ practice:
 - **Lambda in hook where `setq-hook!` works** — `(setq-hook! 'mode-hook var val)` is cleaner and debuggable.
 - **Stale upstream comments recommending vanilla patterns** — Replace or annotate them (e.g. `with-eval-after-load` → `after!`).
 - **Format on save after `doom sync` breaks indentation** — Run `M-x doom/reload` after `doom sync` before saving.
-- **`(modulep! ...)` guard in a section for a disabled module** — Already wrapped in this config — keep the guard. Code inside won't compile without the module.
+- **`(modulep! ...)` guard in a section for a disabled module** — Keep the guard where configuration depends on that module; do not assume it removes the body at compile time.
 - **Package keybindings scattered across feature files** — Keep every `map!` form in `sections/keys.el`; group by package or leader prefix.
 - **Hardcoded external binary path** — Use `(executable-find ...)` fallback chains and tolerate missing binaries.
 - **Forgetting `:defer t` on `use-package!` without trigger keywords** — Add `:defer t` explicitly if the package has no `:commands`, `:hook`, `:mode`, or `:after` keywords.
