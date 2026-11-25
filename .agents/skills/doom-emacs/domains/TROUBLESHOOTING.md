@@ -148,45 +148,9 @@ against a definition that is no longer available.
   compat 31 for `completion-table-with-metadata`, so Doom's older compat pin can break correction UI commands with
   `(void-function completion-table-with-metadata)`.
 
-- **Full fix pattern for Jinx** — uses plain Jinx package declaration, unpins compat, and provides runtime aliases:
-
-  ```elisp
-  ;; packages.el
-  (unpin! compat)
-
-  (package! jinx
-    :recipe (:host github :repo "minad/jinx"))
-
-  ;; config.el, before `(use-package! jinx ...)`
-  (require 'cl-lib)
-  (unless (fboundp 'incf)
-    (defalias 'incf #'cl-incf))
-  (unless (fboundp 'decf)
-    (defalias 'decf #'cl-decf))
-  ```
-
-- **After adding aliases,** run `doom sync` and restart Emacs so bytecode is recompiled against the aliases. A running
-  Emacs may still have the old bytecode loaded.
-
-- **Verification** — check Jinx loads with compat 31 and the runtime aliases available:
-
-  ```sh
-  emacs --batch \
-    -L ~/.config/emacs/.local/straight/build-30.2/compat \
-    -L ~/.config/emacs/.local/straight/build-30.2/jinx \
-    --eval "(progn (require 'cl-lib) (unless (fboundp 'incf) (defalias 'incf #'cl-incf)) (unless (fboundp 'decf) (defalias 'decf #'cl-decf)) (require 'compat) (require 'jinx) (message \"jinx loads OK: %s, completion metadata: %s\" (featurep 'jinx) (fboundp 'completion-table-with-metadata)))"
-  git -C ~/.config/emacs/.local/straight/repos/jinx status --short
-  ```
-
-  Expected: load check succeeds and Jinx repo status is empty.
-
-- **Cleanup later:** when upstream Jinx replaces `incf`/`decf` with `cl-incf`/`cl-decf`, remove the runtime aliases from
-  `config.el` and run `doom sync`. Keep `(unpin! compat)` while Jinx or other unpinned packages require compat 31.
-
-- Also check the user's PROFILE.md or repos references for config-specific workarounds.
-
-- **Do not use a straight `:pre-build` patch** for the Jinx fix: it modifies the Jinx checkout before `doom sync -u`
-  fetches updates, leaving a dirty worktree and forcing an interactive discard/stash prompt.
+- For this configuration's aliases, compat pin, dependencies and verification,
+  see `references/jinx.md`, `sections/spellcheck.el`, and `packages.el`. Recheck
+  installed package versions before changing the workaround.
 
 ## Slow Emacs startup
 

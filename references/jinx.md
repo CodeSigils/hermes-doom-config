@@ -60,6 +60,19 @@ To confirm Jinx sees the dictionary:
 3. Misspell a word — Jinx should underline it in the active languages.
 4. Correct with `M-$` (`jinx-correct`).
 
+## Compatibility and dependencies
+
+The current configuration unpins `compat` and supplies `incf`/`decf` aliases in
+`sections/spellcheck.el` for the installed Jinx version. Inspect installed Jinx
+and compat sources on updates before removing this workaround. A straight
+`:pre-build` source patch can dirty the checkout and interrupt updates.
+
+Jinx needs Enchant and dictionaries at runtime, plus Enchant development files
+and `pkg-config` to build. Check `pkg-config --exists enchant-2` and `hunspell -D`
+when diagnosing dependencies. After configuration changes, run `doom sync`,
+restart Emacs, and exercise correction in a Jinx-enabled buffer. Check the Jinx
+checkout for local changes before updating it.
+
 ## Related
 
 - `sections/spellcheck.el` — configuration in this repo

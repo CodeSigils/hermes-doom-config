@@ -32,10 +32,7 @@ Note: the official docs site is version-lagging.
 inside Emacs: `M-x doom/help` opens an interactive info browser with current
 documentation matching the installed version.
 
-The Doom Emacs repo recently entered a transition phase. The monolithic
-`doomemacs/doomemacs` repo is being split into
-`doomemacs/core` + per-module repos. This install uses the monolithic
-repo, which remains fully functional.
+Check the installed source when following upstream guidance: local and upstream versions may differ.
 
 ## 2. Local Source Anatomy
 
@@ -46,12 +43,11 @@ This Doom install lives at `~/.config/emacs/`. Key directories:
 | `~/.config/emacs/lisp/`                  | Core Doom libraries (lib/\*.el)                 |
 | `~/.config/emacs/modules/`               | All module categories + module code             |
 | `~/.config/emacs/modules/<cat>/<mod>/`   | Individual module (config.el, packages.el, etc) |
-| `~/.config/emacs/core/`                  | Module system, CLI, bootstrap                   |
 | `~/.config/emacs/static/`                | Template example files                          |
 | `~/.config/emacs/profiles/`              | Profile system for multi-config switching       |
 | `~/.config/emacs/docs/`                  | Official docs in org format                     |
 | `~/.config/emacs/.local/straight/repos/` | Cloned package repos (read source here)         |
-| `~/.config/emacs/.local/straight/build/` | Built/compiled package bytecode                 |
+| `~/.config/emacs/.local/straight/build-<version>/` | Version-specific package builds; inspect the installed directory |
 | `~/.config/emacs/.local/cache/`          | Cache files (eln-cache, etc)                    |
 | `~/.config/emacs/.local/state/`          | Persistent state (savehist, recentf, etc)       |
 
@@ -144,172 +140,15 @@ against the local `~/.config/emacs/` source when examples don't work.
 - DistroTube Doom Emacs overviews (YouTube)
 - "Emacs From Scratch" series by System Crafters (YouTube)
 
-## 6. Tips, Tricks, and Patterns
+## 6. In-Repo Guidance
 
-### Doom Macros (Use These, Not Vanilla)
+- [Doom API](../DOOM-API.md): macro decisions and examples.
+- [Best practices](best-practices.md): organization and performance.
+- [Package management](package-management.md): lifecycle, pinning and recovery.
+- [Troubleshooting](../.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md): diagnostics, including Eglot and lsp-mode.
+- [Procedures](../.agents/skills/doom-emacs/domains/PROCEDURES.md): common tasks.
 
-| Doom Macro             | Replaces                       | Purpose                                                     |
-| ---------------------- | ------------------------------ | ----------------------------------------------------------- |
-| `after!`               | `with-eval-after-load`         | Deferred config after load                                  |
-| `use-package!`         | `use-package`                  | Package declaration + config                                |
-| `map!`                 | `define-key`, `global-set-key` | Keybinding (evil-aware)                                     |
-| `add-hook!`            | `add-hook` (multi-mode)        | Multi-mode hook registration                                |
-| `setq-hook!`           | `add-hook` + lambda            | Buffer-local var in a hook                                  |
-| `set-company-backend!` | `setq company-backends`        | Per-mode company backends                                   |
-| `set-popup-rule!`      | `display-buffer-alist`         | Popup buffer display rules                                  |
-| `defadvice!`           | `defun` + `advice-add`         | Named advice with docstring                                 |
-| `load!`                | `load-file`                    | Load relative to doom-user-dir                              |
-| `modulep!`             | `modulep`                      | Compile-time module check (replaces deprecated `featurep!`) |
-
-For full syntax and examples, see `DOOM-API.md` at the repo root.
-
-### Common Module Flags
-
-Flags toggle features within a module. Examples:
-
-| Flag          | Module           | Effect                           |
-| ------------- | ---------------- | -------------------------------- |
-| `+lsp`        | `:lang <lang>`   | Enable LSP for that language     |
-| `+eglot`      | `:tools lsp`     | Use eglot backend (not lsp-mode) |
-| `+roam`       | `:lang org`      | Enable org-roam                  |
-| `+dragndrop`  | `:lang org`      | Drag-and-drop images in org      |
-| `+pretty`     | `:lang org`      | Org-pretty-mode                  |
-| `+icons`      | `:emacs`         | Icon font in dired, ibuffer      |
-| `+onsave`     | `:editor format` | Auto-format on save              |
-| `+dirvish`    | `:emacs dired`   | Dirvish file manager             |
-| `+childframe` | `:completion`    | Childframe for completion UI     |
-
-Press `gd` on any flag in `init.el` to see its definition.
-
-### Stale Config Detection
-
-Symptoms of config lagging behind Doom updates:
-
-- `doom doctor` warns about deprecated variables or functions
-- `byte-compile` warnings for obsolete API usage
-- `after!` blocks that no longer fire (module was renamed or split)
-
-When in doubt, check the upstream module source at
-`~/.config/emacs/modules/<cat>/<mod>/config.el` for current patterns.
-
-## 7. Troubleshooting
-
-### Quick Diagnostic Commands
-
-| Command                          | When to Use                                    |
-| -------------------------------- | ---------------------------------------------- |
-| `doom doctor`                    | After every `doom sync` — catches basic issues |
-| `doom info`                      | Full diagnostics dump for bug reports          |
-| `doom env`                       | Regenerate environment file                    |
-| `emacs --debug-init`             | Catch init errors with full stack trace        |
-| `M-x doom/debug`                 | Toggle debug logging at runtime                |
-| `M-x doom/reload`                | Reload config without restarting               |
-| `emacsclient -e '(doom/reload)'` | Reload from terminal                           |
-| `check-parens`                   | Verify balanced parens in `.el` files          |
-
-### Common Issues
-
-| Symptom                        | Likely Cause                                 | Fix                                       |
-| ------------------------------ | -------------------------------------------- | ----------------------------------------- |
-| Emacs won't start              | Unbalanced parens in config                  | Run `check-parens` on changed files       |
-| Module flag not working        | Flag not in init.el or wrong module          | Verify in `init.el`, run `doom sync`      |
-| Package not found              | Missing from packages.el or need `doom sync` | Add `package!` in packages.el, sync       |
-| LSP not working for a language | Missing LSP server binary                    | Install server, verify with `doom doctor` |
-| Keybinding not working         | Wrong keymap or missing `:after` keyword     | Use `:after` inside `map!`, not wrapped   |
-| Format on save broken          | Missing formatter on `exec-path`             | Install tool, verify `exec-path`          |
-
-### Debugging Walkthrough
-
-Step-by-step for "something is broken":
-
-1. Run `doom doctor` in terminal
-2. Check `*Messages*` buffer (`C-h e`) for error traces
-3. Try `doom sync` to recompile stale bytecode
-4. Check `~/.config/emacs/docs/faq.org` for known issues
-5. Search Doom GitHub Issues for the error message
-6. If LSP-related: check `M-x lsp-workspace-show-log`
-
-## 8. Doom API Reference (Compact)
-
-This section is a compact reference for common Doom API macros and
-commands. For full syntax and examples, see `DOOM-API.md`.
-
-### Key Variables
-
-| Variable           | Value / Purpose                           |
-| ------------------ | ----------------------------------------- |
-| `doom-user-dir`    | `~/.config/doom/` — user config directory |
-| `doom-cache-dir`   | `~/.config/emacs/.local/cache/`           |
-| `doom-modules-dir` | `~/.config/emacs/modules/`                |
-| `doom-version`     | Current Doom version string               |
-| `+workspace-name`  | Current workspace name (tabspaces)        |
-
-### Key Commands
-
-| Command                    | Binding     | Purpose                                             |
-| -------------------------- | ----------- | --------------------------------------------------- |
-| `doom/reload`              | `SPC h r r` | Reload config without restart (also M-x)            |
-| `doom/open-private-config` | `SPC f P`   | Open `~/.config/doom/` (also `C-h d c` in help-map) |
-| `doom/help`                | `SPC h d h` | Doom help dashboard                                 |
-| `doom/help-modules`        | `SPC h d m` | Browse modules                                      |
-| `doom/debug`               | (M-x)       | Toggle debug mode                                   |
-| `+eval/buffer-or-region`   | `SPC c e`   | Eval current buffer or selected region              |
-
-### Module Lookup
-
-When you encounter an unknown variable or function:
-
-1. `M-x find-library` to load any Emacs library source
-2. `C-h f function-name` to read documentation
-3. `C-h v variable-name` for variable documentation
-4. `C-c c k` on a module flag for its README
-5. Browse `~/.config/emacs/modules/` for module source
-6. Browse `~/.config/emacs/lisp/lib/` for utility libraries
-
-## 9. Package Ecosystem
-
-Doom's package workflow — declaration (`package!`), configuration
-(`use-package!`), installation (`doom sync`), updating, pinning, and
-troubleshooting — is documented at:
-
-- `references/package-management.md` — full lifecycle reference
-
-## 10. Maintenance and Upgrades
-
-### Doom Update Commands
-
-| Command             | Purpose                                    |
-| ------------------- | ------------------------------------------ |
-| `doom upgrade`      | Update Doom framework + all packages       |
-| `doom sync`         | Recompile, sync profiles, update autoloads |
-| `doom update`       | Update all packages (without framework)    |
-| `doom update <pkg>` | Update a specific package                  |
-| `doom gc`           | Remove orphaned packages and stale builds  |
-| `doom doctor`       | Validate config after changes              |
-
-### Upgrade Safety
-
-Before any upgrade:
-
-```sh
-# Backup the config repo (this is YOUR config, not Doom's):
-cp -a ~/.config/doom ~/.config/doom.backup.$(date +%Y%m%d)
-```
-
-After `doom upgrade`:
-
-1. Run `doom sync && doom doctor`
-2. Check doctor output for deprecation warnings
-3. If config still breaks, restore `~/.config/doom.backup.*` from the backup
-
-### Avoiding Common Upgrade Pitfalls
-
-- `doom upgrade` modifies `~/.config/emacs/` — your config at `~/.config/doom/`
-  is separate but API changes can break it
-- After major Doom versions, check `~/.config/emacs/docs/appendix.org` for
-  breaking changes
-- Package unpinning may be needed: if Doom pins a package version that conflicts
-  with an installed package, use `(unpin! <pkg>)` in packages.el
+Consult installed module source for version-specific flags and behavior.
 
 ## 11. Inspiring Community Configurations
 

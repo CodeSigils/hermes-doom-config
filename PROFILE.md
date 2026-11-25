@@ -19,7 +19,7 @@ This is a summary. The source of truth is `init.el`, `config.el` (loader with un
 | Completion       | `:completion company +childframe +tng` + `vertico`        |
 | LSP backend      | `eglot` (not lsp-mode)                                    |
 | File manager     | Dirvish via `:emacs dired +dirvish`                       |
-| Spelling         | Jinx with Enchant/Hunspell (`en_US`)                      |
+| Spelling         | Jinx with Enchant/Hunspell (`en_US el_GR`)                |
 | Git client       | magit                                                     |
 | Terminal         | vterm                                                     |
 | Tab/workspace    | workspaces module (tabspaces)                             |
@@ -72,6 +72,7 @@ Beyond Doom built-ins:
 | Function                     | Purpose                                        | Location                 |
 | ---------------------------- | ---------------------------------------------- | ------------------------ |
 | `user/git-config`            | Read a git config key from global gitconfig    | `config.el`              |
+| `user/greek-input-method`    | Toggle the Greek input method                  | `sections/input.el`      |
 | `user/split-window-sensibly` | Prefer side-by-side splits, fall back to below | `sections/navigation.el` |
 | `user/initial-frame-size`    | Return saved or pixel-width-based frame size   | `sections/navigation.el` |
 | `user/load-frame-geometry`   | Read saved frame geometry from disk            | `sections/navigation.el` |
@@ -100,137 +101,19 @@ For full policy text see [`AGENTS.md`](AGENTS.md):
 
 ### Spell Checking with Jinx
 
-This config uses Jinx for spelling instead of Doom's built-in Flyspell module. Jinx is async (avoids one subprocess per
-check), supports multiple languages simultaneously, and uses Enchant as a backend.
-
-Keep Doom's `(spell +flyspell)` line commented in `init.el`:
-
-```elisp
-;; (spell +flyspell)  ; left commented for future reference
-```
-
-**packages.el:**
-
-```elisp
-(unpin! compat)    ; Jinx needs compat 31+
-(package! jinx
-  :recipe (:host github :repo "minad/jinx"))
-```
-
-**sections/spellcheck.el and sections/keys.el:**
-
-```elisp
-;; Jinx 2.7 calls legacy bare incf/decf at runtime. Emacs 30 only has the
-;; cl-lib names, so install aliases before autoloaded commands run.
-;; Prefer aliases over a straight :pre-build source patch: the source patch
-;; dirties the checkout and makes `doom sync -u` stop for an interactive
-;; dirty-tree prompt.
-(require 'cl-lib)
-(unless (fboundp 'incf)
-  (defalias 'incf #'cl-incf))
-(unless (fboundp 'decf)
-  (defalias 'decf #'cl-decf))
-
-(use-package! jinx
-  :hook ((text-mode prog-mode conf-mode yaml-mode) . jinx-mode)
-  :config
-  (setq! jinx-languages "en_US el_GR"))
-
-;; sections/keys.el
-(map! "M-$" #'jinx-correct
-      "C-M-$" #'jinx-languages
-      :leader
-      (:prefix ("s" . "spelling")
-       :desc "Correct word" "c" #'jinx-correct
-       :desc "Next misspelling" "n" #'jinx-next
-       :desc "Previous misspelling" "p" #'jinx-previous))
-```
-
-**System dependencies** (Debian/PikaOS):
-
-- Runtime: `enchant-2`, `hunspell` or `nuspell`, `hunspell-en-us`
-- Build: `libenchant-2-dev` + `pkg-config` (provides `enchant-2.pc`)
-
-Probe commands:
-
-```sh
-command -v enchant-2 || command -v enchant
-command -v pkg-config
-command -v hunspell || command -v nuspell
-pkg-config --exists enchant-2
-```
-
-**Verification after `doom sync`:**
-
-```sh
-emacs --batch -L ~/.config/emacs/.local/straight/build-30.2/compat \
-  -L ~/.config/emacs/.local/straight/build-30.2/jinx \
-  --eval "(progn (require 'cl-lib) (unless (fboundp 'incf) (defalias 'incf #'cl-incf)) (unless (fboundp 'decf) (defalias 'decf #'cl-decf)) (require 'compat) (require 'jinx) (message \"jinx loads OK: %s, completion metadata: %s\" (featurep 'jinx) (fboundp 'completion-table-with-metadata)))"
-git -C ~/.config/emacs/.local/straight/repos/jinx status --short
-```
-
-Expected result: Jinx loads, `completion-table-with-metadata` is defined, and the Jinx straight checkout is clean.
-
-**`void-function incf` / `void-function decf`:** If `M-$`, `SPC s c`, or unrelated Org commands report
-`Error running timer 'nil': (void-function incf)`, the idle Jinx timer is loading bytecode that still calls legacy
-`incf`/`decf`. Confirm the aliases are present before `(use-package! jinx ...)`, run `doom sync`, restart Emacs, and
-retest.
-
-**Multilingual setup:** Extend `jinx-languages`, e.g. `"en_US de_DE"`. Start with the primary dictionary unless the user
-asks for more.
-
-**Flyspell legacy pattern** (for reference only — do not reintroduce):
-
-```elisp
-;; init.el
-(spell +flyspell)
-
-;; sections/spellcheck.el
-(add-hook! '(org-mode-hook markdown-mode-hook text-mode-hook) #'flyspell-mode)
-(add-hook! '(prog-mode-hook conf-mode-hook yaml-mode-hook) #'flyspell-prog-mode)
-```
+Jinx uses `en_US` and `el_GR`. Its configuration is in `packages.el`,
+`sections/spellcheck.el`, and `sections/keys.el`. See [the Jinx reference](references/jinx.md)
+for dependencies, verification, and the compatibility workaround.
 
 ### Dirvish File Manager
 
-Dirvish replaces Dired as the primary file manager via the `+dirvish` flag. The launcher keybinding stays outside the
-`after!` block so it's available immediately and can autoload the command:
-
-```elisp
-;; sections/keys.el
-;; Launcher binding — keep outside after! for immediate availability
-(map! :leader :desc "Dirvish dwim" "d d" #'dirvish-dwim)
-
-;; sections/ui.el
-(after! dirvish
-  (setq! dirvish-attributes '(vc-state nerd-icons subtree-state collapse git-msg file-size))
-  (setq! dirvish-subtree-state-style 'nerd)
-  (setq! dirvish-path-separators
-        (list (format " %s " (nerd-icons-codicon "nf-cod-home"))
-              (format " %s " (nerd-icons-codicon "nf-cod-root_folder"))
-              (format " %s " (nerd-icons-faicon "nf-fa-angle_right")))))
-```
-
-Pitfall: putting `SPC d d` inside `(after! dirvish ...)` delays the binding until dirvish loads. For launcher commands,
-bind first; customize after load.
+The `+dirvish` flag enables Dirvish. Its launcher is in `sections/keys.el` and
+appearance in `sections/ui.el`. Bind launchers outside `after!` for immediate availability.
 
 ### Org-Tempo (`<s` Tab Expansion)
 
-Org-tempo provides `<s` + Tab → `#+begin_src` template expansion in Org buffers. The templates are built-in but Doom
-loads them lazily, so an explicit `require` is needed:
-
-```elisp
-;; sections/org.el
-(after! org
-  (require 'org-tempo)   ; without this, `<s` won't expand
-  ;; ... rest of org config
-)
-```
-
-The current `init.el` declaration is `(org +roam +dragndrop)`. If `<s` still doesn't expand after adding the require,
-consider adding the `+pretty` flag: `(org +roam +dragndrop +pretty)`.
-
-The yasnippet path is separate: `SPC h i` to insert a snippet, type `src`, and Tab. Org-tempo and yasnippet are
-independent completion systems and coexist.
+`sections/org.el` loads `org-tempo` for source-block expansion. Yasnippet is
+separate; see [the snippet reference](references/yasnippets.md).
 
 ## Related Files
 

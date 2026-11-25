@@ -11,7 +11,7 @@ When you change a source of truth, update its dependent files in the same change
 | `config.el` / `sections/*.el` | Re-evaluate `.agents/` files for stale examples, paths, procedures (automated advisory)
 | `DOOM-API.md` | `.agents/skills/doom-emacs/SKILL.md` Doom API Essentials (automated), `domains/PROCEDURES.md` sections C, D, E |
 | `sections/*.el` (user/ functions) | `PROFILE.md` custom functions table (automated) |
-| `sections/*.el` (config values) | `PROFILE.md` prose code examples |
+| `sections/*.el` (config values) | Recheck `PROFILE.md` summaries and topic references |
 | `AGENTS.md` | `PROFILE.md` Config Policies Summary, `README.md` agent entry section |
 | `scripts/` | `SKILL.md` Scripts table, `AGENTS.md` workflow, CI routing |
 | `.github/workflows/ci.yml` | `README.md` maintenance guidance, script contracts |
@@ -22,7 +22,24 @@ When you change a source of truth, update its dependent files in the same change
 | `references/jinx.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources |
 | `references/snippet-validation.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources |
 | `snippets/` | `references/yasnippets.md` (inventory) |
-| Doom module source | `references/INDEX.md` flags/features tables |
+| Doom module source | Recheck version-sensitive API and topic guidance |
 | Doom CLI | `references/package-management.md` |
 
 Stale documentation is worse than missing documentation — the agent cannot distinguish it from truth.
+
+## Documentation ownership
+
+| Concern | Owner | Consumers and recheck trigger |
+|---|---|---|
+| Current configuration inventory | `PROFILE.md`; config files are authoritative | README and summaries; recheck on config changes |
+| Repository policy | `AGENTS.md` | Skill summaries; recheck on policy changes |
+| Doom macro guidance | `DOOM-API.md` | Skill essentials and procedures; recheck against installed source on API changes |
+| Package lifecycle | `references/package-management.md` | Procedures and index; recheck on CLI changes |
+| Diagnosis | `domains/TROUBLESHOOTING.md` | Index links; recheck when failures or installed behavior change |
+| Jinx setup and workaround | `references/jinx.md` | Profile and troubleshooting; recheck on Jinx, compat or Emacs updates |
+| Source discovery | `references/INDEX.md` | Entry guides; recheck paths on Doom layout changes |
+
+The runtime skill mirror is a generated copy; use the existing sync and check.
+Keep audience-specific summaries short and link to the owner. Add a topic document
+when a concrete task or reference needs depth; avoid empty sections. Existing checks
+cover selected exact relationships, not semantic freshness.
