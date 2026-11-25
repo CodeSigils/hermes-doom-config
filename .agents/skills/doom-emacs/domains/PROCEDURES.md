@@ -68,6 +68,13 @@ Do not try to `use-package!` modules that Doom already manages. Use `after!`.
 
 Use `map!` in `sections/keys.el` (this repo centralizes all keybindings there):
 
+Before choosing a key, inspect the existing bindings in `sections/keys.el` and
+the installed Doom default bindings for the active keymaps. A key inside
+`(:prefix ...)` is relative to that prefix. Every intermediate key must be a
+prefix map, not a command; check the effective binding in Emacs as well, since
+enabled modules can add bindings. Avoid replacing an existing command unless
+that replacement is intentional.
+
 ```elisp
 (map! :leader :desc "Description" "f f" #'some-command)
 (map! :n "C-c C-f" #'find-file)  ; Normal mode only
