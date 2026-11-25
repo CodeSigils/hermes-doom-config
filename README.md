@@ -46,22 +46,15 @@ is the canonical source; the link does not copy or synchronize files.
 Add new settings and hooks to the matching section file. Add new keybindings to
 `sections/keys.el`. Register a new section file with `(load! ...)` in `config.el`.
 
-```text
-                    Config Edit Workflow
-
-  ┌──────────┐   ┌──────────┐   ┌────────────┐   ┌──────────┐
-  │ git stat │   │ check-   │   │ doom sync  │   │ doom     │
-  │ +inspect │──>│ parens   │──>│ after      │──>│ doctor   │
-  │ +edit .el│   │          │   │ config edit│   │          │
-  └──────────┘   └──────────┘   └────────────┘   └────┬─────┘
-                                                      │
-                                                      v
-  ┌──────────────┐       ┌──────────┐     ┌────────────────┐
-  │ stale        │       │ git diff │     │ commit with    │
-  │ patterns     │──────>│ --check  │────>│ decision aware │
-  │ checks       │       │          │     │ message        │
-  └──────────────┘       └──────────┘     └────────────────┘
+```mermaid
+flowchart LR
+  Inspect[Inspect configuration] --> Edit[Edit configuration]
+  Edit --> Parens[Check Elisp parentheses]
+  Parens --> Sync[Run doom sync]
+  Sync --> Doctor[Run doom doctor]
 ```
+
+Illustrative workflow. Authoritative details: [Agent Workflow](AGENTS.md#agent-workflow).
 
 ## Agent Script Awareness
 
