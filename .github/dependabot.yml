@@ -6,4 +6,7 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "ci"
+    labels:
+      - "dependencies"
+      - "github-actions"
     open-pull-requests-limit: 5
