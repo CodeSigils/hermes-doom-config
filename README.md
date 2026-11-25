@@ -48,7 +48,7 @@ Add new settings and hooks to the matching section file. Add new keybindings to
 
 ```mermaid
 flowchart LR
-  Inspect[Inspect configuration] --> Edit[Edit configuration]
+  Inspect[Inspect config and relevant references] --> Edit[Edit configuration]
   Edit --> Parens[Check Elisp parentheses]
   Parens --> Sync[Run doom sync]
   Sync --> Doctor[Run doom doctor]
