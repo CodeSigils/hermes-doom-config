@@ -13,6 +13,7 @@ When you change a source of truth, update its dependent files in the same change
 | `sections/*.el` (user/ functions) | `PROFILE.md` custom functions table (automated) |
 | `sections/*.el` (config values) | Recheck `PROFILE.md` summaries and topic references |
 | `AGENTS.md` | `PROFILE.md` Config Policies Summary, `README.md` agent entry section |
+| `SECURITY.md` | `README.md` security link, `AGENTS.md` Security Policy, `references/INDEX.md` local docs |
 | `scripts/` | `SKILL.md` Scripts table, `AGENTS.md` workflow, CI routing |
 | `.github/workflows/ci.yml` | `README.md` maintenance guidance, script contracts |
 | `SKILL.md` Scripts table | `README.md` Agent Script Awareness diagram |

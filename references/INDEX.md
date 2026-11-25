@@ -51,6 +51,13 @@ This Doom install lives at `~/.config/emacs/`. Key directories:
 | `~/.config/emacs/.local/cache/`          | Cache files (eln-cache, etc)                    |
 | `~/.config/emacs/.local/state/`          | Persistent state (savehist, recentf, etc)       |
 
+## 2.1 Repository Security Policy
+
+This repository's security reporting scope and handling expectations live in
+[`SECURITY.md`](../SECURITY.md). It covers config/script/CI/agent-guidance
+risks in this repo; upstream Doom/Emacs/package vulnerabilities should be
+reported upstream when appropriate.
+
 ## 3. Module Documentation
 
 The module system is organized by category, each with its own init.el,
