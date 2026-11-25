@@ -49,9 +49,8 @@ Add new settings and hooks to the matching section file. Add new keybindings to
 ```mermaid
 flowchart LR
   Inspect[Inspect config and relevant references] --> Edit[Edit configuration]
-  Edit --> Parens[Check Elisp parentheses]
-  Parens --> Sync[Run doom sync]
-  Sync --> Doctor[Run doom doctor]
+  Edit --> Parens["Check changed `.el` parens"]
+  Parens --> Verify["Run `doom sync` / `doom doctor` after config edits"]
 ```
 
 Illustrative workflow. Authoritative details: [Agent Workflow](AGENTS.md#agent-workflow).
