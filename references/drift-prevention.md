@@ -22,6 +22,7 @@ When you change a source of truth, update its dependent files in the same change
 | `references/yasnippets.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources |
 | `references/jinx.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources |
 | `references/frame-geometry.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources, `PROFILE.md` Related Files |
+| Reusable research findings | Reconcile with the current topic reference and config; update skill guidance or routing only when agent behavior or discovery needs to change |
 | `references/snippet-validation.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources |
 | `snippets/` | `references/yasnippets.md` (inventory) |
 | Doom module source | Recheck version-sensitive API and topic guidance |

@@ -50,12 +50,17 @@ what your task needs:
 
 1. Identify this repository's target checkout and requested outcome; apply its
    `AGENTS.md` for local-config and repository policy.
-2. Inspect the relevant config and installed Doom source or CLI; identify any
-   unavailable evidence before relying on version-sensitive behavior.
+2. Inspect the relevant config, installed Doom documentation and source or CLI,
+   and runtime help where available. Before web research, consult those local
+   sources; use the web for specific gaps, version checks, or explicit requests.
+   Identify unavailable evidence before relying on version-sensitive behavior.
 3. Select the smallest relevant domain or checkout reference in the Quick Index.
 4. Make the authorized change or report findings, preserving existing work.
 5. Validate the affected surface under `AGENTS.md`; distinguish static checks,
    observed runtime behavior, and delivery status in the handoff.
+6. When research yields reusable findings, follow the evidence-to-guidance
+   workflow in `AGENTS.md`: record and reconcile evidence with the topic reference
+   before updating skill instructions or routing where warranted.
 
 ## File Roles — Know What Goes Where
 

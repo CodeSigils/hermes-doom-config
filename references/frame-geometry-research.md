@@ -25,7 +25,10 @@ conversion produced a 3856 by 4270 frame in a fresh Doom session under Xvfb.
 Using text-pixel parameters and allowing for the non-text area restored the
 same record to 1920 by 2075. In a separate isolated test, a new 1520 by 1400
 frame was saved to a temporary geometry file and restored at the same size in
-the next session. The tests used Emacs 30.2, a virtual X display, and no window
+the next session. The second session injected that temporary file's geometry
+into its initial frame parameters before those settings were applied; it did
+not replace the user's saved file or test an unmodified startup path. The tests
+used Emacs 30.2, a virtual X display, and no window
 manager; other toolkits and window managers may constrain sizes differently.
 
 The character conversion was rejected because it depended on font metrics

@@ -75,6 +75,13 @@ prefix map, not a command; check the effective binding in Emacs as well, since
 enabled modules can add bindings. Avoid replacing an existing command unless
 that replacement is intentional.
 
+In the affected buffer and Evil state, use `C-h k` to inspect a key, `C-h w`
+to find keys for a command, or `M-x describe-bindings` to inspect active
+bindings. The installed default module also exposes which-key views for major,
+minor, and other keymaps. Check installed module source and Doom's help for
+defaults before consulting online examples; runtime bindings can differ from
+source because of active modes, overrides, or deferred loading.
+
 ```elisp
 (map! :leader :desc "Description" "f f" #'some-command)
 (map! :n "C-c C-f" #'find-file)  ; Normal mode only

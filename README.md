@@ -54,9 +54,10 @@ Add new settings and hooks to the matching section file. Add new keybindings to
 
 ```mermaid
 flowchart LR
-  Inspect[Inspect config and relevant references] --> Edit[Edit configuration]
-  Edit --> Parens["Check changed `.el` parens"]
-  Parens --> Verify["Run `doom sync` / `doom doctor` after config edits"]
+  Inspect[Inspect config and relevant references] --> Evidence[Investigate evidence when needed]
+  Evidence --> Work[Make authorized changes or report findings]
+  Work --> Verify[Verify the affected behavior]
+  Verify --> Reconcile[Reconcile references and skill guidance when warranted]
 ```
 
 Illustrative workflow. Authoritative details: [Agent Workflow](AGENTS.md#agent-workflow).

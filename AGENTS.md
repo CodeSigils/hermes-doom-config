@@ -18,6 +18,13 @@ When opening this repo cold, read files in this order:
 
 The installed Doom source at `~/.config/emacs/` is the authoritative reference for this config — not upstream docs, not community configs. Before editing `config.el`, `sections/*.el`, `init.el`, or `packages.el`, consult the corresponding module source at `~/.config/emacs/modules/<cat>/<mod>/` to verify flags, patterns, and configuration options. External references supplement, never replace, the installed source.
 
+Before researching Doom behavior on the web, consult the relevant installed Doom
+documentation, module README and source, and in-Emacs help when available. Use
+web sources to fill a specific gap, check upstream changes or version-sensitive
+claims, or fulfill an explicit request; compare their version with the installed
+checkout. If local help or a running session is unavailable, record that limit
+and use the best available sources. See `references/INDEX.md` for entry points.
+
 **Agent config is config.** `.agents/` files (SKILL.md and domains/) govern how the agent operates in this repo. Include them in reviews, audits, and consistency checks alongside `init.el`, `config.el`, and `packages.el` — stale agent guidance compounds across sessions.
 
 ## Reference Map
@@ -56,6 +63,8 @@ Read only the task-relevant material after this file. Tier 2 is on demand; the s
 - Verify `DOOM-API.md` patterns against Doom source. If they conflict, propose a fix.
 - When `DOOM-API.md` macro patterns change, audit `SKILL.md` Doom API Essentials and `domains/PROCEDURES.md` (sections C, D, E) for consistency.
 - Cross-check `.agents/` files in every review and audit. After editing project config files, re-evaluate `.agents/` for stale examples, paths, and patterns.
+- When an investigation yields reusable findings, record the source, checked date, observed behavior, limits, and decision in the existing topic research record when one is warranted. Reconcile verified findings with the current config and topic reference; distinguish historical observations from current guidance.
+- After reconciling evidence and validating the affected behavior, update the skill or its routing only if the findings change how an agent should perform or discover the task. Keep the topic reference authoritative for details and update its documented dependents in the same change. Do not create research files or skill rules for routine work without a reusable finding.
 - The pre-commit hook runs `check-stale-patterns.sh` + `compileall` automatically. Before committing script changes, also run `scripts/run-offline-contracts.sh`.
 - Follow "Learn, Don't Copy" — understand first, propose, implement only on request.
 - On failure, stop and present output. Do not proceed past a failed step without confirmation.

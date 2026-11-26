@@ -28,9 +28,9 @@ macros. This index points to those sources.
 | Doom Online Help         | https://github.com/doomemacs/doomemacs/wiki                              |
 | Doom Core API Demos      | https://github.com/doomemacs/core/blob/master/modules/doom/demos.org     |
 
-Note: the official docs site is version-lagging.
-inside Emacs: `M-x doom/help` opens an interactive info browser with current
-documentation matching the installed version.
+The official docs site may lag the installed version. In the installed Doom,
+`M-x doom/help` opens the local user manual; `M-x doom/help-search` searches
+the installed documentation, and `M-x doom/help-modules` browses modules.
 
 Check the installed source when following upstream guidance: local and upstream versions may differ.
 
@@ -99,8 +99,8 @@ when viewed in context of the module's init.el.
 
 ### Module Discovery
 
-Doom's `M-x doom/help` includes a module browser. From the terminal, `doom
-doctor` reports module-related issues (missing dependencies, conflicting
+Doom's `M-x doom/help-modules` browses module documentation. From the terminal,
+`doom doctor` reports module-related issues (missing dependencies, conflicting
 flags, unregistered packages).
 
 For a community-maintained module index with available flags and per-module
