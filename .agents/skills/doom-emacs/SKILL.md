@@ -42,6 +42,7 @@ what your task needs:
 | Writing or editing snippets           | Checkout reference                                 | `references/yasnippets.md`                 |
 | Validating snippet syntax             | Checkout reference                                 | `references/snippet-validation.md`         |
 | Configuring Jinx spell checking       | Checkout reference                                 | `references/jinx.md`                       |
+| Configuring or debugging frames       | Checkout reference                                 | `references/frame-geometry.md`             |
 | Upgrading Doom framework              | Skill domain and Safety Checks                     | `domains/PROCEDURES.md` (G)                |
 | Maintaining config repo scripts       | Skill Script Conventions                           |                                            |
 
@@ -235,6 +236,7 @@ When you need to understand how a package or Doom module works, the source code 
   - `references/yasnippets.md` — snippet inventory, template syntax, best practices
   - `references/snippet-validation.md` — parser-level snippet validation, directive reference, false-positive catalog
   - `references/jinx.md` — Jinx language configuration, dictionary setup, source reference
+  - `references/frame-geometry.md` — frame sizing, persistence, and verification
   - `references/drift-prevention.md` — source-to-dependent drift map
   - `AGENTS.md` — user-specific policies, workflow, drift prevention
   - `domains/` — depth guides (architecture, procedures, elisp, troubleshooting)

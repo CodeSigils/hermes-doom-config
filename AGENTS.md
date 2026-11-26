@@ -35,6 +35,8 @@ Guide to reference files in this repo, organized by depth tier. Consult it when 
 | 2 — references/ | `best-practices.md` | Consolidated Doom config best practices |
 | 2 — references/ | `yasnippets.md` | Snippet inventory, template syntax |
 | 2 — references/ | `jinx.md` | Jinx spell-checking reference |
+| 2 — references/ | `frame-geometry.md` | Frame sizing, persistence and verification |
+| 2 — references/ | `frame-geometry-research.md` | Historical frame sizing investigation |
 | 2 — references/ | `snippet-validation.md` | Parser-level snippet validation |
 | 2 — references/ | `drift-prevention.md` | Source-to-dependent drift map |
 | 3 — Skill entry | `.agents/skills/doom-emacs/SKILL.md` | Core: file roles, API essentials, pitfalls, domains index |

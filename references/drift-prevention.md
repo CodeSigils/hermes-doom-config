@@ -21,6 +21,7 @@ When you change a source of truth, update its dependent files in the same change
 | `references/best-practices.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources, `PROFILE.md` Related Files |
 | `references/yasnippets.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources |
 | `references/jinx.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources |
+| `references/frame-geometry.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources, `PROFILE.md` Related Files |
 | `references/snippet-validation.md` | `AGENTS.md` Reference Map, `SKILL.md` Quick Index, Reference Sources |
 | `snippets/` | `references/yasnippets.md` (inventory) |
 | Doom module source | Recheck version-sensitive API and topic guidance |
@@ -38,6 +39,7 @@ Stale documentation is worse than missing documentation — the agent cannot dis
 | Package lifecycle | `references/package-management.md` | Procedures and index; recheck on CLI changes |
 | Diagnosis | `domains/TROUBLESHOOTING.md` | Index links; route package recovery to `references/package-management.md`; recheck on failures or behavior changes |
 | Jinx setup and workaround | `references/jinx.md` | Profile and troubleshooting; recheck on Jinx, compat or Emacs updates |
+| Frame sizing and persistence | `references/frame-geometry.md` | Skill, profile and historical research; recheck when frame configuration or Emacs behavior changes |
 | Source discovery | `references/INDEX.md` | Entry guides; recheck paths on Doom layout changes |
 
 The skill and domains serve agents working on this configuration. The repository
