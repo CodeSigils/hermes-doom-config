@@ -152,6 +152,7 @@ against the local `~/.config/emacs/` source when examples don't work.
 - [Doom API](../DOOM-API.md): macro decisions and examples.
 - [Best practices](best-practices.md): organization and performance.
 - [Package management](package-management.md): lifecycle, pinning and recovery.
+- [Environment setup](environment-setup.md): enabled workflows, external tools and recovery boundaries.
 - [Troubleshooting](../.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md): diagnostics, including Eglot and lsp-mode.
 - [Procedures](../.agents/skills/doom-emacs/domains/PROCEDURES.md): common tasks.
 
@@ -214,4 +215,5 @@ Reference files shipped with this config, beyond the skill system:
 | `references/best-practices.md`     | Consolidated Doom config best practices       |
 | `references/yasnippets.md`         | Yasnippet inventory and template syntax       |
 | `references/jinx.md`               | Jinx spell-checking — config and dictionaries |
+| `references/environment-setup.md`  | Enabled-workflow setup and recovery boundaries |
 | `references/snippet-validation.md` | Yasnippet parser-level validation guide       |

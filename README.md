@@ -20,6 +20,9 @@ doom doctor
 
 If you're an AI agent working in this repo, read [`AGENTS.md`](AGENTS.md) first for policy and its [Reference Map](AGENTS.md#reference-map), then consult the profile, skill, and API guidance relevant to the task.
 
+For setup on a new machine, use the enabled-workflow dependency and recovery
+guidance in [environment setup](references/environment-setup.md).
+
 ## Agent Skill
 
 The repo-bound [Doom skill](.agents/skills/doom-emacs/SKILL.md) assists with this
@@ -151,7 +154,9 @@ doom sync
 doom doctor
 ```
 
-If something breaks, restore `~/.config/doom.backup.*` from the backup.
+If something breaks, identify the affected revision and backup before restoring.
+The config backup above does not include Org notes or other user data; see
+[environment setup](references/environment-setup.md#notes-and-recovery).
 
 ## Notes
 

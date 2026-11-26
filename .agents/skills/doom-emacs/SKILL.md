@@ -37,6 +37,7 @@ what your task needs:
 | Setting a keybinding                  | `domains/PROCEDURES.md` (E), Doom API Essentials   |                                            |
 | Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                       |                                            |
 | Verifying a setup or workflow         | `domains/TROUBLESHOOTING.md` — Workflow smoke checks |                                          |
+| Setting up an environment             | Checkout reference                                 | `references/environment-setup.md`          |
 | Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |                                            |
 | Checking style or reviewing patterns  | Checkout reference                                 | `references/best-practices.md`             |
 | Writing or editing snippets           | Checkout reference                                 | `references/yasnippets.md`                 |
@@ -55,12 +56,19 @@ what your task needs:
    sources; use the web for specific gaps, version checks, or explicit requests.
    Identify unavailable evidence before relying on version-sensitive behavior.
 3. Select the smallest relevant domain or checkout reference in the Quick Index.
+   For setup, inspect enabled `init.el` modules and flags, then offer guidance
+   for the user's workflows using the environment setup reference.
+   For the current request or problem, identify gaps in guidance, configuration,
+   dependencies, or verification that would affect the task. Do not treat an
+   undocumented topic as proof of a defect or broaden into unrelated work.
 4. Make the authorized change or report findings, preserving existing work.
 5. Validate the affected surface under `AGENTS.md`; distinguish static checks,
    observed runtime behavior, and delivery status in the handoff.
-6. When research yields reusable findings, follow the evidence-to-guidance
-   workflow in `AGENTS.md`: record and reconcile evidence with the topic reference
-   before updating skill instructions or routing where warranted.
+6. Follow the evidence-to-guidance workflow in `AGENTS.md`: investigate relevant
+   gaps, record reusable research with sources and limits, reconcile it with the
+   current config, and update an existing topic reference or domain. Add a focused
+   topic only for a demonstrated recurring need; update skill instructions or
+   routing when agent behavior or discovery needs to change.
 
 ## File Roles — Know What Goes Where
 
@@ -242,6 +250,7 @@ When you need to understand how a package or Doom module works, the source code 
   - `references/snippet-validation.md` — parser-level snippet validation, directive reference, false-positive catalog
   - `references/jinx.md` — Jinx language configuration, dictionary setup, source reference
   - `references/frame-geometry.md` — frame sizing, persistence, and verification
+  - `references/environment-setup.md` — enabled-module dependencies, workflow checks, and recovery boundaries
   - `references/drift-prevention.md` — source-to-dependent drift map
   - `AGENTS.md` — user-specific policies, workflow, drift prevention
   - `domains/` — depth guides (architecture, procedures, elisp, troubleshooting)

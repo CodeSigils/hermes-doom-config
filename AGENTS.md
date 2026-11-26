@@ -44,6 +44,7 @@ Guide to reference files in this repo, organized by depth tier. Consult it when 
 | 2 — references/ | `jinx.md` | Jinx spell-checking reference |
 | 2 — references/ | `frame-geometry.md` | Frame sizing, persistence and verification |
 | 2 — references/ | `frame-geometry-research.md` | Historical frame sizing investigation |
+| 2 — references/ | `environment-setup.md` | Enabled-workflow dependencies and recovery boundaries |
 | 2 — references/ | `snippet-validation.md` | Parser-level snippet validation |
 | 2 — references/ | `drift-prevention.md` | Source-to-dependent drift map |
 | 3 — Skill entry | `.agents/skills/doom-emacs/SKILL.md` | Core: file roles, API essentials, pitfalls, domains index |
@@ -63,8 +64,10 @@ Read only the task-relevant material after this file. Tier 2 is on demand; the s
 - Verify `DOOM-API.md` patterns against Doom source. If they conflict, propose a fix.
 - When `DOOM-API.md` macro patterns change, audit `SKILL.md` Doom API Essentials and `domains/PROCEDURES.md` (sections C, D, E) for consistency.
 - Cross-check `.agents/` files in every review and audit. After editing project config files, re-evaluate `.agents/` for stale examples, paths, and patterns.
-- When an investigation yields reusable findings, record the source, checked date, observed behavior, limits, and decision in the existing topic research record when one is warranted. Reconcile verified findings with the current config and topic reference; distinguish historical observations from current guidance.
-- After reconciling evidence and validating the affected behavior, update the skill or its routing only if the findings change how an agent should perform or discover the task. Keep the topic reference authoritative for details and update its documented dependents in the same change. Do not create research files or skill rules for routine work without a reusable finding.
+- For each current request or problem, check whether relevant guidance, configuration, dependencies, or verification leave a gap that affects the task. An undocumented topic is a lead, not proof of a broken setup; do not expand into a fleet-wide or feature-wide audit.
+- Investigate task-relevant gaps using installed documentation, source, and the affected runtime surface first. Use external primary sources for a specific unanswered or version-sensitive question, and distinguish observed failures, inferred causes, and untested behavior.
+- When findings are reusable, record sources, checked date, observed behavior, limits, and the decision in the existing topic research record, or add a focused record when the existing one cannot own it. Reconcile verified findings with the current config and topic reference; distinguish historical observations from current guidance.
+- Update an existing topic reference or domain for the affected concern; add a focused one when a real recurring need is not covered. After reconciliation and validation, update skill instructions or routing when the findings change how an agent should perform or discover the task. Keep topic details authoritative in their owner and update documented dependents in the same change. Do not create files or skill rules for routine work without a reusable finding.
 - The pre-commit hook runs `check-stale-patterns.sh` + `compileall` automatically. Before committing script changes, also run `scripts/run-offline-contracts.sh`.
 - Follow "Learn, Don't Copy" — understand first, propose, implement only on request.
 - On failure, stop and present output. Do not proceed past a failed step without confirmation.

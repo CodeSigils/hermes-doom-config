@@ -99,6 +99,9 @@ Consult the installed `doom help sync` for debugging options.
 - **Verify the language server in Emacs** — evaluate `(executable-find "server-name")` with `M-:` in the affected
   session. Compare with `command -v server-name` in the shell; GUI sessions can have a different `exec-path`. Inspect
   `eglot-server-programs` with `C-h v` to find the configured server and arguments for the major mode.
+- **Inspect a failed server process** — read its Eglot stderr buffer and `*Messages*`. A server may exist on the path
+  yet fail because its runtime or a package dependency is missing. Compare the selected executable and its install
+  layout before changing package managers; see `references/environment-setup.md` for the observed YAML example.
 - **Run `doom doctor`** — verifies that the LSP module has no flag conflicts. If `(python +lsp)` is enabled but
   `(lsp +eglot)` isn't, LSP won't work.
 - **Check `M-x eglot-events-buffer`** — shows protocol events when event logging is enabled. This Doom setup disables

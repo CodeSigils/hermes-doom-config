@@ -126,6 +126,7 @@ separate; see [the snippet reference](references/yasnippets.md).
 | [`references/best-practices.md`](references/best-practices.md)             | Consolidated Doom config best practices                    |
 | [`references/jinx.md`](references/jinx.md)                                 | Jinx spell-checking — config, dictionaries, verification   |
 | [`references/frame-geometry.md`](references/frame-geometry.md)             | Frame sizing, persistence and graphical verification       |
+| [`references/environment-setup.md`](references/environment-setup.md)     | Enabled-workflow dependencies and recovery boundaries      |
 | [`references/drift-prevention.md`](references/drift-prevention.md)         | Source-to-dependent drift prevention map                   |
 | [`references/snippet-validation.md`](references/snippet-validation.md)     | Yasnippet parser-level validation — directives, semantics  |
 | [`references/yasnippets.md`](references/yasnippets.md)                     | Snippet inventory, template syntax, best practices         |
