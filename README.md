@@ -133,6 +133,11 @@ Not currently enabled: Doom's `mu4e`, `irc`, `rss`, `rest`, `web`, `treemacs`, `
 | `pyflakes`                             | Python syntax checking        | Optional Python checker                      |
 | `isort`                                | Python import sorting         | Optional formatter/import sorter             |
 | `pipenv`                               | Python environments           | Only needed for Pipenv projects              |
+| `nosetests`                            | Python test runner            | Only needed for projects using nose          |
+
+Python, shell, and YAML LSP support also requires a suitable language server
+visible to Emacs. See the [LSP troubleshooting guide](.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md#lsp-not-working)
+and the [workflow smoke checks](.agents/skills/doom-emacs/domains/TROUBLESHOOTING.md#workflow-smoke-checks).
 
 ## Maintenance
 

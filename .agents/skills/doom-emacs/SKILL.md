@@ -36,6 +36,7 @@ what your task needs:
 | Adding a module or package            | `domains/PROCEDURES.md` (A, B)                     |                                            |
 | Setting a keybinding                  | `domains/PROCEDURES.md` (E), Doom API Essentials   |                                            |
 | Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                       |                                            |
+| Verifying a setup or workflow         | `domains/TROUBLESHOOTING.md` — Workflow smoke checks |                                          |
 | Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |                                            |
 | Checking style or reviewing patterns  | Checkout reference                                 | `references/best-practices.md`             |
 | Writing or editing snippets           | Checkout reference                                 | `references/yasnippets.md`                 |

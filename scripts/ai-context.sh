@@ -81,13 +81,28 @@ else
 fi
 printf '\n'
 printf '**Tool Availability:**\n'
-for tool in git emacs python3 shellcheck prettier ruff; do
+for tool in git emacs python3 shellcheck prettier ruff marked pylsp pyright-langserver basedpyright-langserver bash-language-server yaml-language-server; do
     if command -v "$tool" >/dev/null 2>&1; then
         printf '  %-12s %s\n' "$tool" "$(command -v "$tool")"
     else
         printf '  %-12s (not found)\n' "$tool"
     fi
 done
+printf '\n'
+printf '**Emacs Version:**\n'
+if command -v emacs >/dev/null 2>&1; then
+    emacs --version | head -n 1
+else
+    printf '  (emacs not found)\n'
+fi
+printf '\n'
+printf '**Running Emacs Tool Availability:**\n'
+if command -v emacsclient >/dev/null 2>&1 &&
+    emacsclient -e '(mapcar (lambda (tool) (cons tool (executable-find tool))) (quote ("ruff" "prettier" "marked" "pylsp" "pyright-langserver" "basedpyright-langserver" "bash-language-server" "yaml-language-server")))' 2>/dev/null; then
+    :
+else
+    printf '  (no accessible Emacs server; shell availability may differ from Emacs exec-path)\n'
+fi
 printf '\n'
 printf '**Recent Commits:**\n'
 git log --oneline -5

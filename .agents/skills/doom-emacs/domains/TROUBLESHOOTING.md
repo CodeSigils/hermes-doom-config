@@ -96,14 +96,31 @@ Consult the installed `doom help sync` for debugging options.
 
 - **`M-x eglot-reconnect`** — reconnects the LSP session without closing files.
 - **`M-x eglot-shutdown-all`** then re-open the file — forces a fresh session.
-- **Verify the language server binary** — `which <language-server>` should return a path. If not, install the server
-  separately.
-- **Check `.eglot/` workspace logs** — in the project root, `.eglot/` contains server logs with protocol messages and
-  errors.
+- **Verify the language server in Emacs** — evaluate `(executable-find "server-name")` with `M-:` in the affected
+  session. Compare with `command -v server-name` in the shell; GUI sessions can have a different `exec-path`. Inspect
+  `eglot-server-programs` with `C-h v` to find the configured server and arguments for the major mode.
 - **Run `doom doctor`** — verifies that the LSP module has no flag conflicts. If `(python +lsp)` is enabled but
   `(lsp +eglot)` isn't, LSP won't work.
-- **Check `M-x eglot-events-buffer`** — shows the raw LSP protocol exchange. Server-side errors (incapable server,
-  unsupported capability) appear here.
+- **Check `M-x eglot-events-buffer`** — shows protocol events when event logging is enabled. This Doom setup disables
+  the event buffer by default; enable logging temporarily when needed, then reconnect.
+
+## Workflow smoke checks
+
+Run checks for the workflows affected by a change in a running Doom session. Use disposable files and record the
+observed result, including missing dependencies or any check that could not be performed.
+
+- **Completion and LSP:** open a Python, shell, or YAML project file; verify Eglot connects when a server is installed,
+  then invoke completion and check for a relevant candidate. Use the LSP steps above for connection failures.
+- **Formatting:** save disposable Python and Markdown files with visibly unformatted content; verify Ruff and Prettier
+  respectively format them. Check `executable-find` and formatter errors if the content does not change.
+- **Spelling:** in a text buffer, check that Jinx marks a misspelling and offers a correction. Check both configured
+  dictionaries when relevant; see `references/jinx.md` for dictionary verification.
+- **Org-roam:** open or create a disposable node and confirm it can be found after the database sync. Do not alter
+  existing notes solely for a smoke check.
+- **Markdown preview:** open a disposable Markdown file with `markdown-open` and confirm rendered content opens in the
+  configured browser. This requires the Markdown compiler and a graphical browser.
+- **Frame geometry:** resize a graphical frame, exit normally, and restart; confirm its restored dimensions are close
+  to the previous size. Window-manager constraints can affect the exact result.
 
 ## `void-function` errors
 

@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/sections/formatting.el -*- lexical-binding: t; -*-
 ;; Ruff (Python) and Prettier (Markdown) formatting configuration.
 
-;; Ruff is on PATH at ~/.local/bin/ruff, installed via pnpm global.
+;; Ruff is on PATH at ~/.local/bin/ruff, installed as a Python CLI tool.
 ;; Doom's (format +onsave) + apheleia autodetects it, but be explicit.
 (after! python
   (set-formatter! 'ruff "ruff format --stdin-filename=%b -"
