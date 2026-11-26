@@ -23,14 +23,14 @@ When something breaks, gather this information before changing anything:
 
 ## Emacs fails to start
 
-| Symptom                                        | Likely cause                                              | Fix                                                                                |
-| :--------------------------------------------- | :-------------------------------------------------------- | :--------------------------------------------------------------------------------- |
-| Blank screen, Emacs exits immediately          | Unbalanced parens or syntax error in a `.el` file         | `emacs --debug-init` to locate the error; `check-parens` on affected files         |
-| Error mentions a specific file or line         | An error in that file at that line                        | Inspect the file around that line, check recent edits                              |
-| Error is a missing function or variable        | A `require` or autoload is failing                        | The stack trace shows what Emacs tried to load and where                           |
-| Error about `void-variable` or `void-function` | A referenced symbol doesn't exist, or load order is wrong | Check module guards, package availability, and load order |
-| Error about an unknown module flag             | Typo or removed flag in `init.el`                         | Check the module's README.org for valid flags                                      |
-| Emacs starts but shows nothing useful          | The daemon started but GUI/X11 failed                     | Run `emacs --no-window-system` or `emacs -nw` to force terminal mode               |
+| Symptom                                        | Likely cause                                              | Fix                                                                        |
+| :--------------------------------------------- | :-------------------------------------------------------- | :------------------------------------------------------------------------- |
+| Blank screen, Emacs exits immediately          | Unbalanced parens or syntax error in a `.el` file         | `emacs --debug-init` to locate the error; `check-parens` on affected files |
+| Error mentions a specific file or line         | An error in that file at that line                        | Inspect the file around that line, check recent edits                      |
+| Error is a missing function or variable        | A `require` or autoload is failing                        | The stack trace shows what Emacs tried to load and where                   |
+| Error about `void-variable` or `void-function` | A referenced symbol doesn't exist, or load order is wrong | Check module guards, package availability, and load order                  |
+| Error about an unknown module flag             | Typo or removed flag in `init.el`                         | Check the module's README.org for valid flags                              |
+| Emacs starts but shows nothing useful          | The daemon started but GUI/X11 failed                     | Run `emacs --no-window-system` or `emacs -nw` to force terminal mode       |
 
 Steps:
 
@@ -49,12 +49,12 @@ Steps:
 
 ## Config changes not taking effect
 
-| Change in     | Required action                    | Typical mistake                                  |
-| :------------ | :--------------------------------- | :----------------------------------------------- |
-| `init.el`     | `doom sync` then restart           | Running `doom/reload` instead of `doom sync`     |
-| `packages.el` | `doom sync` then restart           | Running `package-install` instead of `doom sync` |
+| Change in     | Required action                     | Typical mistake                                  |
+| :------------ | :---------------------------------- | :----------------------------------------------- |
+| `init.el`     | `doom sync` then restart            | Running `doom/reload` instead of `doom sync`     |
+| `packages.el` | `doom sync` then restart            | Running `package-install` instead of `doom sync` |
 | `config.el`   | `doom sync`, then reload or restart | Syncing without reloading the running session    |
-| Snippet file  | Save file, no Emacs restart needed | Unclear; check `SPC h i` in the target mode      |
+| Snippet file  | Save file, no Emacs restart needed  | Unclear; check `SPC h i` in the target mode      |
 
 Verify with:
 
@@ -161,12 +161,12 @@ against a definition that is no longer available.
 
 ## Slow Emacs startup
 
-| Symptom                       | Likely cause                           | Fix                                                 |
-| :---------------------------- | :------------------------------------- | :-------------------------------------------------- |
-| Startup feels slow            | Several possible causes                | Measure startup before choosing a change            |
-| A package takes long to load  | Expensive loading or configuration    | Profile it; defer only with an appropriate trigger  |
-| Startup slow only in GUI      | Font or tooltip initialization         | Check font cache, disable unneeded UI features      |
-| Startup slow only in terminal | Frame initialization differences       | Check for terminal-specific config that waits on X  |
+| Symptom                       | Likely cause                       | Fix                                                |
+| :---------------------------- | :--------------------------------- | :------------------------------------------------- |
+| Startup feels slow            | Several possible causes            | Measure startup before choosing a change           |
+| A package takes long to load  | Expensive loading or configuration | Profile it; defer only with an appropriate trigger |
+| Startup slow only in GUI      | Font or tooltip initialization     | Check font cache, disable unneeded UI features     |
+| Startup slow only in terminal | Frame initialization differences   | Check for terminal-specific config that waits on X |
 
 Steps:
 
@@ -217,15 +217,13 @@ yellow warning means a missing dep that may affect that module's feature.
 
 ## `doom doctor` warning guide
 
-| Warning text                                        | What it means                                           | Action                                             |
-| :-------------------------------------------------- | :------------------------------------------------------ | :------------------------------------------------- |
-| "Couldn't find executable"                          | A required CLI tool is missing                          | Install the tool or disable the module             |
-| "No module flag matches"                            | `init.el` has a flag that the module doesn't know about | Check the module's README.org and correct the flag |
-| "Package is pinned to a version that may not exist" | `:pin` SHA doesn't match upstream                       | Update the SHA or remove the `:pin`                |
-| "Recipe error for <package>"                        | straight can't process the recipe                       | Check the recipe syntax and the package source     |
+| Warning text                                        | What it means                                           | Action                                                |
+| :-------------------------------------------------- | :------------------------------------------------------ | :---------------------------------------------------- |
+| "Couldn't find executable"                          | A required CLI tool is missing                          | Install the tool or disable the module                |
+| "No module flag matches"                            | `init.el` has a flag that the module doesn't know about | Check the module's README.org and correct the flag    |
+| "Package is pinned to a version that may not exist" | `:pin` SHA doesn't match upstream                       | Update the SHA or remove the `:pin`                   |
+| "Recipe error for <package>"                        | straight can't process the recipe                       | Check the recipe syntax and the package source        |
 | "Straight repo is dirty"                            | Uncommitted changes in a package checkout               | Inspect and preserve changes before deciding recovery |
-
-
 
 ## Recovery procedures
 

@@ -95,7 +95,11 @@ jobs:
             echo "elisp=$elisp"
             echo "scripts=$scripts"
             echo "workflow=$workflow"
-            elisp_files=$(awk '/[.]el$/' changed-files.txt | base64 -w0)
+            if [[ "$workflow" == "true" ]]; then
+              elisp_files=$(git ls-files '*.el' | base64 -w0)
+            else
+              elisp_files=$(awk '/[.]el$/' changed-files.txt | base64 -w0)
+            fi
             echo "elisp_files=$elisp_files"
           } >>"$GITHUB_OUTPUT"
 
@@ -108,11 +112,29 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Install Python lint tools
+        if: needs.changes.outputs.scripts == 'true'
+        run: python3 -m pip install --disable-pip-version-check ruff==0.15.16 mypy==2.4.1 types-PyYAML
+      - name: Install Prettier
+        if: needs.changes.outputs.docs == 'true'
+        run: npm install -g --no-audit --no-fund prettier@3.10.1
       - name: Compile Python scripts
         if: needs.changes.outputs.scripts == 'true'
         run: python3 -m compileall -q scripts
+      - name: Ruff check
+        if: needs.changes.outputs.scripts == 'true'
+        run: ruff check scripts/
+      - name: Ruff format check
+        if: needs.changes.outputs.scripts == 'true'
+        run: ruff format --check scripts/
+      - name: Mypy
+        if: needs.changes.outputs.scripts == 'true'
+        run: mypy scripts/
       - name: Validate documentation
         run: bash scripts/check-stale-patterns.sh
+      - name: Prettier check Markdown
+        if: needs.changes.outputs.docs == 'true'
+        run: prettier --check "**/*.md"
       - name: Run offline contracts
         if: needs.changes.outputs.scripts == 'true'
         run: bash scripts/run-offline-contracts.sh

@@ -19,7 +19,7 @@ scannable reference.
 | `setq-hook!`           | `add-hook` + lambda                 | Buffer-local var in a hook, cleaner than a lambda                                                |
 | `set-company-backend!` | `setq company-backends`             | Per-mode company backends                                                                        |
 | `set-popup-rule!`      | `display-buffer-alist`              | Transient buffer display rules                                                                   |
-| `modulep!`             | `(when (require ... nil 'noerror))` | Checks module availability without loading a package; replaces deprecated `featurep!`             |
+| `modulep!`             | `(when (require ... nil 'noerror))` | Checks module availability without loading a package; replaces deprecated `featurep!`            |
 | `load!`                | `load-file`                         | Relative to the currently executing file (`load-file-name`) — portable, no hardcoded paths       |
 | `defadvice!`           | `defun` + `advice-add`              | Named advice with docstring, manageable                                                          |
 

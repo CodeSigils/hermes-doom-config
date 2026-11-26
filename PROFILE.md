@@ -69,14 +69,14 @@ Beyond Doom built-ins:
 
 ## Custom Functions (user/ prefix)
 
-| Function                     | Purpose                                        | Location                 |
-| ---------------------------- | ---------------------------------------------- | ------------------------ |
-| `user/git-config`            | Read a git config key from global gitconfig    | `config.el`              |
-| `user/greek-input-method`    | Toggle the Greek input method                  | `sections/input.el`      |
-| `user/split-window-sensibly` | Prefer side-by-side splits, fall back to below | `sections/navigation.el` |
-| `user/initial-frame-size`    | Return saved or pixel-width-based frame size   | `sections/navigation.el` |
-| `user/load-frame-geometry`   | Read saved frame geometry from disk            | `sections/navigation.el` |
-| `user/save-frame-geometry`   | Save frame geometry to disk on Emacs exit      | `sections/navigation.el` |
+| Function                      | Purpose                                              | Location                 |
+| ----------------------------- | ---------------------------------------------------- | ------------------------ |
+| `user/git-config`             | Read a git config key from global gitconfig          | `config.el`              |
+| `user/greek-input-method`     | Toggle the Greek input method                        | `sections/input.el`      |
+| `user/split-window-sensibly`  | Prefer side-by-side splits, fall back to below       | `sections/navigation.el` |
+| `user/initial-frame-size`     | Return saved or pixel-width-based frame size         | `sections/navigation.el` |
+| `user/load-frame-geometry`    | Read saved frame geometry from disk                  | `sections/navigation.el` |
+| `user/save-frame-geometry`    | Save frame geometry to disk on Emacs exit            | `sections/navigation.el` |
 | `user/company-markdown-files` | Complete paths without consuming Markdown delimiters | `sections/completion.el` |
 
 ## Config Policies Summary
@@ -126,9 +126,9 @@ separate; see [the snippet reference](references/yasnippets.md).
 | [`references/best-practices.md`](references/best-practices.md)             | Consolidated Doom config best practices                    |
 | [`references/jinx.md`](references/jinx.md)                                 | Jinx spell-checking — config, dictionaries, verification   |
 | [`references/frame-geometry.md`](references/frame-geometry.md)             | Frame sizing, persistence and graphical verification       |
-| [`references/environment-setup.md`](references/environment-setup.md)     | Enabled-workflow dependencies and recovery boundaries      |
+| [`references/environment-setup.md`](references/environment-setup.md)       | Enabled-workflow dependencies and recovery boundaries      |
 | [`references/drift-prevention.md`](references/drift-prevention.md)         | Source-to-dependent drift prevention map                   |
 | [`references/snippet-validation.md`](references/snippet-validation.md)     | Yasnippet parser-level validation — directives, semantics  |
 | [`references/yasnippets.md`](references/yasnippets.md)                     | Snippet inventory, template syntax, best practices         |
-| [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md) | Repo-specific guide with procedures and troubleshooting     |
+| [`.agents/skills/doom-emacs/SKILL.md`](.agents/skills/doom-emacs/SKILL.md) | Repo-specific guide with procedures and troubleshooting    |
 | [`README.md`](README.md)                                                   | Human-facing quick start                                   |

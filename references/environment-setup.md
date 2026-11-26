@@ -16,15 +16,15 @@ report missing tools without assuming every `doom doctor` warning needs a fix.
 
 For the current setup, useful checks include:
 
-| Enabled workflow | Check before setup | Expected behavior |
-| --- | --- | --- |
-| Python, shell, YAML LSP | An Eglot-compatible server for each language | Server connects and offers relevant features in a project buffer |
-| Python formatting | `ruff` visible to Emacs | Saving a Python file formats it with Ruff |
-| Markdown formatting and preview | `prettier`; `marked` and a graphical browser for preview | Formatting and preview work in their respective workflows |
-| Jinx | Enchant and the requested dictionaries | Corrections work for the configured languages; see [Jinx](jinx.md) |
-| Org and Org-roam | Configured notes directories and a usable Org-roam database | A disposable node can be indexed and found |
-| vterm, PDF, tree-sitter | Installed module prerequisites and build support | The particular terminal, PDF or parsing workflow works |
-| Ansible, Docker, direnv | Relevant executables for the features actually used | Their enabled integrations work when invoked |
+| Enabled workflow                | Check before setup                                          | Expected behavior                                                  |
+| ------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------ |
+| Python, shell, YAML LSP         | An Eglot-compatible server for each language                | Server connects and offers relevant features in a project buffer   |
+| Python formatting               | `ruff` visible to Emacs                                     | Saving a Python file formats it with Ruff                          |
+| Markdown formatting and preview | `prettier`; `marked` and a graphical browser for preview    | Formatting and preview work in their respective workflows          |
+| Jinx                            | Enchant and the requested dictionaries                      | Corrections work for the configured languages; see [Jinx](jinx.md) |
+| Org and Org-roam                | Configured notes directories and a usable Org-roam database | A disposable node can be indexed and found                         |
+| vterm, PDF, tree-sitter         | Installed module prerequisites and build support            | The particular terminal, PDF or parsing workflow works             |
+| Ansible, Docker, direnv         | Relevant executables for the features actually used         | Their enabled integrations work when invoked                       |
 
 Doom does not install external language servers just because `+lsp` is enabled.
 Inspect the installed Eglot server list and the relevant module README before

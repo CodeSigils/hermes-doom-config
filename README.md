@@ -48,7 +48,7 @@ is the canonical source; the link does not copy or synchronize files.
 | `sections/formatting.el`     | Ruff (Python), Prettier (Markdown)                              |
 | `sections/keys.el`           | All keybindings (loaded last)                                   |
 | `snippets/`                  | Yasnippet templates per major-mode                              |
-| `scripts/`                   | Repo tooling (validation and CI)                      |
+| `scripts/`                   | Repo tooling (validation and CI)                                |
 | `references/`                | Best-practices, package management, external resource catalogue |
 | `.agents/skills/doom-emacs/` | Agent skill with domain files for depth                         |
 

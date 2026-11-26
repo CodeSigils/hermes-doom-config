@@ -38,18 +38,18 @@ Check the installed source when following upstream guidance: local and upstream 
 
 This Doom install lives at `~/.config/emacs/`. Key directories:
 
-| Path                                     | Contents                                        |
-| ---------------------------------------- | ----------------------------------------------- |
-| `~/.config/emacs/lisp/`                  | Core Doom libraries (lib/\*.el)                 |
-| `~/.config/emacs/modules/`               | All module categories + module code             |
-| `~/.config/emacs/modules/<cat>/<mod>/`   | Individual module (config.el, packages.el, etc) |
-| `~/.config/emacs/static/`                | Template example files                          |
-| `~/.config/emacs/profiles/`              | Profile system for multi-config switching       |
-| `~/.config/emacs/docs/`                  | Official docs in org format                     |
-| `~/.config/emacs/.local/straight/repos/` | Cloned package repos (read source here)         |
+| Path                                               | Contents                                                         |
+| -------------------------------------------------- | ---------------------------------------------------------------- |
+| `~/.config/emacs/lisp/`                            | Core Doom libraries (lib/\*.el)                                  |
+| `~/.config/emacs/modules/`                         | All module categories + module code                              |
+| `~/.config/emacs/modules/<cat>/<mod>/`             | Individual module (config.el, packages.el, etc)                  |
+| `~/.config/emacs/static/`                          | Template example files                                           |
+| `~/.config/emacs/profiles/`                        | Profile system for multi-config switching                        |
+| `~/.config/emacs/docs/`                            | Official docs in org format                                      |
+| `~/.config/emacs/.local/straight/repos/`           | Cloned package repos (read source here)                          |
 | `~/.config/emacs/.local/straight/build-<version>/` | Version-specific package builds; inspect the installed directory |
-| `~/.config/emacs/.local/cache/`          | Cache files (eln-cache, etc)                    |
-| `~/.config/emacs/.local/state/`          | Persistent state (savehist, recentf, etc)       |
+| `~/.config/emacs/.local/cache/`                    | Cache files (eln-cache, etc)                                     |
+| `~/.config/emacs/.local/state/`                    | Persistent state (savehist, recentf, etc)                        |
 
 ## 2.1 Repository Security Policy
 
@@ -209,11 +209,11 @@ config repos.
 
 Reference files shipped with this config, beyond the skill system:
 
-| File                               | Purpose                                       |
-| ---------------------------------- | --------------------------------------------- |
-| `references/package-management.md` | Package lifecycle, pinning, straight recovery |
-| `references/best-practices.md`     | Consolidated Doom config best practices       |
-| `references/yasnippets.md`         | Yasnippet inventory and template syntax       |
-| `references/jinx.md`               | Jinx spell-checking — config and dictionaries |
+| File                               | Purpose                                        |
+| ---------------------------------- | ---------------------------------------------- |
+| `references/package-management.md` | Package lifecycle, pinning, straight recovery  |
+| `references/best-practices.md`     | Consolidated Doom config best practices        |
+| `references/yasnippets.md`         | Yasnippet inventory and template syntax        |
+| `references/jinx.md`               | Jinx spell-checking — config and dictionaries  |
 | `references/environment-setup.md`  | Enabled-workflow setup and recovery boundaries |
-| `references/snippet-validation.md` | Yasnippet parser-level validation guide       |
+| `references/snippet-validation.md` | Yasnippet parser-level validation guide        |

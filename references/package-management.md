@@ -125,13 +125,13 @@ This is the single command that:
 
 ### When to Run
 
-| Event                               | Required?                     |
-| ----------------------------------- | ----------------------------- |
-| Added a `package!` to `packages.el` | Yes                           |
-| Removed a `package!`                | Yes                           |
-| Changed `init.el` modules           | Yes                           |
+| Event                               | Required?                                         |
+| ----------------------------------- | ------------------------------------------------- |
+| Added a `package!` to `packages.el` | Yes                                               |
+| Removed a `package!`                | Yes                                               |
+| Changed `init.el` modules           | Yes                                               |
 | Changed `config.el` (config only)   | Yes, per `AGENTS.md`; reload or restart afterward |
-| Changed documentation files         | No                            |
+| Changed documentation files         | No                                                |
 
 **After `doom sync`, always run `doom doctor`** to catch errors.
 
@@ -218,10 +218,10 @@ If a package update breaks compatibility, pin to a known-good commit:
 
 Doom uses straight.el as its package manager. Key facts:
 
-| Directory                                | Contents                         |
-| ---------------------------------------- | -------------------------------- |
-| `~/.config/emacs/.local/straight/repos/` | Full git clones of every package |
-| `~/.config/emacs/.local/straight/build-<version>/` | Version-specific package builds |
+| Directory                                          | Contents                         |
+| -------------------------------------------------- | -------------------------------- |
+| `~/.config/emacs/.local/straight/repos/`           | Full git clones of every package |
+| `~/.config/emacs/.local/straight/build-<version>/` | Version-specific package builds  |
 
 Because repos are full git clones, you can inspect local source:
 
@@ -284,20 +284,20 @@ and restart or reload as appropriate.
 
 ### File Locations
 
-| File / Dir                               | Purpose                                |
-| ---------------------------------------- | -------------------------------------- |
-| `~/.config/doom/packages.el`             | Package declarations (`package!`)      |
-| `~/.config/doom/config.el`               | Package configuration (`use-package!`) |
-| `~/.config/emacs/.local/straight/repos/` | Cloned source repos                    |
-| `~/.config/emacs/.local/straight/build-<version>/` | Version-specific package builds |
+| File / Dir                                         | Purpose                                |
+| -------------------------------------------------- | -------------------------------------- |
+| `~/.config/doom/packages.el`                       | Package declarations (`package!`)      |
+| `~/.config/doom/config.el`                         | Package configuration (`use-package!`) |
+| `~/.config/emacs/.local/straight/repos/`           | Cloned source repos                    |
+| `~/.config/emacs/.local/straight/build-<version>/` | Version-specific package builds        |
 
 ### Command Reference
 
-| Command             | When to Use                                    |
-| ------------------- | ---------------------------------------------- |
-| `doom sync`         | After config edits, per `AGENTS.md`            |
-| `doom sync -u`      | Update all installed packages after syncing    |
-| `doom doctor`       | After every `doom sync` — validation           |
-| `doom sync --rebuild` | Rebuild installed packages                   |
-| `doom upgrade`      | Upgrade Doom framework + all packages          |
-| `doom gc`           | Remove orphaned packages and stale builds      |
+| Command               | When to Use                                 |
+| --------------------- | ------------------------------------------- |
+| `doom sync`           | After config edits, per `AGENTS.md`         |
+| `doom sync -u`        | Update all installed packages after syncing |
+| `doom doctor`         | After every `doom sync` — validation        |
+| `doom sync --rebuild` | Rebuild installed packages                  |
+| `doom upgrade`        | Upgrade Doom framework + all packages       |
+| `doom gc`             | Remove orphaned packages and stale builds   |

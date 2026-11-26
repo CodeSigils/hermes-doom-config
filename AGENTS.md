@@ -4,13 +4,13 @@
 
 When opening this repo cold, read files in this order:
 
-| Step | File | What it tells you | Why this order |
-| :--- | :--- | :--- | :--- |
-| 1 | This file (`AGENTS.md`) | Repo and local-config rules | Establish scope and authority |
-| 2 | `PROFILE.md` | Config modules, packages, environment | Consult when setup context is relevant |
-| 3 | `.agents/skills/doom-emacs/SKILL.md` | Doom task method and routing | Select relevant domain guidance |
-| 4 | `DOOM-API.md` | Idiomatic Doom patterns | Consult relevant sections for `.el` work |
-| 5 | `references/INDEX.md` | External resources and community configs | Consult when external references are needed |
+| Step | File                                 | What it tells you                        | Why this order                              |
+| :--- | :----------------------------------- | :--------------------------------------- | :------------------------------------------ |
+| 1    | This file (`AGENTS.md`)              | Repo and local-config rules              | Establish scope and authority               |
+| 2    | `PROFILE.md`                         | Config modules, packages, environment    | Consult when setup context is relevant      |
+| 3    | `.agents/skills/doom-emacs/SKILL.md` | Doom task method and routing             | Select relevant domain guidance             |
+| 4    | `DOOM-API.md`                        | Idiomatic Doom patterns                  | Consult relevant sections for `.el` work    |
+| 5    | `references/INDEX.md`                | External resources and community configs | Consult when external references are needed |
 
 `README.md` is human-facing; read it when you need quick-start or dependency info. Beyond these 5 entry files, additional reference files exist in depth layers (`references/` and `.agents/skills/doom-emacs/domains/`). The Reference Map below is the full landscape.
 
@@ -31,27 +31,27 @@ and use the best available sources. See `references/INDEX.md` for entry points.
 
 Guide to reference files in this repo, organized by depth tier. Consult it when selecting task-specific depth.
 
-| Tier | File | Purpose |
-| :--- | :--- | :--- |
-| 1 — Root | `PROFILE.md` | Config profile — modules, packages, environment |
-| 1 — Root | `DOOM-API.md` | Idiomatic Doom patterns |
-| 1 — Root | `AGENTS.md` | Agent behavior, workflow, drift prevention |
-| 1 — Root | `README.md` | Human quick-start |
-| 2 — references/ | `INDEX.md` | External resources, community configs |
-| 2 — references/ | `package-management.md` | Package lifecycle, pinning, straight |
-| 2 — references/ | `best-practices.md` | Consolidated Doom config best practices |
-| 2 — references/ | `yasnippets.md` | Snippet inventory, template syntax |
-| 2 — references/ | `jinx.md` | Jinx spell-checking reference |
-| 2 — references/ | `frame-geometry.md` | Frame sizing, persistence and verification |
-| 2 — references/ | `frame-geometry-research.md` | Historical frame sizing investigation |
-| 2 — references/ | `environment-setup.md` | Enabled-workflow dependencies and recovery boundaries |
-| 2 — references/ | `snippet-validation.md` | Parser-level snippet validation |
-| 2 — references/ | `drift-prevention.md` | Source-to-dependent drift map |
+| Tier            | File                                 | Purpose                                                   |
+| :-------------- | :----------------------------------- | :-------------------------------------------------------- |
+| 1 — Root        | `PROFILE.md`                         | Config profile — modules, packages, environment           |
+| 1 — Root        | `DOOM-API.md`                        | Idiomatic Doom patterns                                   |
+| 1 — Root        | `AGENTS.md`                          | Agent behavior, workflow, drift prevention                |
+| 1 — Root        | `README.md`                          | Human quick-start                                         |
+| 2 — references/ | `INDEX.md`                           | External resources, community configs                     |
+| 2 — references/ | `package-management.md`              | Package lifecycle, pinning, straight                      |
+| 2 — references/ | `best-practices.md`                  | Consolidated Doom config best practices                   |
+| 2 — references/ | `yasnippets.md`                      | Snippet inventory, template syntax                        |
+| 2 — references/ | `jinx.md`                            | Jinx spell-checking reference                             |
+| 2 — references/ | `frame-geometry.md`                  | Frame sizing, persistence and verification                |
+| 2 — references/ | `frame-geometry-research.md`         | Historical frame sizing investigation                     |
+| 2 — references/ | `environment-setup.md`               | Enabled-workflow dependencies and recovery boundaries     |
+| 2 — references/ | `snippet-validation.md`              | Parser-level snippet validation                           |
+| 2 — references/ | `drift-prevention.md`                | Source-to-dependent drift map                             |
 | 3 — Skill entry | `.agents/skills/doom-emacs/SKILL.md` | Core: file roles, API essentials, pitfalls, domains index |
-| 4 — domains/ | `domains/ARCHITECTURE.md` | Doom framework, module system, reload semantics |
-| 4 — domains/ | `domains/ELISP.md` | Emacs Lisp for Doom config |
-| 4 — domains/ | `domains/PROCEDURES.md` | Task procedures (add module, install package) |
-| 4 — domains/ | `domains/TROUBLESHOOTING.md` | Diagnostic guide for Emacs failures |
+| 4 — domains/    | `domains/ARCHITECTURE.md`            | Doom framework, module system, reload semantics           |
+| 4 — domains/    | `domains/ELISP.md`                   | Emacs Lisp for Doom config                                |
+| 4 — domains/    | `domains/PROCEDURES.md`              | Task procedures (add module, install package)             |
+| 4 — domains/    | `domains/TROUBLESHOOTING.md`         | Diagnostic guide for Emacs failures                       |
 
 Read only the task-relevant material after this file. Tier 2 is on demand; the skill routes to tier 4 domains.
 
@@ -76,11 +76,11 @@ The script inventory and invocation details live in `.agents/skills/doom-emacs/S
 
 ## Decision Thresholds
 
-| Authority level | What the agent does | Examples |
-| :--- | :--- | :--- |
-| Do automatically | Routine maintenance within documented patterns | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add `user/` functions, run `doom sync` + `doom doctor` |
-| Propose (ask first) | Structural changes beyond the edit target | New top-level files, new modules, change completion backend, override Doom's core macros, modify popup rules broadly |
-| Never without explicit request | Destructive or irreversible operations | `doom upgrade`, removing lines from `init.el` instead of commenting |
+| Authority level                | What the agent does                            | Examples                                                                                                                        |
+| :----------------------------- | :--------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
+| Do automatically               | Routine maintenance within documented patterns | Comment/uncomment modules in `init.el`, add `package!` to `packages.el`, add `user/` functions, run `doom sync` + `doom doctor` |
+| Propose (ask first)            | Structural changes beyond the edit target      | New top-level files, new modules, change completion backend, override Doom's core macros, modify popup rules broadly            |
+| Never without explicit request | Destructive or irreversible operations         | `doom upgrade`, removing lines from `init.el` instead of commenting                                                             |
 
 When in doubt, propose and wait. The cost of asking is lower than the cost of reverting.
 
@@ -135,6 +135,7 @@ committed — it didn't survive the cost-of-omission test.
 ## Drift Prevention
 
 When you change a source of truth, update its dependents in the same change. The full mapping is in `references/drift-prevention.md`. The automated checks (pre-commit hook and CI via validate-docs.py) enforce:
+
 - No stale active guidance patterns
 - Selected local file paths resolve; anchors, external URLs, and full Markdown syntax are not checked
 - Script/domain/section/snippet inventory is in sync

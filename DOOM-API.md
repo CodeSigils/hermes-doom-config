@@ -14,7 +14,7 @@ lazy. Understanding these axioms explains almost every macro decision below:
 
 | Axiom                        | Meaning                                                                                  |
 | ---------------------------- | ---------------------------------------------------------------------------------------- |
-| Defer where useful           | Load packages when needed, with a real trigger for deferred configuration               |
+| Defer where useful           | Load packages when needed, with a real trigger for deferred configuration                |
 | Declarative over imperative  | Say _what_ a package does, not _how_ to set it up                                        |
 | Composability through macros | `after!`, `map!`, `add-hook!` compose across files without conflict                      |
 | Stable pinned base           | Doom pins all packages. Unpin only when upstream moves faster than Doom                  |
@@ -368,33 +368,33 @@ their headers merely to apply this runtime-config convention.
 
 Doom's design philosophy is "lazy by default." Stay consistent:
 
-| Principle                                                       | Practice                                                                                                                                                                              |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Defer where appropriate                                         | Use a hook, command, or other real load trigger; verify the intended behavior                                                                                                          |
-| Prefer `after!` over `(require '...)`                           | `(require 'foo)` force-loads `foo` at config time. `(after! foo ...)` runs when the feature actually loads. Never `(require)` in config unless you have a specific startup dependency |
-| Use `:commands` for autoloads                                   | Instead of loading a package, declare entry-point commands that autoload it on first use                                                                                              |
-| Use `:hook` in `use-package!`                                   | `(use-package! foo :hook (mode . func))` keeps package-specific hook setup together                                                                                                    |
-| Keep `:init` blocks lean                                        | `:init` runs at startup even with `:defer t`. Put expensive setup in `:config` (runs after actual load)                                                                               |
-| Use `modulep!` for module conditions                            | Check enabled modules without loading a package just to test for it                                                                                                                    |
-| Prefer named hook functions                                     | Named functions are easier to inspect and remove; use a lambda when appropriate                                                                                                      |
+| Principle                             | Practice                                                                                                                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Defer where appropriate               | Use a hook, command, or other real load trigger; verify the intended behavior                                                                                                         |
+| Prefer `after!` over `(require '...)` | `(require 'foo)` force-loads `foo` at config time. `(after! foo ...)` runs when the feature actually loads. Never `(require)` in config unless you have a specific startup dependency |
+| Use `:commands` for autoloads         | Instead of loading a package, declare entry-point commands that autoload it on first use                                                                                              |
+| Use `:hook` in `use-package!`         | `(use-package! foo :hook (mode . func))` keeps package-specific hook setup together                                                                                                   |
+| Keep `:init` blocks lean              | `:init` runs at startup even with `:defer t`. Put expensive setup in `:config` (runs after actual load)                                                                               |
+| Use `modulep!` for module conditions  | Check enabled modules without loading a package just to test for it                                                                                                                   |
+| Prefer named hook functions           | Named functions are easier to inspect and remove; use a lambda when appropriate                                                                                                       |
 
 **Hot take: if you can't justify why a piece of code needs to run at startup,
 it shouldn't run at startup.**
 
 ### 7.3 Config Style and Runtime Performance
 
-| Wrong / Anti-pattern                                  | Right / Doom Way                                       | Why                                                                                                                                  |
-| ----------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `(use-package foo ...)`                               | `(use-package! foo ...)`                               | Adds disabled-package awareness and extra keywords; the regular `use-package` misses these                                           |
-| Deferred package configuration                        | `(after! foo ...)`                                     | Runs after the feature loads; use `require` where a dependency must load immediately                                                 |
-| Global customizable setting                           | `setq!`                                                | Triggers custom setters on customizable variables                                                                                    |
-| `(define-key map k f)` or `(global-set-key ...)`      | `(map! ...)` with `:leader`, `:map`, or `:localleader` | Integrates with which-key for discoverability and evil-state awareness                                                               |
-| `(add-hook 'foo-hook ...)` with a lambda              | `(add-hook! ...)` or `use-package!` `:hook`            | Supports multiple hooks, local variables natively (`setq-local` inside the form), and mode-specific behavior without lambda wrappers |
-| `(loop for ... collect ...)`                          | `(cl-loop for ... collect ...)`                        | `cl-lib` is the modern, namespaced version. Bare `loop` pollutes the namespace                                                       |
-| `(defun* ...)` or `(destructuring-bind ...)`          | `(cl-defun ...)` or `(cl-destructuring-bind ...)`      | All `cl` functions have `cl-` prefixed equivalents                                                                                   |
-| Complex matching                                      | `pcase` where appropriate                              | Pattern matching can make the cases clearer                                                                                          |
-| Deleting unused `init.el` lines                       | Commenting them out                                    | The comment IS documentation — it tells the next agent a module was considered and turned off                                        |
-| `package-install` (interactive)                       | `(package! ...)` in `packages.el` + `doom sync`        | Straight vs package.el conflict; explicit declarations keep the config reproducible                                                  |
+| Wrong / Anti-pattern                             | Right / Doom Way                                       | Why                                                                                                                                  |
+| ------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `(use-package foo ...)`                          | `(use-package! foo ...)`                               | Adds disabled-package awareness and extra keywords; the regular `use-package` misses these                                           |
+| Deferred package configuration                   | `(after! foo ...)`                                     | Runs after the feature loads; use `require` where a dependency must load immediately                                                 |
+| Global customizable setting                      | `setq!`                                                | Triggers custom setters on customizable variables                                                                                    |
+| `(define-key map k f)` or `(global-set-key ...)` | `(map! ...)` with `:leader`, `:map`, or `:localleader` | Integrates with which-key for discoverability and evil-state awareness                                                               |
+| `(add-hook 'foo-hook ...)` with a lambda         | `(add-hook! ...)` or `use-package!` `:hook`            | Supports multiple hooks, local variables natively (`setq-local` inside the form), and mode-specific behavior without lambda wrappers |
+| `(loop for ... collect ...)`                     | `(cl-loop for ... collect ...)`                        | `cl-lib` is the modern, namespaced version. Bare `loop` pollutes the namespace                                                       |
+| `(defun* ...)` or `(destructuring-bind ...)`     | `(cl-defun ...)` or `(cl-destructuring-bind ...)`      | All `cl` functions have `cl-` prefixed equivalents                                                                                   |
+| Complex matching                                 | `pcase` where appropriate                              | Pattern matching can make the cases clearer                                                                                          |
+| Deleting unused `init.el` lines                  | Commenting them out                                    | The comment IS documentation — it tells the next agent a module was considered and turned off                                        |
+| `package-install` (interactive)                  | `(package! ...)` in `packages.el` + `doom sync`        | Straight vs package.el conflict; explicit declarations keep the config reproducible                                                  |
 
 ### 7.4 Config Hygiene — Code That Stays Maintainable
 

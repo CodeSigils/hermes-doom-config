@@ -29,23 +29,23 @@ policies (completion preference, Markdown style, verification steps, etc.).
 This skill is organised as a compact core (task-agnostic essentials) with domain files for specific needs. Read only
 what your task needs:
 
-| When your task is...                  | Read this section or file                          | Reference file                             |
-| :------------------------------------ | :------------------------------------------------- | :----------------------------------------- |
-| First time in this repo               | Doom Task Method, Writing Conventions, Safety Checks |                                          |
-| Editing `init.el`                     | `domains/ARCHITECTURE.md`, Safety Checks           |                                            |
-| Adding a module or package            | `domains/PROCEDURES.md` (A, B)                     |                                            |
-| Setting a keybinding                  | `domains/PROCEDURES.md` (E), Doom API Essentials   |                                            |
-| Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                       |                                            |
-| Verifying a setup or workflow         | `domains/TROUBLESHOOTING.md` — Workflow smoke checks |                                          |
-| Setting up an environment             | Checkout reference                                 | `references/environment-setup.md`          |
-| Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                       |                                            |
-| Checking style or reviewing patterns  | Checkout reference                                 | `references/best-practices.md`             |
-| Writing or editing snippets           | Checkout reference                                 | `references/yasnippets.md`                 |
-| Validating snippet syntax             | Checkout reference                                 | `references/snippet-validation.md`         |
-| Configuring Jinx spell checking       | Checkout reference                                 | `references/jinx.md`                       |
-| Configuring or debugging frames       | Checkout reference                                 | `references/frame-geometry.md`             |
-| Upgrading Doom framework              | Skill domain and Safety Checks                     | `domains/PROCEDURES.md` (G)                |
-| Maintaining config repo scripts       | Skill Script Conventions                           |                                            |
+| When your task is...                  | Read this section or file                            | Reference file                     |
+| :------------------------------------ | :--------------------------------------------------- | :--------------------------------- |
+| First time in this repo               | Doom Task Method, Writing Conventions, Safety Checks |                                    |
+| Editing `init.el`                     | `domains/ARCHITECTURE.md`, Safety Checks             |                                    |
+| Adding a module or package            | `domains/PROCEDURES.md` (A, B)                       |                                    |
+| Setting a keybinding                  | `domains/PROCEDURES.md` (E), Doom API Essentials     |                                    |
+| Emacs won't start or something breaks | `domains/TROUBLESHOOTING.md`                         |                                    |
+| Verifying a setup or workflow         | `domains/TROUBLESHOOTING.md` — Workflow smoke checks |                                    |
+| Setting up an environment             | Checkout reference                                   | `references/environment-setup.md`  |
+| Writing custom Elisp                  | `domains/ELISP.md`, Pitfalls                         |                                    |
+| Checking style or reviewing patterns  | Checkout reference                                   | `references/best-practices.md`     |
+| Writing or editing snippets           | Checkout reference                                   | `references/yasnippets.md`         |
+| Validating snippet syntax             | Checkout reference                                   | `references/snippet-validation.md` |
+| Configuring Jinx spell checking       | Checkout reference                                   | `references/jinx.md`               |
+| Configuring or debugging frames       | Checkout reference                                   | `references/frame-geometry.md`     |
+| Upgrading Doom framework              | Skill domain and Safety Checks                       | `domains/PROCEDURES.md` (G)        |
+| Maintaining config repo scripts       | Skill Script Conventions                             |                                    |
 
 ## Doom Task Method
 
@@ -74,10 +74,10 @@ what your task needs:
 
 Doom splits config across three files. Putting the wrong thing in the wrong file is the most common mistake.
 
-| File               | Purpose                                                  | `doom sync` needed? |
-| :----------------- | :------------------------------------------------------- | :------------------ |
-| `init.el`          | Declare which Doom modules are enabled, with their flags | Yes                 |
-| `packages.el`      | Install external packages (MELPA, git repos)             | Yes                 |
+| File               | Purpose                                                  | `doom sync` needed?  |
+| :----------------- | :------------------------------------------------------- | :------------------- |
+| `init.el`          | Declare which Doom modules are enabled, with their flags | Yes                  |
+| `packages.el`      | Install external packages (MELPA, git repos)             | Yes                  |
 | `config.el`        | Thin loader with universal defaults and `load!` calls    | Yes, per repo policy |
 | `sections/`        | Split config loaded via `(load! ...)` from `config.el`   | Yes, per repo policy |
 | `sections/keys.el` | Centralized keybinding inventory loaded last             | Yes, per repo policy |
@@ -138,7 +138,7 @@ memory:
 | Any requested Doom edit | `check-parens` for changed `.el` files, then `doom sync` unless told not to |
 | `init.el` change        | `doom sync` (required after any module change)                              |
 | `packages.el` change    | `doom sync` (required after any package change)                             |
-| `config.el` change      | `doom sync`, then reload or restart the running session                      |
+| `config.el` change      | `doom sync`, then reload or restart the running session                     |
 | Any `.el` file change   | `check-parens` to verify balanced parens                                    |
 | After `doom sync`       | `doom doctor` — catches missing deps, wrong flags, broken recipes           |
 | Emacs won't start (CLI) | `emacs --debug-init` for stack trace; `emacs --batch` for paren check       |
@@ -195,14 +195,14 @@ its purpose changes, **update the Quick Index in the same change**:
 All repo scripts live under `scripts/`. Sourcing `scripts/config.sh` provides shared paths and safety checks; the
 registered workflow tools are:
 
-| Script                       | Purpose                                                                       | When to run                                          |
-| :--------------------------- | :---------------------------------------------------------------------------- | :--------------------------------------------------- |
-| `check-stale-patterns.sh`    | Run documentation, script, domain, and section inventory validation           | Before committing documentation or scripts           |
-| `validate-docs.py`           | Run all doc-health checks (full list: AGENTS.md > Drift Prevention)           | Called by `check-stale-patterns.sh`                  |
-| `run-offline-contracts.sh`   | Exercise documentation contracts                 | Before committing script changes                     |
-| `ai-context.sh`              | Report config, tool, and Git context; file content is explicit opt-in | On demand when enlisting an external model           |
-| `install-hooks.sh`           | Install the pre-commit hook into `.git/hooks/pre-commit`                      | After cloning fresh or when hook script changes      |
-| `pre-commit-hook.sh`         | Canonical pre-commit hook source (installed by install-hooks.sh)              | Automatically on every commit (via git hook)         |
+| Script                     | Purpose                                                               | When to run                                     |
+| :------------------------- | :-------------------------------------------------------------------- | :---------------------------------------------- |
+| `check-stale-patterns.sh`  | Run documentation, script, domain, and section inventory validation   | Before committing documentation or scripts      |
+| `validate-docs.py`         | Run all doc-health checks (full list: AGENTS.md > Drift Prevention)   | Called by `check-stale-patterns.sh`             |
+| `run-offline-contracts.sh` | Exercise documentation contracts                                      | Before committing script changes                |
+| `ai-context.sh`            | Report config, tool, and Git context; file content is explicit opt-in | On demand when enlisting an external model      |
+| `install-hooks.sh`         | Install the pre-commit hook into `.git/hooks/pre-commit`              | After cloning fresh or when hook script changes |
+| `pre-commit-hook.sh`       | Canonical pre-commit hook source (installed by install-hooks.sh)      | Automatically on every commit (via git hook)    |
 
 ## Skill Script Conventions
 

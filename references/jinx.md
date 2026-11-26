@@ -44,12 +44,12 @@ The authoritative Jinx source lives in the installed straight repo:
 
 Key documentation found inline in the source:
 
-| Variable              | Type   | Description                                     |
-|-----------------------|--------|-------------------------------------------------|
-| `jinx-languages`      | string | "Dictionary language codes, as a string separated by whitespace." |
+| Variable              | Type   | Description                                                                     |
+| --------------------- | ------ | ------------------------------------------------------------------------------- |
+| `jinx-languages`      | string | "Dictionary language codes, as a string separated by whitespace."               |
 | `jinx-save-languages` | symbol | Whether to save `jinx-languages` as a file-local variable (`'ask`, `t`, `nil`). |
-| `jinx-delay`          | float  | Idle timer delay before checking.               |
-| `jinx-include-faces`  | list   | Faces to check per mode (comments, strings, etc.) |
+| `jinx-delay`          | float  | Idle timer delay before checking.                                               |
+| `jinx-include-faces`  | list   | Faces to check per mode (comments, strings, etc.)                               |
 
 ## Verification
 

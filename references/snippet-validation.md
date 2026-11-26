@@ -23,17 +23,17 @@ The parser in `yasnippet.el` works like this:
 
 The parser recognizes exactly 9 directive names:
 
-| Directive     | Action                                                  |
-|---------------|---------------------------------------------------------|
-| `key`         | Sets trigger key (defaults to filename if absent)       |
-| `name`        | Sets display name (defaults to filename if absent)      |
-| `condition`   | Emacs-Lisp condition (evaluated with `yas--read-lisp`)  |
-| `group`       | Menu grouping (split on `.` for nesting)                |
-| `expand-env`  | Override variables during expansion (`let` varlist form)|
-| `binding`     | Direct keybinding                                       |
-| `type`        | `snippet` (default) or `command`                        |
-| `uuid`        | Unique identifier                                       |
-| `contributor` | Acknowledged (parser no-ops this)                       |
+| Directive     | Action                                                   |
+| ------------- | -------------------------------------------------------- |
+| `key`         | Sets trigger key (defaults to filename if absent)        |
+| `name`        | Sets display name (defaults to filename if absent)       |
+| `condition`   | Emacs-Lisp condition (evaluated with `yas--read-lisp`)   |
+| `group`       | Menu grouping (split on `.` for nesting)                 |
+| `expand-env`  | Override variables during expansion (`let` varlist form) |
+| `binding`     | Direct keybinding                                        |
+| `type`        | `snippet` (default) or `command`                         |
+| `uuid`        | Unique identifier                                        |
+| `contributor` | Acknowledged (parser no-ops this)                        |
 
 Unrecognized directives produce a warning message but do not prevent loading.
 
@@ -44,6 +44,7 @@ Unrecognized directives produce a warning message but do not prevent loading.
 ### `# key:` vs filename
 
 From the parser source:
+
 ```elisp
 (unless (or key binding)
   (setq key (and file (file-name-nondirectory file))))
@@ -54,6 +55,7 @@ If neither `key` nor `binding` is set, the key defaults to the filename. An expl
 ### `# name:` defaults
 
 From the parser source:
+
 ```elisp
 (name (and file (file-name-nondirectory file)))
 ```
@@ -69,6 +71,7 @@ The relevant parser and navigation code:
 - `$0` — the exit marker. Code: `yas-next-field-will-exit-p` returns t when the next field after the current one is the exit field.
 
 Key points:
+
 - `$0` is NOT a regular tab-stop field. It is the cursor exit position. It does not need to be numerically ordered.
 - Mirrors (`$1` after `${1:...}` has been defined) work regardless of their position relative to `$0`.
 - `$N` and `${N:...}` are the two syntaxes for tab-stop fields.

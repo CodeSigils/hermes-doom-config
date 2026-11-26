@@ -15,7 +15,7 @@ from _findings import CheckResult
 from _repo import Repo
 
 try:
-    import yaml
+    import yaml  # type: ignore[import-untyped]
 except ImportError:
     yaml = None  # type: ignore[assignment]
 
@@ -37,9 +37,7 @@ def stale_findings(repo: Repo, files: list[Path]) -> CheckResult:
     """Scan all markdown for stale active-guidance patterns."""
     findings: list[str] = []
     for path in files:
-        for line_number, line in enumerate(
-            repo.read_text(path).splitlines(), start=1
-        ):
+        for line_number, line in enumerate(repo.read_text(path).splitlines(), start=1):
             if repo.allow_marker in line:
                 continue
             for pattern, explanation in STALE_PATTERNS:
@@ -70,7 +68,7 @@ def _candidate_paths(line: str) -> set[tuple[str, bool]]:
     for m in MARKDOWN_LINK.finditer(line):
         destination = m.group(1).strip()
         if destination.startswith("<") and ">" in destination:
-            target = destination[1:destination.index(">")]
+            target = destination[1 : destination.index(">")]
         else:
             target = destination.split(maxsplit=1)[0]
         if not re.match(r"^(?:https?://|mailto:|#)", target):
@@ -100,9 +98,7 @@ def reference_findings(repo: Repo, files: list[Path]) -> CheckResult:
     """Check selected local file paths; fragments and external URLs are excluded."""
     findings: list[str] = []
     for path in files:
-        for line_number, line in enumerate(
-            repo.read_text(path).splitlines(), start=1
-        ):
+        for line_number, line in enumerate(repo.read_text(path).splitlines(), start=1):
             for target, markdown in sorted(_candidate_paths(line)):
                 if not _resolves(path, target, repo, markdown):
                     findings.append(
@@ -129,9 +125,7 @@ def _registered_scripts(repo: Repo) -> set[str]:
     except IndexError:
         return set()
     return {
-        m.group(1)
-        for line in section.splitlines()
-        if (m := SCRIPT_ROW.match(line))
+        m.group(1) for line in section.splitlines() if (m := SCRIPT_ROW.match(line))
     }
 
 
@@ -152,9 +146,7 @@ def inventory_findings(repo: Repo) -> CheckResult:
             f"MISSING: scripts/{name} is not registered in SKILL.md Scripts table"
         )
     for name in sorted(registered - actual):
-        findings.append(
-            f"STALE: SKILL.md Scripts table lists missing scripts/{name}"
-        )
+        findings.append(f"STALE: SKILL.md Scripts table lists missing scripts/{name}")
     if "scripts/config.sh" not in repo.read_text(repo.skill_file):
         findings.append(
             "MISSING: SKILL.md must explicitly classify scripts/config.sh "
@@ -197,13 +189,13 @@ def domain_inventory_findings(repo: Repo) -> CheckResult:
 
     referenced = set(DOMAIN_ROW.findall(qi_section))
     findings: list[str] = []
-    for path in sorted(actual - referenced):
+    for rel_path in sorted(actual - referenced):
         findings.append(
-            f"MISSING: {path} exists on disk but has no row in SKILL.md Quick Index"
+            f"MISSING: {rel_path} exists on disk but has no row in SKILL.md Quick Index"
         )
-    for path in sorted(referenced - actual):
+    for rel_path in sorted(referenced - actual):
         findings.append(
-            f"STALE: SKILL.md Quick Index references {path} but file does not exist"
+            f"STALE: SKILL.md Quick Index references {rel_path} but file does not exist"
         )
     return CheckResult(
         "Domain File Inventory Coverage",
@@ -250,14 +242,11 @@ def section_inventory_findings(repo: Repo) -> CheckResult:
         if (m := SECTION_LOAD.match(line.strip()))
     }
     actual = {
-        str(p.relative_to(repo.root))
-        for p in sections_dir.glob("*.el")
-        if p.is_file()
+        str(p.relative_to(repo.root)) for p in sections_dir.glob("*.el") if p.is_file()
     }
 
     findings: list[str] = [
-        f"BROKEN: config.el loads missing {p}"
-        for p in sorted(loaded - actual)
+        f"BROKEN: config.el loads missing {p}" for p in sorted(loaded - actual)
     ]
     findings.extend(
         f"ORPHAN: {p} exists on disk but is not loaded from config.el"
@@ -384,9 +373,7 @@ def pipe_artifact_findings(repo: Repo, files: list[Path]) -> CheckResult:
     """Check markdown table rows for ``||`` at line start (display artifact)."""
     findings: list[str] = []
     for path in files:
-        for line_number, line in enumerate(
-            repo.read_text(path).splitlines(), start=1
-        ):
+        for line_number, line in enumerate(repo.read_text(path).splitlines(), start=1):
             if PIPE_ARTIFACT.match(line) and repo.allow_marker not in line:
                 findings.append(
                     f"PIPE_ARTIFACT: {repo.display(path)}:{line_number}: "
@@ -515,8 +502,7 @@ def readme_disabled_module_findings(repo: Repo) -> CheckResult:
                     commented.add(bare)
 
     findings: list[str] = [
-        f"STALE: README.md says '{mod}' is disabled "
-        f"but it is not commented in init.el"
+        f"STALE: README.md says '{mod}' is disabled but it is not commented in init.el"
         for mod in sorted(readme_modules - commented)
     ]
     return CheckResult(
@@ -530,7 +516,7 @@ def readme_disabled_module_findings(repo: Repo) -> CheckResult:
 # PROFILE module-table counts vs init.el
 # ---------------------------------------------------------------------------
 
-PROFILE_MODULE_ROW = re.compile(r'^\| `:(\w+)`\s+\|\s+(.+?)\s+\|$')
+PROFILE_MODULE_ROW = re.compile(r"^\| `:(\w+)`\s+\|\s+(.+?)\s+\|$")
 MODULE_CATEGORY = re.compile(
     r"^\s+:(input|completion|ui|editor|emacs|term|checkers|tools|os|lang|email|app|config)"
 )
@@ -779,9 +765,7 @@ def cross_commit_drift_findings(repo: Repo) -> CheckResult:
         if not source_changed:
             continue
 
-        dependent_changed = any(
-            d in staged for d in dependents
-        )
+        dependent_changed = any(d in staged for d in dependents)
         if not dependent_changed:
             deps_str = ", ".join(sorted(dependents))
             findings.append(
@@ -813,7 +797,9 @@ def _split_gfm_cells(line: str) -> list[str]:
     """
     trimmed = line.strip()
     start = 1 if trimmed.startswith("|") else 0
-    end = len(trimmed) - 1 if len(trimmed) > 1 and trimmed.endswith("|") else len(trimmed)
+    end = (
+        len(trimmed) - 1 if len(trimmed) > 1 and trimmed.endswith("|") else len(trimmed)
+    )
 
     cells: list[str] = []
     cell: list[str] = []
@@ -927,9 +913,7 @@ def table_structural_findings(repo: Repo) -> CheckResult:
 
         content = repo.read_text(path)
         for _, line_num, msg in _find_table_errors(content):
-            findings.append(
-                f"TABLE_MISMATCH: {repo.display(path)}:{line_num}: {msg}"
-            )
+            findings.append(f"TABLE_MISMATCH: {repo.display(path)}:{line_num}: {msg}")
 
     return CheckResult(
         "Agent-Config Table Structure",
