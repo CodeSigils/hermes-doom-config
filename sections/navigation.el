@@ -47,12 +47,18 @@ Saves last geometry on exit so Emacs remembers your manual resizes."
        (t '((width . 100) (height . 45))))))
 
 (defun user/load-frame-geometry ()
-  "Read saved frame geometry from disk if it exists."
+  "Read saved native pixel geometry as text-area pixel parameters."
   (when (file-exists-p user/frame-geometry-file)
     (condition-case nil
         (with-temp-buffer
           (insert-file-contents user/frame-geometry-file)
-          (read (current-buffer)))
+          (let* ((geometry (read (current-buffer)))
+                 (width (alist-get 'width geometry))
+                 (height (alist-get 'height geometry)))
+            (when (and (integerp width) (> width 0)
+                       (integerp height) (> height 0))
+              `((width . (text-pixels . ,(max 1 (- width (- (frame-pixel-width) (frame-text-width))))))
+                (height . (text-pixels . ,(max 1 (- height (- (frame-pixel-height) (frame-text-height))))))))))
       (error nil))))
 
 (defun user/save-frame-geometry ()
