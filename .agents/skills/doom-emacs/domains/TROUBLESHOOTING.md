@@ -107,10 +107,14 @@ Consult the installed `doom help sync` for debugging options.
 ## Workflow smoke checks
 
 Run checks for the workflows affected by a change in a running Doom session. Use disposable files and record the
-observed result, including missing dependencies or any check that could not be performed.
+date, relevant versions, test surface and observed result, including missing dependencies or any check that could not
+be performed. Executable lookup, a server connection, and an actual workflow are separate observations.
 
 - **Completion and LSP:** open a Python, shell, or YAML project file; verify Eglot connects when a server is installed,
   then invoke completion and check for a relevant candidate. Use the LSP steps above for connection failures.
+- **Markdown path completion:** in a disposable Markdown file, check `major-mode` and buffer-local `company-backends`,
+  then try an existing path in prose, inline code, a fenced block, and a link destination. Confirm the file backend
+  offers the expected candidate; a configured backend alone does not prove runtime completion works.
 - **Formatting:** save disposable Python and Markdown files with visibly unformatted content; verify Ruff and Prettier
   respectively format them. Check `executable-find` and formatter errors if the content does not change.
 - **Spelling:** in a text buffer, check that Jinx marks a misspelling and offers a correction. Check both configured
@@ -121,6 +125,22 @@ observed result, including missing dependencies or any check that could not be p
   configured browser. This requires the Markdown compiler and a graphical browser.
 - **Frame geometry:** resize a graphical frame, exit normally, and restart; confirm its restored dimensions are close
   to the previous size. Window-manager constraints can affect the exact result.
+
+In an isolated Doom session checked 2026-11-26, `company-files` offered paths in
+fenced Markdown blocks but did not recognize paths immediately after an inline
+backtick or `](`. Its prefix also treated the closing delimiter as a suffix to
+replace. `sections/completion.el` adds Markdown-specific matching and preserves
+those delimiters; recheck against the installed Company source after upgrades.
+Automatic completion and candidate insertion were exercised in Markdown and GFM
+buffers, but this does not establish behavior in every Markdown context.
+
+## Org-roam note not found
+
+First check the note's path against the running session's `org-roam-directory`, and inspect
+`org-roam-db-autosync-mode` and `*Messages*`. A file existing on disk does not prove it is indexed, and a search can
+miss a node for reasons other than database failure. If needed, reproduce with a disposable note and an isolated
+directory and database; do not sync, rebuild, or delete the user's database as an initial diagnostic. Consult the
+installed Org-roam documentation before choosing any recovery action.
 
 ## `void-function` errors
 

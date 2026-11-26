@@ -108,7 +108,7 @@ Not currently enabled: Doom's `mu4e`, `irc`, `rss`, `rest`, `web`, `treemacs`, `
 ## Key Features
 
 - **Company completion** with file path expansion — `company-files` added to programming, configuration, text,
-  Org, and Markdown mode backends
+  Org, and Markdown mode backends; Markdown inline-code and link delimiters are preserved when completing paths
 - **Split config layout** — `config.el` is a thin loader with universal defaults; per-feature config lives under
   `sections/*.el`, and all keybindings live in `sections/keys.el`
 - **Dirvish** — `SPC d d` launches `dirvish-dwim`

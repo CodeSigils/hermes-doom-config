@@ -77,6 +77,7 @@ Beyond Doom built-ins:
 | `user/initial-frame-size`    | Return saved or pixel-width-based frame size   | `sections/navigation.el` |
 | `user/load-frame-geometry`   | Read saved frame geometry from disk            | `sections/navigation.el` |
 | `user/save-frame-geometry`   | Save frame geometry to disk on Emacs exit      | `sections/navigation.el` |
+| `user/company-markdown-files` | Complete paths without consuming Markdown delimiters | `sections/completion.el` |
 
 ## Config Policies Summary
 
